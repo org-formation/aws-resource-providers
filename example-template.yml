@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  OlafOU:
+    Type: 'OC::ORG::OrganizationalUnit'
+    Properties:
+      OrganizationalUnitName: 'Olaf'
+  
+  ChildOU:
+    Type: 'OC::ORG::OrganizationalUnit'
+    Properties:
+      OrganizationalUnitName: 'Child'
+      ParentOU: !Ref OlafOU

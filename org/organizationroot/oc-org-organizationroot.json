@@ -1,0 +1,49 @@
+{
+    "typeName": "OC::ORG::OrganizationRoot",
+    "description": "OC ORG OrganizationRoot schema.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "properties": {
+        "Policies": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "DefaultOrganizationAccessRoleName": {
+            "type": "string"
+        },
+        "Arn": {
+            "type": "string"
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn",
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": []
+        },
+        "read": {
+            "permissions": []
+        },
+        "update": {
+            "permissions": []
+        },
+        "delete": {
+            "permissions": []
+        },
+        "list": {
+            "permissions": []
+        }
+    }
+}

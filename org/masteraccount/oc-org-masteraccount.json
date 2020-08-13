@@ -1,0 +1,72 @@
+{
+    "typeName": "OC::ORG::MasterAccount",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+        "Tags": {
+            "type": "object",
+            "additionalProperties": true
+        }
+    },
+    "properties": {
+        "AccountName": {
+            "type":"string"
+        },
+        "RootEmail": {
+            "type":"string"
+        },
+        "Alias": {
+            "type":"string"
+        },
+        "SupportLevel": {
+            "type": "string"
+        },
+        "OrganizationAccessRoleName": {
+            "type": "string"
+        },
+        "Policies": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "Arn": {
+            "type": "string"
+        },
+        "ResourceId": {
+            "type": "string"
+        },
+        "Tags": {
+            "$ref": "#/definitions/Tags"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "AccountName",
+        "AccountId"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn",
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": []
+        },
+        "read": {
+            "permissions": []
+        },
+        "update": {
+            "permissions": []
+        },
+        "delete": {
+            "permissions": []
+        },
+        "list": {
+            "permissions": []
+        }
+    }
+}
