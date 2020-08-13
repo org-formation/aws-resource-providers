@@ -25,6 +25,7 @@ Resources:
                 Action:
                 - "organizations:DeleteOrganizationalUnit"
                 - "organizations:ListRoots"
+                - "organizations:UpdateOrganizationalUnit"
                 - "organizations:createOrganizationalUnit"
                 Resource: "*"
 Outputs:

@@ -1,6 +1,6 @@
 # OC::ORG::OrganizationalUnit
 
-An example resource schema demonstrating some basic constructs and validation rules.
+An Organizational Unit used within an AWS Organization.
 
 ## Syntax
 

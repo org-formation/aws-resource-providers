@@ -1,6 +1,6 @@
 {
     "typeName": "OC::ORG::OrganizationalUnit",
-    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "description": "An Organizational Unit used within an AWS Organization.",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
     "definitions": {
     },
@@ -47,11 +47,13 @@
         },
         "update": {
             "permissions": [
-                "organizations:DeleteOrganizationalUnit"
+                "organizations:UpdateOrganizationalUnit"
             ]
         },
         "delete": {
-            "permissions": []
+            "permissions": [
+                "organizations:DeleteOrganizationalUnit"
+            ]
         },
         "list": {
             "permissions": []
