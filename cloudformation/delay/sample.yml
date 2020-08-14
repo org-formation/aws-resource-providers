@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Sample template for delay resource
+
+Parameters:
+  duration:
+    Type: String
+    Default: PT30S
+
+Resources:
+  Delay:
+    Type: OC::CloudFormation::Delay
+    Properties:
+      Duration: !Ref duration

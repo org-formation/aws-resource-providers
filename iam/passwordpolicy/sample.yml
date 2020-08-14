@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Sample template to change password policy in account
+
+Parameters:
+  minimumPasswordLength:
+    Type: Number
+    Default: 6
+    MinValue: 6
+    MaxValue: 128
+
+Resources:
+  PasswordPolicy:
+    Type: OC::Organizations::PasswordPolicy
+    Properties:
+      MinimumPasswordLength: !Sub '${minimumPasswordLength}'
+      RequireLowercaseCharacters: true
+      RequireNumbers: true
+      RequireSymbols: false
+      RequireUppercaseCharacters: false
+      AllowUsersToChangePassword: true
