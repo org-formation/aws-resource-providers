@@ -9,7 +9,9 @@ export class ResourceModel extends BaseModel {
     public static readonly TYPE_NAME: string = 'OC::ORG::OrganizationalUnit';
 
     @Exclude()
-    protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';
+    protected readonly IDENTIFIER_KEY_ARN: string = '/properties/Arn';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_ID: string = '/properties/Id';
 
     @Expose({ name: 'OrganizationalUnitName' })
     @Transform(
@@ -47,21 +49,21 @@ export class ResourceModel extends BaseModel {
         }
     )
     arn?: Optional<string>;
-    @Expose({ name: 'ResourceId' })
+    @Expose({ name: 'Id' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'resourceId', value, obj, []),
+            transformValue(String, 'id', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    resourceId?: Optional<string>;
+    id?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.resourceId != null) {
-            identifier[this.IDENTIFIER_KEY_RESOURCEID] = this.resourceId;
+        if (this.arn != null) {
+            identifier[this.IDENTIFIER_KEY_ARN] = this.arn;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
@@ -71,8 +73,22 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getAdditionalIdentifiers(): Array<Dict> {
         const identifiers: Array<Dict> = new Array<Dict>();
+        if (this.getIdentifier_Id() != null) {
+            identifiers.push(this.getIdentifier_Id());
+        }
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
+    }
+
+    @Exclude()
+    public getIdentifier_Id(): Dict {
+        const identifier: Dict = {};
+        if ((this as any).id != null) {
+            identifier[this.IDENTIFIER_KEY_ID] = (this as any).id;
+        }
+
+        // only return the identifier if it can be used, i.e. if all components are present
+        return Object.keys(identifier).length === 1 ? identifier : null;
     }
 }
 

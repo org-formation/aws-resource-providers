@@ -11,6 +11,7 @@ import {
     SessionProxy,
 } from 'cfn-rpdk';
 import { ResourceModel } from './models';
+import { Organizations } from 'aws-sdk';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
@@ -34,14 +35,18 @@ class Resource extends BaseResource<ResourceModel> {
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
     ): Promise<ProgressEvent> {
+        LOGGER.info('create');
         const model: ResourceModel = request.desiredResourceState;
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        // TODO: put code here
-
-        // Example:
         try {
+            LOGGER.info(request);
+            LOGGER.info(model);
+            
             if (session instanceof SessionProxy) {
-                const client = session.client('S3');
+                const client = session.client('Organizations') as Organizations;
+                
+                model.id = '123123123123'
+                model.arn = 'aws::arn::account::' + model.id;
             }
             // Setting Status to success will signal to CloudFormation that the operation is complete
             progress.status = OperationStatus.Success;
@@ -70,9 +75,16 @@ class Resource extends BaseResource<ResourceModel> {
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
     ): Promise<ProgressEvent> {
+        LOGGER.info('update');
+
         const model: ResourceModel = request.desiredResourceState;
+        const prevModel: ResourceModel = request.previousResourceState;
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        // TODO: put code here
+        
+        LOGGER.info(request);
+        LOGGER.info(model);
+        LOGGER.info(prevModel);
+        
         progress.status = OperationStatus.Success;
         return progress;
     }
@@ -93,9 +105,12 @@ class Resource extends BaseResource<ResourceModel> {
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
     ): Promise<ProgressEvent> {
+        LOGGER.info('delete');
         const model: ResourceModel = request.desiredResourceState;
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
-        // TODO: put code here
+
+        LOGGER.info(request);
+        LOGGER.info(model);
         progress.status = OperationStatus.Success;
         return progress;
     }

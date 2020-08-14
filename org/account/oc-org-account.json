@@ -3,10 +3,7 @@
     "description": "An example resource schema demonstrating some basic constructs and validation rules.",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
     "definitions": {
-        "Tags": {
-            "type": "object",
-            "additionalProperties": true
-        }
+        
     },
     "properties": {
         "AccountName": {
@@ -36,23 +33,19 @@
         "Arn": {
             "type": "string"
         },
-        "ResourceId": {
+        "Id": {
             "type": "string"
-        },
-        "Tags": {
-            "$ref": "#/definitions/Tags"
         }
     },
     "additionalProperties": false,
     "required": [
         "AccountName"
     ],
-    "readOnlyProperties": [
-        "/properties/Arn",
-        "/properties/ResourceId"
+    "additionalIdentifiers": [
+        ["/properties/Id"]
     ],
     "primaryIdentifier": [
-        "/properties/ResourceId"
+        "/properties/Arn"
     ],
     "handlers": {
         "create": {

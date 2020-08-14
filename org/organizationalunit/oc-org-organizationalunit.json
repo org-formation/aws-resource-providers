@@ -20,7 +20,7 @@
         "Arn": {
             "type": "string"
         },
-        "ResourceId": {
+        "Id": {
             "type": "string"
         }
     },
@@ -29,17 +29,19 @@
         "OrganizationalUnitName"
     ],
     "readOnlyProperties": [
-        "/properties/Arn",
-        "/properties/ResourceId"
+        "/properties/Id"
+    ],
+    "additionalIdentifiers": [
+        ["/properties/Id"]
     ],
     "primaryIdentifier": [
-        "/properties/ResourceId"
+        "/properties/Arn"
     ],
     "handlers": {
         "create": {
             "permissions": [
                 "organizations:ListRoots",
-                "organizations:createOrganizationalUnit"
+                "organizations:CreateOrganizationalUnit"
             ]
         },
         "read": {

@@ -2,13 +2,12 @@
     "typeName": "OC::ORG::ServiceControlPolicy",
     "description": "An example resource schema demonstrating some basic constructs and validation rules.",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-    "definitions": {
-    },
+    "definitions": {},
     "properties": {
         "Arn": {
             "type": "string"
         },
-        "ResourceId": {
+        "Id": {
             "type": "string"
         },
         "PolicyName": {
@@ -18,38 +17,37 @@
             "type": "string"
         },
         "PolicyDocument": {
-            "type": "string"
-        }        
+            "type": "object"
+        }
     },
     "additionalProperties": false,
     "required": [
         "PolicyDocument",
         "PolicyName"
     ],
-    "readOnlyProperties": [
-        "/properties/Arn",
-        "/properties/ResourceId"
+    "additionalIdentifiers": [
+        [
+            "/properties/Id"
+        ]
     ],
     "primaryIdentifier": [
-        "/properties/ResourceId"
+        "/properties/Arn"
     ],
     "handlers": {
-        "handlers": {
-            "create": {
-                "permissions": []
-            },
-            "read": {
-                "permissions": []
-            },
-            "update": {
-                "permissions": []
-            },
-            "delete": {
-                "permissions": []
-            },
-            "list": {
-                "permissions": []
-            }
+        "create": {
+            "permissions": []
+        },
+        "read": {
+            "permissions": []
+        },
+        "update": {
+            "permissions": []
+        },
+        "delete": {
+            "permissions": []
+        },
+        "list": {
+            "permissions": []
         }
     }
 }

@@ -9,7 +9,7 @@
     "scripts": {
         "build": "npx tsc",
         "prepack": "npm run build",
-        "submit": "cfn generate && npm run build && cfn submit --region us-east-1",
+        "submit": "cfn generate && npm run build && cfn submit -vv --region us-east-1 --set-default",
         "package": "cfn submit --dry-run -vv",
         "test": "echo \"Error: no test specified\" && exit 1"
     },

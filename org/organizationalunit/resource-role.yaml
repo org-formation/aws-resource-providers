@@ -23,10 +23,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "organizations:CreateOrganizationalUnit"
                 - "organizations:DeleteOrganizationalUnit"
                 - "organizations:ListRoots"
                 - "organizations:UpdateOrganizationalUnit"
-                - "organizations:createOrganizationalUnit"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

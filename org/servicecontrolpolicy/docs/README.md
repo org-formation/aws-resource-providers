@@ -12,14 +12,11 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "OC::ORG::ServiceControlPolicy",
     "Properties" : {
-        "<a href="#title" title="Title">Title</a>" : <i>String</i>,
-        "<a href="#coversheetincluded" title="CoverSheetIncluded">CoverSheetIncluded</a>" : <i>Boolean</i>,
-        "<a href="#duedate" title="DueDate">DueDate</a>" : <i>String</i>,
-        "<a href="#approvaldate" title="ApprovalDate">ApprovalDate</a>" : <i>String</i>,
-        "<a href="#memo" title="Memo">Memo</a>" : <i><a href="memo.md">Memo</a></i>,
-        "<a href="#secondcopyofmemo" title="SecondCopyOfMemo">SecondCopyOfMemo</a>" : <i><a href="memo.md">Memo</a></i>,
-        "<a href="#testcode" title="TestCode">TestCode</a>" : <i>String</i>,
-        "<a href="#authors" title="Authors">Authors</a>" : <i>[ String, ... ]</i>
+        "<a href="#arn" title="Arn">Arn</a>" : <i>String</i>,
+        "<a href="#id" title="Id">Id</a>" : <i>String</i>,
+        "<a href="#policyname" title="PolicyName">PolicyName</a>" : <i>String</i>,
+        "<a href="#description" title="Description">Description</a>" : <i>String</i>,
+        "<a href="#policydocument" title="PolicyDocument">PolicyDocument</a>" : <i>String</i>
     }
 }
 </pre>
@@ -29,44 +26,40 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: OC::ORG::ServiceControlPolicy
 Properties:
-    <a href="#title" title="Title">Title</a>: <i>String</i>
-    <a href="#coversheetincluded" title="CoverSheetIncluded">CoverSheetIncluded</a>: <i>Boolean</i>
-    <a href="#duedate" title="DueDate">DueDate</a>: <i>String</i>
-    <a href="#approvaldate" title="ApprovalDate">ApprovalDate</a>: <i>String</i>
-    <a href="#memo" title="Memo">Memo</a>: <i><a href="memo.md">Memo</a></i>
-    <a href="#secondcopyofmemo" title="SecondCopyOfMemo">SecondCopyOfMemo</a>: <i><a href="memo.md">Memo</a></i>
-    <a href="#testcode" title="TestCode">TestCode</a>: <i>String</i>
-    <a href="#authors" title="Authors">Authors</a>: <i>
-      - String</i>
+    <a href="#arn" title="Arn">Arn</a>: <i>String</i>
+    <a href="#id" title="Id">Id</a>: <i>String</i>
+    <a href="#policyname" title="PolicyName">PolicyName</a>: <i>String</i>
+    <a href="#description" title="Description">Description</a>: <i>String</i>
+    <a href="#policydocument" title="PolicyDocument">PolicyDocument</a>: <i>String</i>
 </pre>
 
 ## Properties
 
-#### Title
+#### Arn
 
-The title of the TPS report is a mandatory element.
+_Required_: No
+
+_Type_: String
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Id
+
+_Required_: No
+
+_Type_: String
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### PolicyName
 
 _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>20</code>
-
-_Maximum_: <code>250</code>
-
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### CoverSheetIncluded
-
-Required for all TPS Reports submitted after 2/19/1999
-
-_Required_: No
-
-_Type_: Boolean
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### DueDate
+#### Description
 
 _Required_: No
 
@@ -74,45 +67,11 @@ _Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### ApprovalDate
-
-_Required_: No
-
-_Type_: String
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### Memo
-
-_Required_: No
-
-_Type_: <a href="memo.md">Memo</a>
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### SecondCopyOfMemo
-
-_Required_: No
-
-_Type_: <a href="memo.md">Memo</a>
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### TestCode
+#### PolicyDocument
 
 _Required_: Yes
 
 _Type_: String
-
-_Allowed Values_: <code>NOT_STARTED</code> | <code>CANCELLED</code>
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### Authors
-
-_Required_: No
-
-_Type_: List of String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -120,15 +79,4 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 ### Ref
 
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the TPSCode.
-
-### Fn::GetAtt
-
-The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of this type. The following are the available attributes and sample return values.
-
-For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
-
-#### TPSCode
-
-A TPS Code is automatically generated on creation and assigned as the unique identifier.
-
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Arn.

@@ -18,13 +18,21 @@ const LOGGER = console;
 interface CallbackContext extends Record<string, any> {}
 
 
+const convertArnToId = (arn: string) => {
+    const allParts = arn.split('/');
+    return allParts[allParts.length -1];
+}
+
 const parentIdOrRootId = async (client: Organizations, parentId?: string): Promise<string> => {
 
     if (typeof parentId !== 'string' || parentId === '') {
         const roots = await client.listRoots().promise();
         return roots.Roots[0].Id;
     }
-
+    if (typeof parentId === 'string' && parentId.includes('/')) {
+        const allParts = parentId.split('/');
+        return allParts[allParts.length -1];
+    }
     return parentId;
 }
 
@@ -43,23 +51,37 @@ class Resource extends BaseResource<ResourceModel> {
     public async create(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: any,
     ): Promise<ProgressEvent> {
+        LOGGER.info('create');
+        LOGGER.info(callbackContext);
+
         const model: ResourceModel = request.desiredResourceState;
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+
+        if (callbackContext && callbackContext.CallbackToken === undefined) {
+            progress.callbackDelaySeconds = 1;
+            progress.callbackContext = { CallbackToken: 'second time' };
+            model.arn = 'temp id' + request.clientRequestToken + 'booha';
+            return progress;
+        }
+
+
         try {
+            LOGGER.info(request);
+            LOGGER.info(model);
             if (session instanceof SessionProxy) {
                 const client = session.client('Organizations') as Organizations;
                 const parentId = await parentIdOrRootId(client, model.parentOU);
-
+                
                 const createRequest: Organizations.Types.CreateOrganizationalUnitRequest = {
                     Name: model.organizationalUnitName,
                     ParentId: parentId
                 };
-
+                LOGGER.info(createRequest)
                 const result = await client.createOrganizationalUnit(createRequest).promise();
-                
-                model.resourceId = result.OrganizationalUnit.Id; //would this work?
+                LOGGER.info(result);
+                model.id = result.OrganizationalUnit.Id; //would this work?
                 model.arn = result.OrganizationalUnit.Arn; //would this work?
             }
             progress.status = OperationStatus.Success;
@@ -88,15 +110,21 @@ class Resource extends BaseResource<ResourceModel> {
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
     ): Promise<ProgressEvent> {
+        LOGGER.info('update');
+
         const model: ResourceModel = request.desiredResourceState;
         const prevModel: ResourceModel = request.previousResourceState;
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
         
+        LOGGER.info(request);
+        LOGGER.info(model);
+        LOGGER.info(prevModel);
+        
         if (model.parentOU !== prevModel.parentOU) {
             progress.status = OperationStatus.Failed;
             progress.message = `cannot change parentOU on resource of type ${model.getTypeName()}`;
+            return progress;
         }
-
 
         progress.status = OperationStatus.Success;
         return progress;
@@ -118,17 +146,21 @@ class Resource extends BaseResource<ResourceModel> {
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
     ): Promise<ProgressEvent> {
-        const model: ResourceModel = request.previousResourceState;
+        LOGGER.info('delete');
+        const model: ResourceModel = request.desiredResourceState;
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        LOGGER.info(request);
+        LOGGER.info(model);
         try {
             if (session instanceof SessionProxy) {
                 const client = session.client('Organizations') as Organizations;
 
                 const deleteRequest: Organizations.Types.DeleteOrganizationalUnitRequest = {
-                    OrganizationalUnitId: model.resourceId!
+                    OrganizationalUnitId: convertArnToId(model.arn) //would have been better if this is done using Id
                 };
-
+                LOGGER.info(deleteRequest);
                 const result = await client.deleteOrganizationalUnit(deleteRequest).promise();
+                LOGGER.info(result);
             }
             progress.status = OperationStatus.Success;
         } catch(err) {
@@ -187,7 +219,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 }
 
-const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
+export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
 

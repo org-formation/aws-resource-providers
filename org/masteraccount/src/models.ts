@@ -9,83 +9,88 @@ export class ResourceModel extends BaseModel {
     public static readonly TYPE_NAME: string = 'OC::ORG::MasterAccount';
 
     @Exclude()
-    protected readonly IDENTIFIER_KEY_TPSCODE: string = '/properties/TPSCode';
+    protected readonly IDENTIFIER_KEY_ARN: string = '/properties/Arn';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_ID: string = '/properties/Id';
 
-    @Expose({ name: 'TPSCode' })
+    @Expose({ name: 'AccountName' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'tPSCode', value, obj, []),
+            transformValue(String, 'accountName', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    tPSCode?: Optional<string>;
-    @Expose({ name: 'Title' })
+    accountName?: Optional<string>;
+    @Expose({ name: 'RootEmail' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'title', value, obj, []),
+            transformValue(String, 'rootEmail', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    title?: Optional<string>;
-    @Expose({ name: 'CoverSheetIncluded' })
+    rootEmail?: Optional<string>;
+    @Expose({ name: 'Alias' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(Boolean, 'coverSheetIncluded', value, obj, []),
+            transformValue(String, 'alias', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    coverSheetIncluded?: Optional<boolean>;
-    @Expose({ name: 'DueDate' })
+    alias?: Optional<string>;
+    @Expose({ name: 'SupportLevel' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'dueDate', value, obj, []),
+            transformValue(String, 'supportLevel', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    dueDate?: Optional<string>;
-    @Expose({ name: 'ApprovalDate' })
+    supportLevel?: Optional<string>;
+    @Expose({ name: 'OrganizationAccessRoleName' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'approvalDate', value, obj, []),
+            transformValue(String, 'organizationAccessRoleName', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    approvalDate?: Optional<string>;
-    @Expose({ name: 'Memo' })
-    @Type(() => Memo)
-    memo?: Optional<Memo>;
-    @Expose({ name: 'SecondCopyOfMemo' })
-    @Type(() => Memo)
-    secondCopyOfMemo?: Optional<Memo>;
-    @Expose({ name: 'TestCode' })
+    organizationAccessRoleName?: Optional<string>;
+    @Expose({ name: 'Policies' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'testCode', value, obj, []),
+            transformValue(String, 'policies', value, obj, [Array]),
         {
             toClassOnly: true,
         }
     )
-    testCode?: Optional<string>;
-    @Expose({ name: 'Authors' })
+    policies?: Optional<Array<string>>;
+    @Expose({ name: 'Arn' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'authors', value, obj, [Array]),
+            transformValue(String, 'arn', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    authors?: Optional<Array<string>>;
+    arn?: Optional<string>;
+    @Expose({ name: 'Id' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'id', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    id?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.tPSCode != null) {
-            identifier[this.IDENTIFIER_KEY_TPSCODE] = this.tPSCode;
+        if (this.arn != null) {
+            identifier[this.IDENTIFIER_KEY_ARN] = this.arn;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
@@ -95,33 +100,22 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getAdditionalIdentifiers(): Array<Dict> {
         const identifiers: Array<Dict> = new Array<Dict>();
+        if (this.getIdentifier_Id() != null) {
+            identifiers.push(this.getIdentifier_Id());
+        }
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
     }
-}
 
-export class Memo extends BaseModel {
-    ['constructor']: typeof Memo;
-
-
-    @Expose({ name: 'Heading' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'heading', value, obj, []),
-        {
-            toClassOnly: true,
+    @Exclude()
+    public getIdentifier_Id(): Dict {
+        const identifier: Dict = {};
+        if ((this as any).id != null) {
+            identifier[this.IDENTIFIER_KEY_ID] = (this as any).id;
         }
-    )
-    heading?: Optional<string>;
-    @Expose({ name: 'Body' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'body', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    body?: Optional<string>;
 
+        // only return the identifier if it can be used, i.e. if all components are present
+        return Object.keys(identifier).length === 1 ? identifier : null;
+    }
 }
 
