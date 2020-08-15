@@ -39,7 +39,7 @@ class Resource extends BaseResource<ResourceModel> {
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
         LOGGER.info({handler: 'create', request, callbackContext, env: process.env});
-        model.accountId = 'region-defaults'; // there can only be one
+        model.resourceId = 'region-defaults'; // there can only be one
 
         try {
             if (session instanceof SessionProxy) {

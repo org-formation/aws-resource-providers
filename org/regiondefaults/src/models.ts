@@ -9,17 +9,17 @@ export class ResourceModel extends BaseModel {
     public static readonly TYPE_NAME: string = 'OC::ORG::RegionDefaults';
 
     @Exclude()
-    protected readonly IDENTIFIER_KEY_ACCOUNTID: string = '/properties/AccountId';
+    protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';
 
-    @Expose({ name: 'AccountId' })
+    @Expose({ name: 'ResourceId' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'accountId', value, obj, []),
+            transformValue(String, 'resourceId', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    accountId?: Optional<string>;
+    resourceId?: Optional<string>;
     @Expose({ name: 'EnableEbsEncryptionByDefault' })
     @Transform(
         (value: any, obj: any) =>
@@ -42,8 +42,8 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.accountId != null) {
-            identifier[this.IDENTIFIER_KEY_ACCOUNTID] = this.accountId;
+        if (this.resourceId != null) {
+            identifier[this.IDENTIFIER_KEY_RESOURCEID] = this.resourceId;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present

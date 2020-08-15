@@ -6,7 +6,7 @@
 
     },
     "properties": {
-        "AccountId": {
+        "ResourceId": {
             "type":"string"
         },
         "EnableEbsEncryptionByDefault": {
@@ -20,10 +20,10 @@
     "required": [
     ],
     "readOnlyProperties": [
-        "/properties/AccountId"
+        "/properties/ResourceId"
     ],
     "primaryIdentifier": [
-        "/properties/AccountId"
+        "/properties/ResourceId"
     ],
     "handlers": {
         "create": {
