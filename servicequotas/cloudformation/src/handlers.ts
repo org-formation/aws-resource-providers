@@ -28,7 +28,7 @@ const quotaCodeForPropertyName: Record<string, string> = {
 const UpsertCloudFormationQuotas = async (service: ServiceQuotas, previous: ResourceModel, desired: ResourceModel) => {
     for (const [key, val] of Object.entries(desired)) {
         const prevVal = (previous as any)[key];
-        LOGGER.info({ key, val, prevVal, valType : (typeof val) });
+        LOGGER.info({ key, val, prevVal, valType: (typeof val) });
 
         const quotaCode = quotaCodeForPropertyName[key];
         if (!quotaCode) continue;
@@ -37,35 +37,41 @@ const UpsertCloudFormationQuotas = async (service: ServiceQuotas, previous: Reso
                 throw new Error(`Decrease of limit failed because desired value ${val} is lower than previous value ${prevVal}`);
             }
 
-            const quota = {QuotaCode: quotaCode, ServiceCode: 'cloudformation'};
+            const quota = { QuotaCode: quotaCode, ServiceCode: 'cloudformation' };
 
-            const history = await service.listRequestedServiceQuotaChangeHistoryByQuota(quota).promise();
-            LOGGER.info({method: 'get history', history});
-            if (history.RequestedQuotas && history.RequestedQuotas.length > 0) {
-                const lastRequest = history.RequestedQuotas.find(x=>x.Status === 'CASE_OPENED' || x.Status === 'PENDING');
-                if (lastRequest && lastRequest.DesiredValue > val) {
-                    throw new Error(`Decrease of limit failed because desired value ${val} is lower than last requested value ${lastRequest.DesiredValue}`);
-                } else if (lastRequest && lastRequest.DesiredValue == val) {
-                    LOGGER.info(`skipping update because desired value ${val} is equal to last requested value ${lastRequest.DesiredValue}`);
+            try {
+                const history = await service.listRequestedServiceQuotaChangeHistoryByQuota(quota).promise();
+                LOGGER.info({ method: 'get history', history });
+                if (history.RequestedQuotas && history.RequestedQuotas.length > 0) {
+                    const lastRequest = history.RequestedQuotas.find(x => x.Status === 'CASE_OPENED' || x.Status === 'PENDING');
+                    if (lastRequest && lastRequest.DesiredValue > val) {
+                        throw new Error(`Decrease of limit failed because desired value ${val} is lower than last requested value ${lastRequest.DesiredValue}`);
+                    } else if (lastRequest && lastRequest.DesiredValue == val) {
+                        LOGGER.info(`skipping update because desired value ${val} is equal to last requested value ${lastRequest.DesiredValue}`);
+                    }
+                }
+            } catch (err) {
+                if (err.code !== 'NoSuchResourceException') {
+                    throw err;
                 }
             }
 
             const quotaResponse = await service.getServiceQuota(quota).promise();
-            LOGGER.info({method: 'get quota', quotaResponse});
+            LOGGER.info({ method: 'get quota', quotaResponse });
             if (quotaResponse.Quota && quotaResponse.Quota.Value > val) {
                 throw new Error(`Decrease of limit failed because desired value ${val} is lower than current quota value ${quotaResponse.Quota.Value}`);
             } else if (quotaResponse.Quota && quotaResponse.Quota.Value == val) {
                 LOGGER.info(`skipping update because desired value ${val} is equal to current quota value ${quotaResponse.Quota.Value}`);
             }
-            
+
             const valAsNumber = 0 + (new Number(val) as any);
-            const increaseRequest: RequestServiceQuotaIncreaseRequest = { ...quota, DesiredValue: valAsNumber};
+            const increaseRequest: RequestServiceQuotaIncreaseRequest = { ...quota, DesiredValue: valAsNumber };
             LOGGER.info({ method: 'requesting service quota increase', request: increaseRequest });
             try {
                 const response = await service.requestServiceQuotaIncrease(increaseRequest).promise();
                 LOGGER.info(response);
             } catch (err) {
-                LOGGER.error(err);
+                throw err;
             }
         }
     }
