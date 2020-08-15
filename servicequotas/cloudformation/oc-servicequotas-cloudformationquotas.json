@@ -1,0 +1,82 @@
+{
+    "typeName": "OC::ServiceQuotas::CloudFormationQuotas",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+       
+    },
+    "properties": {
+        "Stacks": {
+            "description":"Maximum number of AWS CloudFormation stacks that you can create (default = 200).",
+            "type": "integer",
+            "default": 200,
+            "minimum": 200
+        },
+        "ResourceTypes": {
+            "description":"Maximum number of resource types you are allowed to register (default = 50).",
+            "type": "integer",
+            "default": 50,
+            "minimum": 50
+        },
+        "VersionsPerResourceType": {
+            "description":"Maximum number of versions per resource type you are allowed to register (default = 50).",
+            "type": "integer",
+            "default": 50,
+            "minimum": 50
+        },
+        "StackSetsPerAdministratorAccount": {
+            "description":"Maximum number of AWS CloudFormation stack sets you can create in your administrator account (default = 100).",
+            "type": "integer",
+            "default": 100,
+            "minimum": 100
+        },
+        "StackInstancesPerStackSet": {
+            "description":"Maximum number of stack instances you can create per stack set (default = 2000).",
+            "type": "integer",
+            "default": 2000,
+            "minimum": 2000
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits"
+            ]
+        },
+        "delete": {
+            "permissions": [
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
