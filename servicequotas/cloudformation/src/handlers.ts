@@ -16,8 +16,17 @@ import { RequestServiceQuotaIncreaseRequest, GetServiceQuotaRequest } from 'aws-
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
+type QuotaID = {QuotaCode: string, ServiceCode: string};
 
-const quotaCodeForPropertyName: Record<string, string> = {
+const quotaCodeForPropertyName: Record<string, QuotaID> = {
+    stacks: {QuotaCode: 'L-0485CB21', ServiceCode: 'cloudformation'},
+    resourceTypes: {QuotaCode: 'L-9DE8E4FB',ServiceCode: 'cloudformation'},
+    versionsPerResourceType: {QuotaCode: 'L-EA1018E8',ServiceCode: 'cloudformation'},
+    stackSetsPerAdministratorAccount: {QuotaCode: 'L-EC62D81A',ServiceCode: 'cloudformation'},
+    stackInstancesPerStackSet: {QuotaCode: 'L-C8225BA5',ServiceCode: 'cloudformation'},
+}
+
+const serviceCodeForPropertyName: Record<string, string> = {
     stacks: 'L-0485CB21',
     resourceTypes: 'L-9DE8E4FB',
     versionsPerResourceType: 'L-EA1018E8',
@@ -30,29 +39,21 @@ const UpsertCloudFormationQuotas = async (service: ServiceQuotas, previous: Reso
         const prevVal = (previous as any)[key];
         LOGGER.info({ key, val, prevVal, valType: (typeof val) });
 
-        const quotaCode = quotaCodeForPropertyName[key];
-        if (!quotaCode) continue;
+        const quota = quotaCodeForPropertyName[key];
+        if (!quota) continue;
         if (prevVal !== val) {
             if (prevVal && prevVal > val) {
                 throw new Error(`Decrease of limit failed because desired value ${val} is lower than previous value ${prevVal}`);
             }
 
-            const quota = { QuotaCode: quotaCode, ServiceCode: 'cloudformation' };
-
-            try {
-                const history = await service.listRequestedServiceQuotaChangeHistoryByQuota(quota).promise();
-                LOGGER.info({ method: 'get history', history });
-                if (history.RequestedQuotas && history.RequestedQuotas.length > 0) {
-                    const lastRequest = history.RequestedQuotas.find(x => x.Status === 'CASE_OPENED' || x.Status === 'PENDING');
-                    if (lastRequest && lastRequest.DesiredValue > val) {
-                        throw new Error(`Decrease of limit failed because desired value ${val} is lower than last requested value ${lastRequest.DesiredValue}`);
-                    } else if (lastRequest && lastRequest.DesiredValue == val) {
-                        LOGGER.info(`skipping update because desired value ${val} is equal to last requested value ${lastRequest.DesiredValue}`);
-                    }
-                }
-            } catch (err) {
-                if (err.code !== 'NoSuchResourceException') {
-                    throw err;
+            const history = await service.listRequestedServiceQuotaChangeHistoryByQuota(quota).promise();
+            LOGGER.info({ method: 'get history', history });
+            if (history.RequestedQuotas && history.RequestedQuotas.length > 0) {
+                const lastRequest = history.RequestedQuotas.find(x => x.Status === 'CASE_OPENED' || x.Status === 'PENDING');
+                if (lastRequest && lastRequest.DesiredValue > val) {
+                    throw new Error(`Decrease of limit failed because desired value ${val} is lower than last requested value ${lastRequest.DesiredValue}`);
+                } else if (lastRequest && lastRequest.DesiredValue == val) {
+                    LOGGER.info(`skipping update because desired value ${val} is equal to last requested value ${lastRequest.DesiredValue}`);
                 }
             }
 

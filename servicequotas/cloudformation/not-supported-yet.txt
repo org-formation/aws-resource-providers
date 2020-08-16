@@ -1,0 +1,24 @@
+"ResourceTypes": {
+    "description":"Maximum number of resource types you are allowed to register (default = 50).",
+    "type": "integer",
+    "default": 50,
+    "minimum": 50
+},
+"VersionsPerResourceType": {
+    "description":"Maximum number of versions per resource type you are allowed to register (default = 50).",
+    "type": "integer",
+    "default": 50,
+    "minimum": 50
+},
+"StackSetsPerAdministratorAccount": {
+    "description":"Maximum number of AWS CloudFormation stack sets you can create in your administrator account (default = 100).",
+    "type": "integer",
+    "default": 100,
+    "minimum": 100
+},
+"StackInstancesPerStackSet": {
+    "description":"Maximum number of stack instances you can create per stack set (default = 2000).",
+    "type": "integer",
+    "default": 2000,
+    "minimum": 2000
+},

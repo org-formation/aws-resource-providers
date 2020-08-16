@@ -13,10 +13,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "OC::ServiceQuotas::CloudFormationQuotas",
     "Properties" : {
         "<a href="#stacks" title="Stacks">Stacks</a>" : <i>Integer</i>,
-        "<a href="#resourcetypes" title="ResourceTypes">ResourceTypes</a>" : <i>Integer</i>,
-        "<a href="#versionsperresourcetype" title="VersionsPerResourceType">VersionsPerResourceType</a>" : <i>Integer</i>,
-        "<a href="#stacksetsperadministratoraccount" title="StackSetsPerAdministratorAccount">StackSetsPerAdministratorAccount</a>" : <i>Integer</i>,
-        "<a href="#stackinstancesperstackset" title="StackInstancesPerStackSet">StackInstancesPerStackSet</a>" : <i>Integer</i>,
     }
 }
 </pre>
@@ -27,10 +23,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: OC::ServiceQuotas::CloudFormationQuotas
 Properties:
     <a href="#stacks" title="Stacks">Stacks</a>: <i>Integer</i>
-    <a href="#resourcetypes" title="ResourceTypes">ResourceTypes</a>: <i>Integer</i>
-    <a href="#versionsperresourcetype" title="VersionsPerResourceType">VersionsPerResourceType</a>: <i>Integer</i>
-    <a href="#stacksetsperadministratoraccount" title="StackSetsPerAdministratorAccount">StackSetsPerAdministratorAccount</a>: <i>Integer</i>
-    <a href="#stackinstancesperstackset" title="StackInstancesPerStackSet">StackInstancesPerStackSet</a>: <i>Integer</i>
 </pre>
 
 ## Properties
@@ -38,46 +30,6 @@ Properties:
 #### Stacks
 
 Maximum number of AWS CloudFormation stacks that you can create (default = 200).
-
-_Required_: No
-
-_Type_: Integer
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### ResourceTypes
-
-Maximum number of resource types you are allowed to register (default = 50).
-
-_Required_: No
-
-_Type_: Integer
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### VersionsPerResourceType
-
-Maximum number of versions per resource type you are allowed to register (default = 50).
-
-_Required_: No
-
-_Type_: Integer
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### StackSetsPerAdministratorAccount
-
-Maximum number of AWS CloudFormation stack sets you can create in your administrator account (default = 100).
-
-_Required_: No
-
-_Type_: Integer
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### StackInstancesPerStackSet
-
-Maximum number of stack instances you can create per stack set (default = 2000).
 
 _Required_: No
 

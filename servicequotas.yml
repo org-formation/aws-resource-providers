@@ -4,5 +4,3 @@ Resources:
     Type: 'OC::ServiceQuotas::CloudFormationQuotas'
     Properties:
       Stacks: 200
-      ResourceTypes: 100
-      VersionsPerResourceType: 100
