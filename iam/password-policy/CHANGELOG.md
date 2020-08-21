@@ -17,8 +17,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Improvement for casting types properly based on resource provider schema
 - Handlers for CRUDL methods using AWS SDK
-
-
-[Unreleased]: https://github.com/eduardomourar/aws-resource-provider-passwordpolicy/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/eduardomourar/aws-resource-provider-passwordpolicy/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/eduardomourar/aws-resource-provider-passwordpolicy/releases/tag/v0.1.0

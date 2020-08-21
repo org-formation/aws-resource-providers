@@ -1,6 +1,6 @@
-# OC::CloudFormation::Delay
+# Community::CloudFormation::Delay
 
-Resource schema for OC::CloudFormation::Delay.
+Resource schema for Community::CloudFormation::Delay.
 
 ## Syntax
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::CloudFormation::Delay",
+    "Type" : "Community::CloudFormation::Delay",
     "Properties" : {
         "<a href="#duration" title="Duration">Duration</a>" : <i>String</i>
     }
@@ -20,7 +20,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::CloudFormation::Delay
+Type: Community::CloudFormation::Delay
 Properties:
     <a href="#duration" title="Duration">Duration</a>: <i>String</i>
 </pre>

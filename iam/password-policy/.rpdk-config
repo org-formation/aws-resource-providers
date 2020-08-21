@@ -1,5 +1,5 @@
 {
-    "typeName": "Community::Organizationsanizations::PasswordPolicy",
+    "typeName": "Community::IAM::PasswordPolicy",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

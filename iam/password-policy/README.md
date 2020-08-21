@@ -1,10 +1,10 @@
-# Community::Organizationsanizations::PasswordPolicy
+# Community::IAM::PasswordPolicy
 
-This CloudFormation Resource Provider sets an IAM Password Policy for a target AWS account. Note that IAM password policies are global, and this will be applied to all regions no matter where the CloudFormation stack is deployed to.
+This CloudFormation Resource Provider sets an [IAM Password Policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html) for a target AWS account. Note that IAM password policies are global, and this will be applied to all regions no matter where the CloudFormation stack is deployed to.
 
 ## Resource and Property Reference
 
-Check the [Resource and Property Types Reference documentation](./docs/README.md) that was generated from the JSON schema describing the resource called [Resource Provider Schema](./oc-organizations-passwordpolicy.json).
+Check the [Resource and Property Types Reference documentation](./docs/README.md) that was generated from the JSON schema describing the resource called [Resource Provider Schema](./community-iam-passwordpolicy.json).
 
 ## Usage
 

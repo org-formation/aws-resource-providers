@@ -10,7 +10,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2020-08-10
 ### Added
 - Handlers for CRUDL methods leveraging CloudFormation support protocol version v2.0
-
-
-[Unreleased]: https://github.com/eduardomourar/aws-resource-provider-passwordpolicy/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/eduardomourar/aws-resource-provider-passwordpolicy/releases/tag/v0.1.0

@@ -10,7 +10,7 @@ Parameters:
 
 Resources:
   PasswordPolicy:
-    Type: Community::Organizationsanizations::PasswordPolicy
+    Type: Community::IAM::PasswordPolicy
     Properties:
       MinimumPasswordLength: !Sub '${minimumPasswordLength}'
       RequireLowercaseCharacters: true
