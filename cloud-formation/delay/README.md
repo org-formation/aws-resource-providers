@@ -1,10 +1,10 @@
-# AWS::CloudFormation::Delay
+# Community::CloudFormation::Delay
 
 This CloudFormation Resource Provider is very similar to [AWS::CloudFormation::WaitCondition](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-waitcondition.html), except that we don't need to wait for an external process, only for a period of time (more context [here](https://github.com/aws-cloudformation/aws-cloudformation-coverage-roadmap/issues/589)).
 
 ## Resource and Property Reference
 
-Check the [Resource and Property Types Reference documentation](./docs/README.md) that was generated from the JSON schema describing the resource called [Resource Provider Schema](./oc-cloudformation-delay.json).
+Check the [Resource and Property Types Reference documentation](./docs/README.md) that was generated from the JSON schema describing the resource called [Resource Provider Schema](./community-cloudformation-delay.json).
 
 ## Usage
 

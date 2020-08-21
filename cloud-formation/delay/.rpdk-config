@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::CloudFormation::Delay",
+    "typeName": "Community::CloudFormation::Delay",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

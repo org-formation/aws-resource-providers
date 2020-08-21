@@ -1,6 +1,6 @@
-# OC::Organizations::PasswordPolicy
+# Community::IAM::PasswordPolicy
 
-Resource schema for OC::Organizations::PasswordPolicy.
+Resource schema for Community::IAM::PasswordPolicy.
 
 ## Syntax
 
@@ -10,16 +10,16 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::Organizations::PasswordPolicy",
+    "Type" : "Community::IAM::PasswordPolicy",
     "Properties" : {
-        "<a href="#minimumpasswordlength" title="MinimumPasswordLength">MinimumPasswordLength</a>" : <i>Double</i>,
+        "<a href="#minimumpasswordlength" title="MinimumPasswordLength">MinimumPasswordLength</a>" : <i>Integer</i>,
         "<a href="#requiresymbols" title="RequireSymbols">RequireSymbols</a>" : <i>Boolean</i>,
         "<a href="#requirenumbers" title="RequireNumbers">RequireNumbers</a>" : <i>Boolean</i>,
         "<a href="#requireuppercasecharacters" title="RequireUppercaseCharacters">RequireUppercaseCharacters</a>" : <i>Boolean</i>,
         "<a href="#requirelowercasecharacters" title="RequireLowercaseCharacters">RequireLowercaseCharacters</a>" : <i>Boolean</i>,
         "<a href="#allowuserstochangepassword" title="AllowUsersToChangePassword">AllowUsersToChangePassword</a>" : <i>Boolean</i>,
-        "<a href="#maxpasswordage" title="MaxPasswordAge">MaxPasswordAge</a>" : <i>Double</i>,
-        "<a href="#passwordreuseprevention" title="PasswordReusePrevention">PasswordReusePrevention</a>" : <i>Double</i>,
+        "<a href="#maxpasswordage" title="MaxPasswordAge">MaxPasswordAge</a>" : <i>Integer</i>,
+        "<a href="#passwordreuseprevention" title="PasswordReusePrevention">PasswordReusePrevention</a>" : <i>Integer</i>,
         "<a href="#hardexpiry" title="HardExpiry">HardExpiry</a>" : <i>Boolean</i>
     }
 }
@@ -28,16 +28,16 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::Organizations::PasswordPolicy
+Type: Community::IAM::PasswordPolicy
 Properties:
-    <a href="#minimumpasswordlength" title="MinimumPasswordLength">MinimumPasswordLength</a>: <i>Double</i>
+    <a href="#minimumpasswordlength" title="MinimumPasswordLength">MinimumPasswordLength</a>: <i>Integer</i>
     <a href="#requiresymbols" title="RequireSymbols">RequireSymbols</a>: <i>Boolean</i>
     <a href="#requirenumbers" title="RequireNumbers">RequireNumbers</a>: <i>Boolean</i>
     <a href="#requireuppercasecharacters" title="RequireUppercaseCharacters">RequireUppercaseCharacters</a>: <i>Boolean</i>
     <a href="#requirelowercasecharacters" title="RequireLowercaseCharacters">RequireLowercaseCharacters</a>: <i>Boolean</i>
     <a href="#allowuserstochangepassword" title="AllowUsersToChangePassword">AllowUsersToChangePassword</a>: <i>Boolean</i>
-    <a href="#maxpasswordage" title="MaxPasswordAge">MaxPasswordAge</a>: <i>Double</i>
-    <a href="#passwordreuseprevention" title="PasswordReusePrevention">PasswordReusePrevention</a>: <i>Double</i>
+    <a href="#maxpasswordage" title="MaxPasswordAge">MaxPasswordAge</a>: <i>Integer</i>
+    <a href="#passwordreuseprevention" title="PasswordReusePrevention">PasswordReusePrevention</a>: <i>Integer</i>
     <a href="#hardexpiry" title="HardExpiry">HardExpiry</a>: <i>Boolean</i>
 </pre>
 
@@ -49,7 +49,7 @@ The minimum number of characters allowed in an IAM user password. If you do not 
 
 _Required_: No
 
-_Type_: Double
+_Type_: Integer
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -109,7 +109,7 @@ The number of days that an IAM user password is valid. If you do not specify a v
 
 _Required_: No
 
-_Type_: Double
+_Type_: Integer
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -119,7 +119,7 @@ Specifies the number of previous passwords that IAM users are prevented from reu
 
 _Required_: No
 
-_Type_: Double
+_Type_: Integer
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

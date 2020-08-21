@@ -8,6 +8,6 @@ Parameters:
 
 Resources:
   Delay:
-    Type: OC::CloudFormation::Delay
+    Type: Community::CloudFormation::Delay
     Properties:
       Duration: !Ref duration
