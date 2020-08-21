@@ -26,7 +26,7 @@ const quotaCodeForPropertyName: Record<string, QuotaID> = {
     stackInstancesPerStackSet: {QuotaCode: 'L-C8225BA5',ServiceCode: 'cloudformation'},
 }
 
-const UpsertCloudFormationQuotas = async (service: ServiceQuotas, previous: ResourceModel, desired: ResourceModel) => {
+const UpsertCloudFormation = async (service: ServiceQuotas, previous: ResourceModel, desired: ResourceModel) => {
     for (const [key, val] of Object.entries(desired)) {
         const prevVal = (previous as any)[key];
         LOGGER.info({ key, val, prevVal, valType: (typeof val) });
@@ -99,7 +99,7 @@ class Resource extends BaseResource<ResourceModel> {
         try {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await UpsertCloudFormationQuotas(serviceQuotas, new ResourceModel(), model);
+                await UpsertCloudFormation(serviceQuotas, new ResourceModel(), model);
             }
             progress.status = OperationStatus.Success;
         } catch (err) {
@@ -136,7 +136,7 @@ class Resource extends BaseResource<ResourceModel> {
         try {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await UpsertCloudFormationQuotas(serviceQuotas, previous, desired);
+                await UpsertCloudFormation(serviceQuotas, previous, desired);
             }
             progress.status = OperationStatus.Success;
         } catch (err) {

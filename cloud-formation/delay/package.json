@@ -1,5 +1,5 @@
 {
-  "name": "aws-cloudformation-delay",
+  "name": "community-cloudformation-delay",
   "version": "0.1.0",
   "description": "CloudFormation Resource Provider for AWS CloudFormation Delay",
   "main": "dist/handlers.js",

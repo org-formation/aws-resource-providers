@@ -6,7 +6,7 @@ export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
 
     @Exclude()
-    public static readonly TYPE_NAME: string = 'Community::ServiceQuotas::CloudFormationQuotas';
+    public static readonly TYPE_NAME: string = 'Community::ServiceQuotas::CloudFormation';
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';

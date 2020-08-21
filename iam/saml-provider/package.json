@@ -1,7 +1,7 @@
 {
-    "name": "oc-iam-samlprovider",
-    "version": "1.0.0",
-    "description": "AWS custom resource provider named OC::IAM::SamlProvider.",
+    "name": "community-iam-saml-provider",
+    "version": "0.1.0",
+    "description": "AWS custom resource provider named Community::IAM::SamlProvider.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

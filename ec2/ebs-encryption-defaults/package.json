@@ -1,6 +1,6 @@
 {
-    "name": "oc-org-EbsEncryptionDefaults",
-    "version": "1.0.0",
+    "name": "community-ec2-ebs-encryption-defaults",
+    "version": "0.1.0",
     "description": "AWS custom resource provider named Community::Organizations::EbsEncryptionDefaults.",
     "main": "dist/handlers.js",
     "files": [

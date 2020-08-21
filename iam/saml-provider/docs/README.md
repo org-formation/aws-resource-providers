@@ -1,4 +1,4 @@
-# OC::IAM::SamlProvider
+# Community::IAM::SamlProvider
 
 An example resource schema demonstrating some basic constructs and validation rules.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::IAM::SamlProvider",
+    "Type" : "Community::IAM::SamlProvider",
     "Properties" : {
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#metadatadocument" title="MetadataDocument">MetadataDocument</a>" : <i>String</i>,
@@ -21,7 +21,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::IAM::SamlProvider
+Type: Community::IAM::SamlProvider
 Properties:
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#metadatadocument" title="MetadataDocument">MetadataDocument</a>: <i>String</i>

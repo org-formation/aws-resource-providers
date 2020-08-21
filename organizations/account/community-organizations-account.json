@@ -1,34 +1,48 @@
 {
-    "typeName": "Community::Organizations::ServiceControlPolicy",
+    "typeName": "Community::Organizations::Account",
     "description": "An example resource schema demonstrating some basic constructs and validation rules.",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-    "definitions": {},
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {
+        
+    },
     "properties": {
+        "AccountName": {
+            "type":"string"
+        },
+        "RootEmail": {
+            "type":"string"
+        },
+        "Alias": {
+            "type":"string"
+        },
+        "SupportLevel": {
+            "type": "string"
+        },
+        "OrganizationAccessRoleName": {
+            "type": "string"
+        },
+        "ParentOU": {
+            "type":"string"
+        },
+        "Policies": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "Arn": {
             "type": "string"
         },
         "Id": {
             "type": "string"
-        },
-        "PolicyName": {
-            "type": "string"
-        },
-        "Description": {
-            "type": "string"
-        },
-        "PolicyDocument": {
-            "type": "object"
         }
     },
     "additionalProperties": false,
     "required": [
-        "PolicyDocument",
-        "PolicyName"
+        "AccountName"
     ],
     "additionalIdentifiers": [
-        [
-            "/properties/Id"
-        ]
+        ["/properties/Id"]
     ],
     "primaryIdentifier": [
         "/properties/Arn"

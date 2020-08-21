@@ -6,7 +6,7 @@ export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
 
     @Exclude()
-    public static readonly TYPE_NAME: string = 'OC::IAM::SamlProvider';
+    public static readonly TYPE_NAME: string = 'Community::IAM::SamlProvider';
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_ARN: string = '/properties/Arn';

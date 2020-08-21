@@ -1,7 +1,7 @@
 {
-    "name": "oc-org-organizationroot",
-    "version": "1.0.0",
-    "description": "AWS custom resource provider named Community::Organizations::OrganizationRoot.",
+    "name": "community-organizations-servicecontrolpolicy",
+    "version": "0.1.0",
+    "description": "AWS custom resource provider named Community::Organizations::ServiceControlPolicy.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

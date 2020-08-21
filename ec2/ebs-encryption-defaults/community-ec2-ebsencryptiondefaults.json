@@ -1,7 +1,7 @@
 {
     "typeName": "Community::Organizations::EbsEncryptionDefaults",
     "description": "CloudFormation Resource Provider for AWS account defaults.",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
 
     },

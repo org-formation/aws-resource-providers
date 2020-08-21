@@ -1,9 +1,8 @@
 {
-    "typeName": "Community::Organizations::Account",
+    "typeName": "Community::Organizations::MasterAccount",
     "description": "An example resource schema demonstrating some basic constructs and validation rules.",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
-        
     },
     "properties": {
         "AccountName": {
@@ -20,9 +19,6 @@
         },
         "OrganizationAccessRoleName": {
             "type": "string"
-        },
-        "ParentOU": {
-            "type":"string"
         },
         "Policies": {
             "type": "array",

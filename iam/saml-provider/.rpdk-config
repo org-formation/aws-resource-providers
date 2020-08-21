@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::IAM::SamlProvider",
+    "typeName": "Community::IAM::SamlProvider",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

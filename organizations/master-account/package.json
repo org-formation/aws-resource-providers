@@ -1,7 +1,7 @@
 {
-    "name": "oc-org-servicecontrolpolicy",
-    "version": "1.0.0",
-    "description": "AWS custom resource provider named Community::Organizations::ServiceControlPolicy.",
+    "name": "community-organizations-masteraccount",
+    "version": "0.1.0",
+    "description": "AWS custom resource provider named Community::Organizations::MasterAccount.",
     "main": "dist/handlers.js",
     "files": [
         "dist"
@@ -9,7 +9,8 @@
     "scripts": {
         "build": "npx tsc",
         "prepack": "npm run build",
-        "submit": "cfn submit --region us-east-1",
+        "submit": "cfn generate && npm run build && cfn submit -vv --region us-east-1 --set-default",
+        "package": "cfn submit --dry-run -vv",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
