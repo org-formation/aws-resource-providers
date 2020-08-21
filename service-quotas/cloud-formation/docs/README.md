@@ -1,6 +1,6 @@
 # Community::ServiceQuotas::CloudFormation
 
-An example resource schema demonstrating some basic constructs and validation rules.
+Custom Service Quota limits for CloudFormation resources. e.g: to increase the maximum number of stacks per account.
 
 ## Syntax
 

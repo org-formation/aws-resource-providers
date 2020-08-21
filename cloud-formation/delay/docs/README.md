@@ -1,6 +1,6 @@
 # Community::CloudFormation::Delay
 
-Resource schema for Community::CloudFormation::Delay.
+Resource that waits for a specified time period.
 
 ## Syntax
 
@@ -29,13 +29,17 @@ Properties:
 
 #### Duration
 
-The length of time that AWS CloudFormation waits. The maximum time that you can specify is 12 hours. The value must be in ISO8601 duration format, in the form: "PT#H#M#S", where each # is the number of hours, minutes, and seconds, respectively.
+The length of time that AWS CloudFormation should wait. The maximum time that you can specify is 12 hours. The value must be in ISO8601 duration format, in the form: "PT#H#M#S", where each # is the number of hours, minutes, and seconds, respectively.
 
 _Required_: No
 
 _Type_: String
 
-_Pattern_: <code>^PT(?=[0-9])([0-1]?[0-9]H)?([0-9]+M)?([0-9]+S)?$</code>
+_Minimum_: <code>4</code>
+
+_Maximum_: <code>15</code>
+
+_Pattern_: <code>^PT(?=[0-9])([0-1]?[0-9]H)?([0-9]{1,3}M)?([0-9]{1,5}S)?$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

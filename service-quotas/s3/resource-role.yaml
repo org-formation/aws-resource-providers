@@ -23,11 +23,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "initech:CreateReport"
-                - "initech:DeleteReport"
-                - "initech:DescribeReport"
-                - "initech:ListReports"
-                - "initech:UpdateReport"
+                - "cloudformation:DescribeAccountLimits"
+                - "servicequotas:getServiceQuota"
+                - "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota"
+                - "servicequotas:requestServiceQuotaIncrease"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

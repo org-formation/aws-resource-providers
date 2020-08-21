@@ -1,6 +1,6 @@
 {
     "typeName": "Community::CloudFormation::Delay",
-    "description": "Resource schema for Community::CloudFormation::Delay.",
+    "description": "Resource that waits for a specified time period.",
     "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {},
     "properties": {

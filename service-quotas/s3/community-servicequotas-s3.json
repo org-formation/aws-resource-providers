@@ -1,6 +1,6 @@
 {
     "typeName": "Community::ServiceQuotas::S3",
-    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "description": "Custom Service Quota limits for S3 resources. e.g: to increase the maximum number of buckets per account.",
     "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
     },

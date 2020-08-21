@@ -1,6 +1,6 @@
 # Community::IAM::PasswordPolicy
 
-Resource schema for Community::IAM::PasswordPolicy.
+Resource that allows for the creation of an IAM Password Policy (applies to entire account).
 
 ## Syntax
 

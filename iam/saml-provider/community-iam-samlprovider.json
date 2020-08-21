@@ -1,6 +1,6 @@
 {
     "typeName": "Community::IAM::SamlProvider",
-    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "description": "Resource that can be used to create a SAML based Identity Provider.",
     "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
     },
