@@ -1,0 +1,54 @@
+{
+    "typeName": "OC::IAM::SamlProvider",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "Name": {
+            "type": "string"
+        },
+        "MetadataDocument": {
+            "type": "string"
+        },
+        "Arn": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Name",
+        "MetadataDocument"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "iam:CreateSamlProvider"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "iam:UpdateSamlProvider"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "iam:DeleteSamlProvider"
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
