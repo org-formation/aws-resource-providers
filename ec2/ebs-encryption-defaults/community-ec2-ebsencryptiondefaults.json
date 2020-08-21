@@ -1,6 +1,6 @@
 {
     "typeName": "Community::Organizations::EbsEncryptionDefaults",
-    "description": "CloudFormation Resource Provider for AWS account defaults.",
+    "description": "Region level EBS encryption defaults: encryption enabled/disabled and KmsKeyId.",
     "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
 

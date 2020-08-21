@@ -1,6 +1,6 @@
 # Community::IAM::SamlProvider
 
-An example resource schema demonstrating some basic constructs and validation rules.
+Resource that can be used to create a SAML based Identity Provider.
 
 ## Syntax
 

@@ -1,6 +1,6 @@
 {
     "typeName": "Community::ServiceQuotas::CloudFormation",
-    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "description": "Custom Service Quota limits for CloudFormation resources. e.g: to increase the maximum number of stacks per account.",
     "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
        
