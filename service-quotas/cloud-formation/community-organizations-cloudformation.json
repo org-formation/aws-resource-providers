@@ -1,0 +1,58 @@
+{
+    "typeName": "Community::ServiceQuotas::CloudFormation",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {
+       
+    },
+    "properties": {
+        "Stacks": {
+            "description":"Maximum number of AWS CloudFormation stacks that you can create (default = 200).",
+            "type": "integer",
+            "default": 200,
+            "minimum": 200
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits"
+            ]
+        },
+        "delete": {
+            "permissions": [
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}

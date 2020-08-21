@@ -1,0 +1,59 @@
+{
+    "typeName": "Community::Organizations::EbsEncryptionDefaults",
+    "description": "CloudFormation Resource Provider for AWS account defaults.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {
+
+    },
+    "properties": {
+        "ResourceId": {
+            "type":"string"
+        },
+        "EnableEbsEncryptionByDefault": {
+            "type":"boolean"
+        },
+        "DefaultEbsEncryptionKeyId": {
+            "type":"string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ec2:EnableEbsEncryptionByDefault",
+                "ec2:DisableEbsEncryptionByDefault",
+                "ec2:ModifyEbsDefaultKmsKeyId"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ec2:EnableEbsEncryptionByDefault",
+                "ec2:DisableEbsEncryptionByDefault",
+                "ec2:ModifyEbsDefaultKmsKeyId",
+                "ec2:ResetEbsDefaultKmsKeyId"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ec2:DisableEbsEncryptionByDefault",
+                "ec2:ResetEbsDefaultKmsKeyId"
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}

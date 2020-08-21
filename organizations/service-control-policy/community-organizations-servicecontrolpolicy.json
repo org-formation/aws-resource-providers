@@ -1,0 +1,53 @@
+{
+    "typeName": "Community::Organizations::ServiceControlPolicy",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {},
+    "properties": {
+        "Arn": {
+            "type": "string"
+        },
+        "Id": {
+            "type": "string"
+        },
+        "PolicyName": {
+            "type": "string"
+        },
+        "Description": {
+            "type": "string"
+        },
+        "PolicyDocument": {
+            "type": "object"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "PolicyDocument",
+        "PolicyName"
+    ],
+    "additionalIdentifiers": [
+        [
+            "/properties/Id"
+        ]
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": []
+        },
+        "read": {
+            "permissions": []
+        },
+        "update": {
+            "permissions": []
+        },
+        "delete": {
+            "permissions": []
+        },
+        "list": {
+            "permissions": []
+        }
+    }
+}
