@@ -1,4 +1,4 @@
-# OC::ServiceQuotas::CloudFormationQuotas
+# Community::ServiceQuotas::CloudFormationQuotas
 
 An example resource schema demonstrating some basic constructs and validation rules.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::ServiceQuotas::CloudFormationQuotas",
+    "Type" : "Community::ServiceQuotas::CloudFormationQuotas",
     "Properties" : {
         "<a href="#stacks" title="Stacks">Stacks</a>" : <i>Integer</i>,
     }
@@ -20,7 +20,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::ServiceQuotas::CloudFormationQuotas
+Type: Community::ServiceQuotas::CloudFormationQuotas
 Properties:
     <a href="#stacks" title="Stacks">Stacks</a>: <i>Integer</i>
 </pre>

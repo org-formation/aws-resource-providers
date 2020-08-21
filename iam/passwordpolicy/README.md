@@ -1,4 +1,4 @@
-# OC::Organizations::PasswordPolicy
+# Community::Organizationsanizations::PasswordPolicy
 
 This CloudFormation Resource Provider sets an IAM Password Policy for a target AWS account. Note that IAM password policies are global, and this will be applied to all regions no matter where the CloudFormation stack is deployed to.
 

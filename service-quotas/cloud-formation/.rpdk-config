@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ServiceQuotas::CloudFormationQuotas",
+    "typeName": "Community::ServiceQuotas::CloudFormationQuotas",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

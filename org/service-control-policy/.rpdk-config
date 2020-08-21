@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ORG::ServiceControlPolicy",
+    "typeName": "Community::Organizations::ServiceControlPolicy",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

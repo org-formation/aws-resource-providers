@@ -1,4 +1,4 @@
-# OC::ServiceQuotas::S3 Memo
+# Community::ServiceQuotas::S3 Memo
 
 ## Syntax
 

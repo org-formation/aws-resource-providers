@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
   EbsEncryptionDefaults:
-    Type: 'OC::ORG::EbsEncryptionDefaults'
+    Type: 'Community::Organizations::EbsEncryptionDefaults'
     Properties:
       EnableEbsEncryptionByDefault: true

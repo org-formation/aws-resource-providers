@@ -1,4 +1,4 @@
-# OC::ORG::OrganizationRoot
+# Community::Organizations::OrganizationRoot
 
 An example resource schema demonstrating some basic constructs and validation rules.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::ORG::OrganizationRoot",
+    "Type" : "Community::Organizations::OrganizationRoot",
     "Properties" : {
         "<a href="#title" title="Title">Title</a>" : <i>String</i>,
         "<a href="#coversheetincluded" title="CoverSheetIncluded">CoverSheetIncluded</a>" : <i>Boolean</i>,
@@ -27,7 +27,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::ORG::OrganizationRoot
+Type: Community::Organizations::OrganizationRoot
 Properties:
     <a href="#title" title="Title">Title</a>: <i>String</i>
     <a href="#coversheetincluded" title="CoverSheetIncluded">CoverSheetIncluded</a>: <i>Boolean</i>

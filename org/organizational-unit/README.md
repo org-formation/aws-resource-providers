@@ -1,4 +1,4 @@
-// OC::ORG::OrganizationalUnit
+// Community::Organizations::OrganizationalUnit
 
 Congratulations on starting development! Next steps:
 

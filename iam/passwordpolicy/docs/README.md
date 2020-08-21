@@ -1,6 +1,6 @@
-# OC::Organizations::PasswordPolicy
+# Community::Organizationsanizations::PasswordPolicy
 
-Resource schema for OC::Organizations::PasswordPolicy.
+Resource schema for Community::Organizationsanizations::PasswordPolicy.
 
 ## Syntax
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::Organizations::PasswordPolicy",
+    "Type" : "Community::Organizationsanizations::PasswordPolicy",
     "Properties" : {
         "<a href="#minimumpasswordlength" title="MinimumPasswordLength">MinimumPasswordLength</a>" : <i>Double</i>,
         "<a href="#requiresymbols" title="RequireSymbols">RequireSymbols</a>" : <i>Boolean</i>,
@@ -28,7 +28,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::Organizations::PasswordPolicy
+Type: Community::Organizationsanizations::PasswordPolicy
 Properties:
     <a href="#minimumpasswordlength" title="MinimumPasswordLength">MinimumPasswordLength</a>: <i>Double</i>
     <a href="#requiresymbols" title="RequireSymbols">RequireSymbols</a>: <i>Boolean</i>

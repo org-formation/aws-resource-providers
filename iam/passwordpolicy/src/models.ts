@@ -3,7 +3,7 @@ import { BaseModel, Optional } from 'cfn-rpdk';
 
 export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
-    public static readonly TYPE_NAME: string = 'OC::Organizations::PasswordPolicy';
+    public static readonly TYPE_NAME: string = 'Community::Organizationsanizations::PasswordPolicy';
 
     ResourceId: Optional<string>;
     MinimumPasswordLength: Optional<number>;

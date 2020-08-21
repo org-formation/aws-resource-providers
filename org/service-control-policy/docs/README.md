@@ -1,4 +1,4 @@
-# OC::ORG::ServiceControlPolicy
+# Community::Organizations::ServiceControlPolicy
 
 An example resource schema demonstrating some basic constructs and validation rules.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::ORG::ServiceControlPolicy",
+    "Type" : "Community::Organizations::ServiceControlPolicy",
     "Properties" : {
         "<a href="#arn" title="Arn">Arn</a>" : <i>String</i>,
         "<a href="#id" title="Id">Id</a>" : <i>String</i>,
@@ -24,7 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::ORG::ServiceControlPolicy
+Type: Community::Organizations::ServiceControlPolicy
 Properties:
     <a href="#arn" title="Arn">Arn</a>: <i>String</i>
     <a href="#id" title="Id">Id</a>: <i>String</i>

@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ORG::OrganizationalUnit",
+    "typeName": "Community::Organizations::OrganizationalUnit",
     "description": "An Organizational Unit used within an AWS Organization.",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
     "definitions": {

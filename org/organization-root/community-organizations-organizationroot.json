@@ -1,48 +1,30 @@
 {
-    "typeName": "OC::ORG::Account",
-    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "typeName": "Community::Organizations::OrganizationRoot",
+    "description": "OC ORG OrganizationRoot schema.",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-    "definitions": {
-        
-    },
     "properties": {
-        "AccountName": {
-            "type":"string"
-        },
-        "RootEmail": {
-            "type":"string"
-        },
-        "Alias": {
-            "type":"string"
-        },
-        "SupportLevel": {
-            "type": "string"
-        },
-        "OrganizationAccessRoleName": {
-            "type": "string"
-        },
-        "ParentOU": {
-            "type":"string"
-        },
         "Policies": {
             "type": "array",
             "items": {
                 "type": "string"
             }
         },
+        "DefaultOrganizationAccessRoleName": {
+            "type": "string"
+        },
         "Arn": {
             "type": "string"
         },
-        "Id": {
+        "ResourceId": {
             "type": "string"
         }
     },
     "additionalProperties": false,
     "required": [
-        "AccountName"
     ],
-    "additionalIdentifiers": [
-        ["/properties/Id"]
+    "readOnlyProperties": [
+        "/properties/Arn",
+        "/properties/ResourceId"
     ],
     "primaryIdentifier": [
         "/properties/Arn"

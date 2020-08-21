@@ -1,7 +1,7 @@
 {
     "name": "oc-servicequotas-cloudformationquotas",
     "version": "1.0.0",
-    "description": "AWS custom resource provider named OC::ServiceQuotas::CloudFormationQuotas.",
+    "description": "AWS custom resource provider named Community::ServiceQuotas::CloudFormationQuotas.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

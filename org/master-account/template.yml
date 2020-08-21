@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: AWS SAM template for the OC::ORG::MasterAccount resource type
+Description: AWS SAM template for the Community::Organizations::MasterAccount resource type
 
 Globals:
   Function:

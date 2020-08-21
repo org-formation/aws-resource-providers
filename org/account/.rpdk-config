@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ORG::Account",
+    "typeName": "Community::Organizations::Account",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

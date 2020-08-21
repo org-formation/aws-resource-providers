@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ORG::OrganizationRoot",
+    "typeName": "Community::Organizations::OrganizationRoot",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

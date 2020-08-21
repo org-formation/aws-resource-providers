@@ -1,4 +1,4 @@
-// OC::ORG::EbsEncryptionDefaults
+// Community::Organizations::EbsEncryptionDefaults
 
 Congratulations on starting development! Next steps:
 

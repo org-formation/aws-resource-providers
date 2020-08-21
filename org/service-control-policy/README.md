@@ -1,4 +1,4 @@
-// OC::ORG::ServiceControlPolicy
+// Community::Organizations::ServiceControlPolicy
 
 Congratulations on starting development! Next steps:
 

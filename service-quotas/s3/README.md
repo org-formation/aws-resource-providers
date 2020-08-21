@@ -1,4 +1,4 @@
-// OC::ServiceQuotas::S3
+// Community::ServiceQuotas::S3
 
 Congratulations on starting development! Next steps:
 

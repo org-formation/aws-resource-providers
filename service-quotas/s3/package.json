@@ -1,7 +1,7 @@
 {
     "name": "oc-servicequotas-s3",
     "version": "1.0.0",
-    "description": "AWS custom resource provider named OC::ServiceQuotas::S3.",
+    "description": "AWS custom resource provider named Community::ServiceQuotas::S3.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

@@ -1,7 +1,7 @@
 {
     "name": "oc-org-servicecontrolpolicy",
     "version": "1.0.0",
-    "description": "AWS custom resource provider named OC::ORG::ServiceControlPolicy.",
+    "description": "AWS custom resource provider named Community::Organizations::ServiceControlPolicy.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

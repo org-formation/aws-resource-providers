@@ -1,4 +1,4 @@
-// OC::ORG::OrganizationRoot
+// Community::Organizations::OrganizationRoot
 
 Congratulations on starting development! Next steps:
 

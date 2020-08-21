@@ -6,7 +6,7 @@ export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
 
     @Exclude()
-    public static readonly TYPE_NAME: string = 'OC::ORG::OrganizationRoot';
+    public static readonly TYPE_NAME: string = 'Community::Organizations::OrganizationRoot';
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_TPSCODE: string = '/properties/TPSCode';

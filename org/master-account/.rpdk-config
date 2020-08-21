@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ORG::MasterAccount",
+    "typeName": "Community::Organizations::MasterAccount",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

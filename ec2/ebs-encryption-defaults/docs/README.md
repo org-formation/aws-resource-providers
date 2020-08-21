@@ -1,4 +1,4 @@
-# OC::ORG::EbsEncryptionDefaults
+# Community::Organizations::EbsEncryptionDefaults
 
 CloudFormation Resource Provider for AWS account defaults.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::ORG::EbsEncryptionDefaults",
+    "Type" : "Community::Organizations::EbsEncryptionDefaults",
     "Properties" : {
         "<a href="#enableebsencryptionbydefault" title="EnableEbsEncryptionByDefault">EnableEbsEncryptionByDefault</a>" : <i>Boolean</i>,
         "<a href="#defaultebsencryptionkeyid" title="DefaultEbsEncryptionKeyId">DefaultEbsEncryptionKeyId</a>" : <i>String</i>
@@ -21,7 +21,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::ORG::EbsEncryptionDefaults
+Type: Community::Organizations::EbsEncryptionDefaults
 Properties:
     <a href="#enableebsencryptionbydefault" title="EnableEbsEncryptionByDefault">EnableEbsEncryptionByDefault</a>: <i>Boolean</i>
     <a href="#defaultebsencryptionkeyid" title="DefaultEbsEncryptionKeyId">DefaultEbsEncryptionKeyId</a>: <i>String</i>

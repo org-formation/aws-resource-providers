@@ -1,7 +1,7 @@
 {
     "name": "oc-org-organizationalunit",
     "version": "1.0.0",
-    "description": "AWS custom resource provider named OC::ORG::OrganizationalUnit.",
+    "description": "AWS custom resource provider named Community::Organizations::OrganizationalUnit.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

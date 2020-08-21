@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::Organizations::PasswordPolicy",
+    "typeName": "Community::Organizationsanizations::PasswordPolicy",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

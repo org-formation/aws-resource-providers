@@ -1,4 +1,4 @@
-# OC::ORG::Account
+# Community::Organizations::Account
 
 An example resource schema demonstrating some basic constructs and validation rules.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::ORG::Account",
+    "Type" : "Community::Organizations::Account",
     "Properties" : {
         "<a href="#accountname" title="AccountName">AccountName</a>" : <i>String</i>,
         "<a href="#rootemail" title="RootEmail">RootEmail</a>" : <i>String</i>,
@@ -28,7 +28,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::ORG::Account
+Type: Community::Organizations::Account
 Properties:
     <a href="#accountname" title="AccountName">AccountName</a>: <i>String</i>
     <a href="#rootemail" title="RootEmail">RootEmail</a>: <i>String</i>

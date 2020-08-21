@@ -1,4 +1,4 @@
-// OC::ORG::MasterAccount
+// Community::Organizations::MasterAccount
 
 Congratulations on starting development! Next steps:
 

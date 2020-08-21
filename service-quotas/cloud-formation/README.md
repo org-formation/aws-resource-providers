@@ -1,4 +1,4 @@
-// OC::ServiceQuotas::CloudFormationQuotas
+// Community::ServiceQuotas::CloudFormationQuotas
 
 Congratulations on starting development! Next steps:
 

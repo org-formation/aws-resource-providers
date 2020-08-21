@@ -1,4 +1,4 @@
-# OC::ORG::OrganizationalUnit
+# Community::Organizations::OrganizationalUnit
 
 An Organizational Unit used within an AWS Organization.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "OC::ORG::OrganizationalUnit",
+    "Type" : "Community::Organizations::OrganizationalUnit",
     "Properties" : {
         "<a href="#organizationalunitname" title="OrganizationalUnitName">OrganizationalUnitName</a>" : <i>String</i>,
         "<a href="#policies" title="Policies">Policies</a>" : <i>[ String, ... ]</i>,
@@ -23,7 +23,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: OC::ORG::OrganizationalUnit
+Type: Community::Organizations::OrganizationalUnit
 Properties:
     <a href="#organizationalunitname" title="OrganizationalUnitName">OrganizationalUnitName</a>: <i>String</i>
     <a href="#policies" title="Policies">Policies</a>: <i>

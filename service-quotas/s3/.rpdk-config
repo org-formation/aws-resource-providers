@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ServiceQuotas::S3",
+    "typeName": "Community::ServiceQuotas::S3",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

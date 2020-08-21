@@ -1,7 +1,7 @@
 {
     "name": "oc-org-masteraccount",
     "version": "1.0.0",
-    "description": "AWS custom resource provider named OC::ORG::MasterAccount.",
+    "description": "AWS custom resource provider named Community::Organizations::MasterAccount.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

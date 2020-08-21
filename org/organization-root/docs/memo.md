@@ -1,4 +1,4 @@
-# OC::ORG::OrganizationRoot Memo
+# Community::Organizations::OrganizationRoot Memo
 
 ## Syntax
 
