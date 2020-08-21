@@ -1,0 +1,22 @@
+{
+    "name": "community-resource-providers-common",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "files": ["lib/**/*"],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.0/cfn-rpdk-0.3.0.tgz"
+    },
+    "devDependencies": {
+        "@types/node": "^12.0.0",
+        "typescript": "^3.8.3"
+    },
+    "optionalDependencies": {
+        "aws-sdk": "^2.656.0"
+    }
+}
