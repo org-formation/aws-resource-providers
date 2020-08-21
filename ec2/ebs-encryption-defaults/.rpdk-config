@@ -1,5 +1,5 @@
 {
-    "typeName": "OC::ORG::RegionDefaults",
+    "typeName": "OC::ORG::EbsEncryptionDefaults",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

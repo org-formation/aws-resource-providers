@@ -1,11 +1,11 @@
-// OC::ORG::RegionDefaults
+// OC::ORG::EbsEncryptionDefaults
 
 Congratulations on starting development! Next steps:
 
-1. Write the JSON schema describing your resource, [oc-org-regiondefaults.json](./oc-org-regiondefaults.json)
-2. Implement your resource handlers in [handlers.ts](./oc-org-regiondefaults/handlers.ts)
+1. Write the JSON schema describing your resource, [oc-org-EbsEncryptionDefaults.json](./oc-org-EbsEncryptionDefaults.json)
+2. Implement your resource handlers in [handlers.ts](./oc-org-EbsEncryptionDefaults/handlers.ts)
 
-> Don't modify [models.ts](./oc-org-regiondefaults/models.ts) by hand, any modifications will be overwritten when the `generate` or `package` commands are run.
+> Don't modify [models.ts](./oc-org-EbsEncryptionDefaults/models.ts) by hand, any modifications will be overwritten when the `generate` or `package` commands are run.
 
 Implement CloudFormation resource here. Each function must always return a ProgressEvent.
 

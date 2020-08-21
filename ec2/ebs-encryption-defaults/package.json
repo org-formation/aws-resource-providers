@@ -1,7 +1,7 @@
 {
-    "name": "oc-org-regiondefaults",
+    "name": "oc-org-EbsEncryptionDefaults",
     "version": "1.0.0",
-    "description": "AWS custom resource provider named OC::ORG::RegionDefaults.",
+    "description": "AWS custom resource provider named OC::ORG::EbsEncryptionDefaults.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

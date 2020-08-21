@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
-  RegionDefaults:
-    Type: 'OC::ORG::RegionDefaults'
+  EbsEncryptionDefaults:
+    Type: 'OC::ORG::EbsEncryptionDefaults'
     Properties:
       EnableEbsEncryptionByDefault: true
