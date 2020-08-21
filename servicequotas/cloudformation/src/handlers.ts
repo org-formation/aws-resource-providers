@@ -26,14 +26,6 @@ const quotaCodeForPropertyName: Record<string, QuotaID> = {
     stackInstancesPerStackSet: {QuotaCode: 'L-C8225BA5',ServiceCode: 'cloudformation'},
 }
 
-const serviceCodeForPropertyName: Record<string, string> = {
-    stacks: 'L-0485CB21',
-    resourceTypes: 'L-9DE8E4FB',
-    versionsPerResourceType: 'L-EA1018E8',
-    stackSetsPerAdministratorAccount: 'L-EC62D81A',
-    stackInstancesPerStackSet: 'L-C8225BA5',
-}
-
 const UpsertCloudFormationQuotas = async (service: ServiceQuotas, previous: ResourceModel, desired: ResourceModel) => {
     for (const [key, val] of Object.entries(desired)) {
         const prevVal = (previous as any)[key];
