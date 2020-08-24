@@ -12,64 +12,18 @@ import {
 } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk'
-import { RequestServiceQuotaIncreaseRequest, GetServiceQuotaRequest } from 'aws-sdk/clients/servicequotas';
-
+import * as Quotas from 'community-resource-providers-common/lib/service-quotas'
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
-type QuotaID = {QuotaCode: string, ServiceCode: string};
 
-const quotaCodeForPropertyName: Record<string, QuotaID> = {
+
+const quotaCodeForPropertyName: Record<string, Quotas.QuotaID> = {
     stacks: {QuotaCode: 'L-0485CB21', ServiceCode: 'cloudformation'},
     resourceTypes: {QuotaCode: 'L-9DE8E4FB',ServiceCode: 'cloudformation'},
     versionsPerResourceType: {QuotaCode: 'L-EA1018E8',ServiceCode: 'cloudformation'},
     stackSetsPerAdministratorAccount: {QuotaCode: 'L-EC62D81A',ServiceCode: 'cloudformation'},
-    stackInstancesPerStackSet: {QuotaCode: 'L-C8225BA5',ServiceCode: 'cloudformation'},
+    stackInstancesPerStackSet: {QuotaCode: 'L-C8225BA5', ServiceCode: 'cloudformation'},
 }
-
-const UpsertCloudFormation = async (service: ServiceQuotas, previous: ResourceModel, desired: ResourceModel) => {
-    for (const [key, val] of Object.entries(desired)) {
-        const prevVal = (previous as any)[key];
-        LOGGER.info({ key, val, prevVal, valType: (typeof val) });
-
-        const quota = quotaCodeForPropertyName[key];
-        if (!quota) continue;
-        if (prevVal !== val) {
-            if (prevVal && prevVal > val) {
-                throw new Error(`Decrease of limit failed because desired value ${val} is lower than previous value ${prevVal}`);
-            }
-
-            const history = await service.listRequestedServiceQuotaChangeHistoryByQuota(quota).promise();
-            LOGGER.info({ method: 'get history', history });
-            if (history.RequestedQuotas && history.RequestedQuotas.length > 0) {
-                const lastRequest = history.RequestedQuotas.find(x => x.Status === 'CASE_OPENED' || x.Status === 'PENDING');
-                if (lastRequest && lastRequest.DesiredValue > val) {
-                    throw new Error(`Decrease of limit failed because desired value ${val} is lower than last requested value ${lastRequest.DesiredValue}`);
-                } else if (lastRequest && lastRequest.DesiredValue == val) {
-                    LOGGER.info(`skipping update because desired value ${val} is equal to last requested value ${lastRequest.DesiredValue}`);
-                }
-            }
-
-            const quotaResponse = await service.getServiceQuota(quota).promise();
-            LOGGER.info({ method: 'get quota', quotaResponse });
-            if (quotaResponse.Quota && quotaResponse.Quota.Value > val) {
-                throw new Error(`Decrease of limit failed because desired value ${val} is lower than current quota value ${quotaResponse.Quota.Value}`);
-            } else if (quotaResponse.Quota && quotaResponse.Quota.Value == val) {
-                LOGGER.info(`skipping update because desired value ${val} is equal to current quota value ${quotaResponse.Quota.Value}`);
-            }
-
-            const valAsNumber = 0 + (new Number(val) as any);
-            const increaseRequest: RequestServiceQuotaIncreaseRequest = { ...quota, DesiredValue: valAsNumber };
-            LOGGER.info({ method: 'requesting service quota increase', request: increaseRequest });
-            try {
-                const response = await service.requestServiceQuotaIncrease(increaseRequest).promise();
-                LOGGER.info(response);
-            } catch (err) {
-                throw err;
-            }
-        }
-    }
-}
-
 
 interface CallbackContext extends Record<string, any> { }
 
@@ -99,7 +53,7 @@ class Resource extends BaseResource<ResourceModel> {
         try {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await UpsertCloudFormation(serviceQuotas, new ResourceModel(), model);
+                await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
             }
             progress.status = OperationStatus.Success;
         } catch (err) {
@@ -136,7 +90,7 @@ class Resource extends BaseResource<ResourceModel> {
         try {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await UpsertCloudFormation(serviceQuotas, previous, desired);
+                await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
             }
             progress.status = OperationStatus.Success;
         } catch (err) {

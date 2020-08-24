@@ -9,11 +9,15 @@
     "scripts": {
         "build": "npx tsc",
         "prepack": "npm run build",
+        "submit": "cfn generate && npm run build && cfn submit -vv --region us-east-1 --set-default",
+        "package": "cfn submit --dry-run -vv",
+        "publish": "npm run package && aws s3 cp community-servicequotas-s3.zip s3://community-resource-provider-catalog/community-servicequotas-s3.zip",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
         "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.0/cfn-rpdk-0.3.0.tgz",
-        "class-transformer": "^0.3.1"
+        "class-transformer": "^0.3.1",
+        "community-resource-providers-common": "https://github.com/org-formation/aws-resource-providers/releases/download/common-0.1.0/community-resource-providers-common-0.1.2.tgz"
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
