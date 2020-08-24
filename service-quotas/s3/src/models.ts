@@ -9,83 +9,32 @@ export class ResourceModel extends BaseModel {
     public static readonly TYPE_NAME: string = 'Community::ServiceQuotas::S3';
 
     @Exclude()
-    protected readonly IDENTIFIER_KEY_TPSCODE: string = '/properties/TPSCode';
+    protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';
 
-    @Expose({ name: 'TPSCode' })
+    @Expose({ name: 'Buckets' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'tPSCode', value, obj, []),
+            transformValue(Integer, 'buckets', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    tPSCode?: Optional<string>;
-    @Expose({ name: 'Title' })
+    buckets?: Optional<integer>;
+    @Expose({ name: 'ResourceId' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'title', value, obj, []),
+            transformValue(String, 'resourceId', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    title?: Optional<string>;
-    @Expose({ name: 'CoverSheetIncluded' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(Boolean, 'coverSheetIncluded', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    coverSheetIncluded?: Optional<boolean>;
-    @Expose({ name: 'DueDate' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'dueDate', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    dueDate?: Optional<string>;
-    @Expose({ name: 'ApprovalDate' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'approvalDate', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    approvalDate?: Optional<string>;
-    @Expose({ name: 'Memo' })
-    @Type(() => Memo)
-    memo?: Optional<Memo>;
-    @Expose({ name: 'SecondCopyOfMemo' })
-    @Type(() => Memo)
-    secondCopyOfMemo?: Optional<Memo>;
-    @Expose({ name: 'TestCode' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'testCode', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    testCode?: Optional<string>;
-    @Expose({ name: 'Authors' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'authors', value, obj, [Array]),
-        {
-            toClassOnly: true,
-        }
-    )
-    authors?: Optional<Array<string>>;
+    resourceId?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.tPSCode != null) {
-            identifier[this.IDENTIFIER_KEY_TPSCODE] = this.tPSCode;
+        if (this.resourceId != null) {
+            identifier[this.IDENTIFIER_KEY_RESOURCEID] = this.resourceId;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
@@ -98,30 +47,5 @@ export class ResourceModel extends BaseModel {
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
     }
-}
-
-export class Memo extends BaseModel {
-    ['constructor']: typeof Memo;
-
-
-    @Expose({ name: 'Heading' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'heading', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    heading?: Optional<string>;
-    @Expose({ name: 'Body' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'body', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    body?: Optional<string>;
-
 }
 

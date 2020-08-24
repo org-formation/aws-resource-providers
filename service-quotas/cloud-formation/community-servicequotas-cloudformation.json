@@ -31,7 +31,8 @@
                 "servicequotas:requestServiceQuotaIncrease",
                 "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
                 "servicequotas:getServiceQuota",
-                "cloudformation:DescribeAccountLimits"
+                "cloudformation:DescribeAccountLimits",
+                "servicequotas:GetAWSDefaultServiceQuota"
             ]
         },
         "read": {
@@ -43,7 +44,8 @@
                 "servicequotas:requestServiceQuotaIncrease",
                 "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
                 "servicequotas:getServiceQuota",
-                "cloudformation:DescribeAccountLimits"
+                "cloudformation:DescribeAccountLimits",
+                "servicequotas:GetAWSDefaultServiceQuota"
             ]
         },
         "delete": {

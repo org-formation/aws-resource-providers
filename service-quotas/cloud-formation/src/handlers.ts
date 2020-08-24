@@ -17,6 +17,14 @@ import * as Quotas from 'community-resource-providers-common/lib/service-quotas'
 const LOGGER = console;
 
 
+const quotaCodeForPropertyName: Record<string, Quotas.QuotaID> = {
+    stacks: {QuotaCode: 'L-0485CB21', ServiceCode: 'cloudformation'},
+    resourceTypes: {QuotaCode: 'L-9DE8E4FB',ServiceCode: 'cloudformation'},
+    versionsPerResourceType: {QuotaCode: 'L-EA1018E8',ServiceCode: 'cloudformation'},
+    stackSetsPerAdministratorAccount: {QuotaCode: 'L-EC62D81A',ServiceCode: 'cloudformation'},
+    stackInstancesPerStackSet: {QuotaCode: 'L-C8225BA5', ServiceCode: 'cloudformation'},
+}
+
 interface CallbackContext extends Record<string, any> { }
 
 class Resource extends BaseResource<ResourceModel> {
@@ -45,7 +53,7 @@ class Resource extends BaseResource<ResourceModel> {
         try {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, LOGGER);
+                await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
             }
             progress.status = OperationStatus.Success;
         } catch (err) {
@@ -82,7 +90,7 @@ class Resource extends BaseResource<ResourceModel> {
         try {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await Quotas.UpsertQuotas(serviceQuotas, previous, desired, LOGGER);
+                await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
             }
             progress.status = OperationStatus.Success;
         } catch (err) {

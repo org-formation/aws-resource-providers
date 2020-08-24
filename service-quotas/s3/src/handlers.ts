@@ -11,12 +11,17 @@ import {
     SessionProxy,
 } from 'cfn-rpdk';
 import { ResourceModel } from './models';
+import { ServiceQuotas } from 'aws-sdk'
+import * as Quotas from 'community-resource-providers-common/lib/service-quotas'
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
 interface CallbackContext extends Record<string, any> {}
 
+const quotaCodeForPropertyName: Record<string, Quotas.QuotaID> = {
+    buckets: {QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3'}
+}
 class Resource extends BaseResource<ResourceModel> {
 
     /**
@@ -36,16 +41,17 @@ class Resource extends BaseResource<ResourceModel> {
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        // TODO: put code here
 
-        // Example:
+        LOGGER.info({ handler: 'create', request, callbackContext, env: process.env });
+        model.resourceId = 's3-quotas'; // there can only be one
+
         try {
             if (session instanceof SessionProxy) {
-                const client = session.client('S3');
+                const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
+                await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
             }
-            // Setting Status to success will signal to CloudFormation that the operation is complete
             progress.status = OperationStatus.Success;
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             // exceptions module lets CloudFormation know the type of failure that occurred
             throw new exceptions.InternalFailure(err.message);
@@ -70,10 +76,25 @@ class Resource extends BaseResource<ResourceModel> {
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
     ): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        // TODO: put code here
-        progress.status = OperationStatus.Success;
+        const desired: ResourceModel = request.desiredResourceState;
+        const previous: ResourceModel = request.previousResourceState;
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(desired);
+
+        LOGGER.info({ handler: 'update', request, callbackContext, env: process.env });
+
+        try {
+            if (session instanceof SessionProxy) {
+                const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
+                await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
+            }
+            progress.status = OperationStatus.Success;
+        } catch (err) {
+            LOGGER.log(err);
+            // exceptions module lets CloudFormation know the type of failure that occurred
+            throw new exceptions.InternalFailure(err.message);
+            // this can also be done by returning a failed progress event
+            // return ProgressEvent.failed(HandlerErrorCode.InternalFailure, err.message);
+        }
         return progress;
     }
 
