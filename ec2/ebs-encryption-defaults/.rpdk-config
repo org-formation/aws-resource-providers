@@ -1,5 +1,5 @@
 {
-    "typeName": "Community::Organizations::EbsEncryptionDefaults",
+    "typeName": "Community::EC2::EbsEncryptionDefaults",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

@@ -1,5 +1,5 @@
 {
-    "name": "community-service-quotas-s3",
+    "name": "community-servicequotas-s3",
     "version": "0.1.0",
     "description": "AWS custom resource provider named Community::ServiceQuotas::S3.",
     "main": "dist/handlers.js",
@@ -10,8 +10,8 @@
         "build": "npx tsc",
         "prepack": "npm run build",
         "submit": "cfn generate && npm run build && cfn submit -vv --region us-east-1 --set-default",
-        "package": "cfn submit --dry-run -vv",
-        "publish": "npm run package && aws s3 cp community-servicequotas-s3.zip s3://community-resource-provider-catalog/community-servicequotas-s3.zip",
+        "package": "cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
+        "publish": "npm run package && aws s3 cp ${npm_package_name}-${npm_package_version}.zip s3://community-resource-provider-catalog/${npm_package_name}-${npm_package_version}.zip",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
@@ -21,9 +21,7 @@
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
-        "typescript": "^3.8.3"
-    },
-    "optionalDependencies": {
+        "typescript": "^3.8.3",
         "aws-sdk": "^2.656.0"
     }
 }
