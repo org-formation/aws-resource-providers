@@ -1,0 +1,6 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  S3:
+    Type: 'Community::ServiceQuotas::S3'
+    Properties:
+      Buckets: 100
