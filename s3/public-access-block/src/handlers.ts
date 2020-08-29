@@ -6,7 +6,7 @@ import {
 import { ResourceModel } from './models';
 import { S3Control, STS } from 'aws-sdk'
 import { WrapHandler, ResourceProviderHandler, HandlerArgs } from './common';
-import { PutPublicAccessBlockRequest } from 'aws-sdk/clients/s3control';
+import { PutPublicAccessBlockRequest, DeletePublicAccessBlockRequest } from 'aws-sdk/clients/s3control';
 
 const getAccountId = async (session: SessionProxy): Promise<string> => {
     const sts = session.client('STS') as STS;
@@ -14,7 +14,9 @@ const getAccountId = async (session: SessionProxy): Promise<string> => {
     return response.Account;
 }
 
-async function putAccountPublicAccessBlock(action: Action, args: HandlerArgs, model: ResourceModel, service: S3Control) {
+const UpsertAccountPublicAccessBlockHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
+    const model = args.request.desiredResourceState;
+
     console.info({ action, message: 'before getting account Id' });
     const accountId = await getAccountId(args.session);
     console.info({ action, message: 'after getting account Id', accountId });
@@ -32,26 +34,24 @@ async function putAccountPublicAccessBlock(action: Action, args: HandlerArgs, mo
     console.info({ action, message: 'before invoke putPublicAccessBlock', request });
     const response = await service.putPublicAccessBlock(request).promise();
     console.info({ action, message: 'after invoke putPublicAccessBlock', response });
-    
-    return accountId;
-}
 
-const UpsertAccountPublicAccessBlockHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
-    const model = args.request.desiredResourceState;
-
-    const accountId = await putAccountPublicAccessBlock(action, args, model, service);
     model.resourceId = accountId;
 
     console.info({action, message: 'done', model});
 }
 
 const DeletePublicAccountBlockHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
-    putAccountPublicAccessBlock(action, args, {
-        blockPublicAcls: false,
-        blockPublicPolicy: false,
-        ignorePublicAcls: false,
-        restrictPublicBuckets: false
-    } as any, service);
+    console.info({ action, message: 'before getting account Id' });
+    const accountId = await getAccountId(args.session);
+    console.info({ action, message: 'after getting account Id', accountId });
+
+    const request: DeletePublicAccessBlockRequest = {
+        AccountId: accountId
+    };
+
+    console.info({ action, message: 'before invoke deletePublicAccessBlock', request });
+    const response = await service.deletePublicAccessBlock(request).promise();
+    console.info({ action, message: 'after invoke deletePublicAccessBlock', response });
 
     console.info({action, message: 'done'});
 }
