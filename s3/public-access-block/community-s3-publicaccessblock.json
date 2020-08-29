@@ -1,0 +1,65 @@
+{
+    "typeName": "Community::S3::PublicAccessBlock",
+    "description": "Account level public access block (applies to all buckets within account).",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {
+    },
+    "properties": {
+        "BlockPublicAcls": {
+            "type": "boolean"
+        },
+        "BlockPublicPolicy": {
+            "type": "boolean"
+        },
+        "IgnorePublicAcls": {
+            "type": "boolean"
+        },
+        "RestrictPublicBuckets": {
+            "type": "boolean"
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "TestCode",
+        "Title"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "s3:PutAccountPublicAccessBlock",
+                "sts:GetCallerIdentity"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "s3:GetAccountPublicAccessBlock"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "s3:PutAccountPublicAccessBlock",
+                "sts:GetCallerIdentity"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "s3:PutAccountPublicAccessBlock",
+                "sts:GetCallerIdentity"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "s3:GetAccountPublicAccessBlock"
+            ]
+        }
+    }
+}
