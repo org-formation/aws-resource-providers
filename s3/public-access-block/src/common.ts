@@ -45,11 +45,10 @@ const wrapHandlerInternal = async <TService extends any>(action: Action, handler
 
             console.info({ action, message: 'before perform' });
             await handlerFunc.perform(action, handlerArgs, service);
-            console.info({ action, message: 'after' });
+            console.info({ action, message: 'after perform' });
 
             progress.status = OperationStatus.Success;
             return progress;
-
         } else {
             throw new exceptions.InternalFailure('session is no SessionProxy');
         }
@@ -57,5 +56,4 @@ const wrapHandlerInternal = async <TService extends any>(action: Action, handler
         console.error(err);
         throw new exceptions.InternalFailure(err.message);
     }
-    return progress;
 }
