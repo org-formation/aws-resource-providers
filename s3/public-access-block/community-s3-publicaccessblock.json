@@ -35,8 +35,7 @@
     "handlers": {
         "create": {
             "permissions": [
-                "s3:PutAccountPublicAccessBlock",
-                "sts:GetCallerIdentity"
+                "s3:PutAccountPublicAccessBlock"
             ]
         },
         "read": {
@@ -46,14 +45,12 @@
         },
         "update": {
             "permissions": [
-                "s3:PutAccountPublicAccessBlock",
-                "sts:GetCallerIdentity"
+                "s3:PutAccountPublicAccessBlock"
             ]
         },
         "delete": {
             "permissions": [
-                "s3:PutAccountPublicAccessBlock",
-                "sts:GetCallerIdentity"
+                "s3:PutAccountPublicAccessBlock"
             ]
         },
         "list": {

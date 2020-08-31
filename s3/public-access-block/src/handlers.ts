@@ -8,18 +8,10 @@ import { S3Control, STS } from 'aws-sdk'
 import { WrapHandler, ResourceProviderHandler, HandlerArgs } from './common';
 import { PutPublicAccessBlockRequest, DeletePublicAccessBlockRequest } from 'aws-sdk/clients/s3control';
 
-const getAccountId = async (session: SessionProxy): Promise<string> => {
-    const sts = session.client('STS') as STS;
-    const response = await sts.getCallerIdentity().promise();
-    return response.Account;
-}
-
 const UpsertAccountPublicAccessBlockHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
     const model = args.request.desiredResourceState;
 
-    console.info({ action, message: 'before getting account Id' });
-    const accountId = await getAccountId(args.session);
-    console.info({ action, message: 'after getting account Id', accountId });
+    const accountId = args.request.awsAccountId;
 
     const request: PutPublicAccessBlockRequest = {
         AccountId: accountId,
@@ -41,12 +33,9 @@ const UpsertAccountPublicAccessBlockHandler: ResourceProviderHandler<S3Control> 
 }
 
 const DeletePublicAccountBlockHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
-    console.info({ action, message: 'before getting account Id' });
-    const accountId = await getAccountId(args.session);
-    console.info({ action, message: 'after getting account Id', accountId });
 
     const request: DeletePublicAccessBlockRequest = {
-        AccountId: accountId
+        AccountId: args.request.awsAccountId
     };
 
     console.info({ action, message: 'before invoke deletePublicAccessBlock', request });
