@@ -1,5 +1,23 @@
+# Distribution / packaging
+build/
+dist/
+
+# Unit test / coverage reports
+.cache
+.hypothesis/
+.pytest_cache/
+
+# RPDK logs
+rpdk.log*
+
+# Node.js
+node_modules/
+coverage/
+
+# contains credentials
+sam-tests/
+
 .DS_Store
 .vscode
 utils
 *.zip
-node_modules

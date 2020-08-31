@@ -1,0 +1,64 @@
+{
+    "name": "aws-resource-providers",
+    "version": "0.1.0",
+    "description": "A community driven repository where you can find AWS Resource Type Providers for different purposes.",
+    "scripts": {
+        "bootstrap": "npm install lerna && lerna bootstrap && npm install",
+        "reset": "npm run cleanup && rimraf -rf node_modules && npm run bootstrap",
+        "cleanup": "lerna run cleanup --stream --parallel",
+        "build": "npx tsc",
+        "lint": "npx eslint --ext .ts,.js .",
+        "lint:fix": "npx eslint --fix --ext .ts,.js .",
+        "test": "npx jest",
+        "test:debug": "npx --node-arg=--inspect jest --runInBand"
+    },
+    "engines": {
+        "node": ">=10.4.0",
+        "npm": ">=5.6.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/git@github.com:org-formation/aws-resource-providers.git"
+    },
+    "author": "org-formation",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/git@github.com:org-formation/aws-resource-providers/issues"
+    },
+    "homepage": "https://github.com/git@github.com:org-formation/aws-resource-providers#readme",
+    "dependencies": {
+        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
+        "class-transformer": "^0.3.1"
+    },
+    "devDependencies": {
+        "@jurijzahn8019/aws-promise-jest-mock": "^2.1.5",
+        "@types/jest": "^26.0.1",
+        "@types/node": "^12.0.0",
+        "@typescript-eslint/eslint-plugin": "^4.0.1",
+        "@typescript-eslint/parser": "^4.0.1",
+        "eslint": "^7.7.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-import-resolver-node": "^0.3.4",
+        "eslint-import-resolver-typescript": "^2.2.1",
+        "eslint-plugin-import": "^2.22.0",
+        "eslint-plugin-prefer-arrow": "^1.2.2",
+        "eslint-plugin-prettier": "^3.1.4",
+        "jest": "^26.4.2",
+        "lerna": "^3.22.1",
+        "prettier": "^2.1.1",
+        "rimraf": "^3.0.2",
+        "ts-jest": "^26.3.0",
+        "typescript": "^3.8.3"
+    },
+    "optionalDependencies": {
+        "aws-sdk": "~2.631.0"
+    },
+    "prettier": {
+        "parser": "typescript",
+        "singleQuote": true,
+        "tabWidth": 4,
+        "printWidth": 88,
+        "trailingComma": "es5",
+        "endOfLine": "lf"
+    }
+}
