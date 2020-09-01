@@ -35,12 +35,12 @@ jobs:
       - name: Install Dependencies Node.js
         id: install_nodejs
         run: |
-          npm ci --optional && npm run build
+          npm ci --optional && npx lerna bootstrap && npm run build
       - name: Run Automated Testing
         id: automated_testing
         run: |
           npm run lint
-          npm run test
+          npm test
         id: codecov
         run: |
           curl -s https://codecov.io/bash > codecov.sh

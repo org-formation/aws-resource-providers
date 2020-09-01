@@ -1,9 +1,4 @@
-import {
-    exceptions,
-    OperationStatus,
-    ResourceHandlerRequest,
-    UnmodeledRequest,
-} from 'cfn-rpdk';
+import { exceptions, OperationStatus, UnmodeledRequest } from 'cfn-rpdk';
 import createOperation from '../sam-tests/create.json';
 import deleteOperation from '../sam-tests/delete.json';
 import listOperation from '../sam-tests/list.json';
@@ -55,9 +50,9 @@ describe('when calling handler', () => {
             status: OperationStatus.InProgress,
             message: '',
             callbackContext: {
-                Remaining: -540,
+                Remaining: -590,
             },
-            callbackDelaySeconds: 60,
+            callbackDelaySeconds: 10,
             resourceModel: request.desiredResourceState,
         });
     });
