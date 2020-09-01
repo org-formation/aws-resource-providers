@@ -25,6 +25,7 @@ module.exports = {
                 directory: './tsconfig.eslint.json',
             },
         },
+        'import/internal-regex': 'aws\\-promise\\-jest\\-mock$',
     },
     ignorePatterns: ['*.d.ts', '*.generated.ts', '**/src/models.ts'],
     rules: {

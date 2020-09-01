@@ -1,9 +1,9 @@
 import { exceptions, OperationStatus, UnmodeledRequest } from 'cfn-rpdk';
-import createOperation from '../sam-tests/create.json';
-import deleteOperation from '../sam-tests/delete.json';
-import listOperation from '../sam-tests/list.json';
-import readOperation from '../sam-tests/read.json';
-import updateOperation from '../sam-tests/update.json';
+import createFixture from '../sam-tests/create.json';
+import deleteFixture from '../sam-tests/delete.json';
+import listFixture from '../sam-tests/list.json';
+import readFixture from '../sam-tests/read.json';
+import updateFixture from '../sam-tests/update.json';
 import { CallbackContext, resource, Resource } from '../src/handlers';
 import { ResourceModel } from '../src/models';
 
@@ -39,7 +39,7 @@ describe('when calling handler', () => {
     });
 
     test('create operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(createOperation).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
         const callbackContext: CallbackContext = {
@@ -58,7 +58,7 @@ describe('when calling handler', () => {
     });
 
     test('update operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(updateOperation).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(updateFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
         const callbackContext: CallbackContext = {
@@ -77,7 +77,7 @@ describe('when calling handler', () => {
     });
 
     test('delete operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(deleteOperation).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(deleteFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
         const callbackContext: CallbackContext = {
@@ -92,7 +92,7 @@ describe('when calling handler', () => {
     });
 
     test('read operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(readOperation).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
         const progress = await resource.read(null, request, {});
@@ -105,7 +105,7 @@ describe('when calling handler', () => {
     });
 
     test('list operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(listOperation).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(listFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
         const progress = await resource.list(null, request, {});
