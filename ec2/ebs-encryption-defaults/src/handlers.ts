@@ -11,15 +11,14 @@ import {
     SessionProxy,
 } from 'cfn-rpdk';
 import { ResourceModel } from './models';
-import { EC2 } from 'aws-sdk'
+import { EC2 } from 'aws-sdk';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-interface CallbackContext extends Record<string, any> {}
+type CallbackContext = Record<string, any>;
 
 class Resource extends BaseResource<ResourceModel> {
-
     /**
      * CloudFormation invokes this handler when the resource is initially created
      * during stack create operations.
@@ -33,32 +32,41 @@ class Resource extends BaseResource<ResourceModel> {
     public async create(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
 
-        LOGGER.info({handler: 'create', request, callbackContext, env: process.env});
+        LOGGER.info({ handler: 'create', request, callbackContext, env: process.env });
         model.resourceId = 'region-defaults'; // there can only be one
 
         try {
             if (session instanceof SessionProxy) {
-                if (model.defaultEbsEncryptionKeyId !== undefined || model.enableEbsEncryptionByDefault !== undefined) {
+                if (
+                    model.defaultEbsEncryptionKeyId !== undefined ||
+                    model.enableEbsEncryptionByDefault !== undefined
+                ) {
                     const ec2client = session.client('EC2') as EC2;
-                    
+
                     if (model.enableEbsEncryptionByDefault === true) {
                         await ec2client.enableEbsEncryptionByDefault().promise();
                     } else if (model.enableEbsEncryptionByDefault === false) {
                         await ec2client.disableEbsEncryptionByDefault().promise();
                     }
-                    
+
                     if (typeof model.defaultEbsEncryptionKeyId === 'string') {
-                        await ec2client.modifyEbsDefaultKmsKeyId({ KmsKeyId: model.defaultEbsEncryptionKeyId}).promise();
+                        await ec2client
+                            .modifyEbsDefaultKmsKeyId({
+                                KmsKeyId: model.defaultEbsEncryptionKeyId,
+                            })
+                            .promise();
                     }
                 }
             }
             progress.status = OperationStatus.Success;
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             // exceptions module lets CloudFormation know the type of failure that occurred
             throw new exceptions.InternalFailure(err.message);
@@ -81,19 +89,23 @@ class Resource extends BaseResource<ResourceModel> {
     public async update(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         const prevModel: ResourceModel = request.previousResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        LOGGER.info({handler: 'update', request, callbackContext});
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
+        LOGGER.info({ handler: 'update', request, callbackContext });
 
         try {
             if (session instanceof SessionProxy) {
-
-                if (model.enableEbsEncryptionByDefault !== prevModel.enableEbsEncryptionByDefault) {
+                if (
+                    model.enableEbsEncryptionByDefault !==
+                    prevModel.enableEbsEncryptionByDefault
+                ) {
                     const ec2client = session.client('EC2') as EC2;
-                    
+
                     if (model.enableEbsEncryptionByDefault === true) {
                         await ec2client.enableEbsEncryptionByDefault().promise();
                     } else {
@@ -101,17 +113,24 @@ class Resource extends BaseResource<ResourceModel> {
                     }
                 }
 
-                if (model.defaultEbsEncryptionKeyId !== prevModel.defaultEbsEncryptionKeyId) {
+                if (
+                    model.defaultEbsEncryptionKeyId !==
+                    prevModel.defaultEbsEncryptionKeyId
+                ) {
                     const ec2client = session.client('EC2') as EC2;
                     if (typeof model.defaultEbsEncryptionKeyId === 'string') {
-                        await ec2client.modifyEbsDefaultKmsKeyId({ KmsKeyId: model.defaultEbsEncryptionKeyId}).promise();
+                        await ec2client
+                            .modifyEbsDefaultKmsKeyId({
+                                KmsKeyId: model.defaultEbsEncryptionKeyId,
+                            })
+                            .promise();
                     } else {
                         await ec2client.resetEbsDefaultKmsKeyId().promise();
                     }
                 }
             }
             progress.status = OperationStatus.Success;
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             // exceptions module lets CloudFormation know the type of failure that occurred
             throw new exceptions.InternalFailure(err.message);
@@ -135,27 +154,28 @@ class Resource extends BaseResource<ResourceModel> {
     public async delete(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        LOGGER.info({handler: 'delete', request, callbackContext});
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
+        LOGGER.info({ handler: 'delete', request, callbackContext });
 
         try {
             if (session instanceof SessionProxy) {
                 const ec2client = session.client('EC2') as EC2;
-                
+
                 if (model.enableEbsEncryptionByDefault === true) {
                     await ec2client.disableEbsEncryptionByDefault().promise();
                 }
-            
+
                 if (typeof model.defaultEbsEncryptionKeyId === 'string') {
                     await ec2client.resetEbsDefaultKmsKeyId().promise();
                 }
-            
             }
             progress.status = OperationStatus.Success;
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             // exceptions module lets CloudFormation know the type of failure that occurred
             throw new exceptions.InternalFailure(err.message);
@@ -178,11 +198,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async read(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.success<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
         return progress;
     }
 
@@ -199,11 +221,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async list(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
+        const progress = ProgressEvent.builder<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >()
             .status(OperationStatus.Success)
             .resourceModels([model])
             .build();

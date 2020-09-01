@@ -16,10 +16,9 @@ import { Organizations } from 'aws-sdk';
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-interface CallbackContext extends Record<string, any> {}
+type CallbackContext = Record<string, any>;
 
 class Resource extends BaseResource<ResourceModel> {
-
     /**
      * CloudFormation invokes this handler when the resource is initially created
      * during stack create operations.
@@ -33,24 +32,26 @@ class Resource extends BaseResource<ResourceModel> {
     public async create(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         LOGGER.info('create');
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
         try {
             LOGGER.info(request);
             LOGGER.info(model);
-            
+
             if (session instanceof SessionProxy) {
                 const client = session.client('Organizations') as Organizations;
-                
-                model.id = '123123123123'
+
+                model.id = '123123123123';
                 model.arn = 'aws::arn::account::' + model.id;
             }
             // Setting Status to success will signal to CloudFormation that the operation is complete
             progress.status = OperationStatus.Success;
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             // exceptions module lets CloudFormation know the type of failure that occurred
             throw new exceptions.InternalFailure(err.message);
@@ -73,18 +74,20 @@ class Resource extends BaseResource<ResourceModel> {
     public async update(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         LOGGER.info('update');
 
         const model: ResourceModel = request.desiredResourceState;
         const prevModel: ResourceModel = request.previousResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
+
         LOGGER.info(request);
         LOGGER.info(model);
         LOGGER.info(prevModel);
-        
+
         if (model.parentOU !== prevModel.parentOU) {
             progress.status = OperationStatus.Failed;
             progress.message = `cannot change parentOU on resource of type ${model.getTypeName()}`;
@@ -109,11 +112,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async delete(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         LOGGER.info('delete');
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >();
 
         LOGGER.info(request);
         LOGGER.info(model);
@@ -134,11 +139,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async read(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.success<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
         return progress;
     }
 
@@ -155,11 +162,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async list(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
+        const progress = ProgressEvent.builder<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >()
             .status(OperationStatus.Success)
             .resourceModels([model])
             .build();

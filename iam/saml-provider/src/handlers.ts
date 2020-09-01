@@ -11,25 +11,30 @@ import {
 } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { IAM } from 'aws-sdk';
-import { CreateSAMLProviderRequest, UpdateSAMLProviderRequest, DeleteSAMLProviderRequest } from 'aws-sdk/clients/iam';
+import {
+    CreateSAMLProviderRequest,
+    UpdateSAMLProviderRequest,
+    DeleteSAMLProviderRequest,
+} from 'aws-sdk/clients/iam';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-interface CallbackContext extends Record<string, any> {}
+type CallbackContext = Record<string, any>;
 
 class Resource extends BaseResource<ResourceModel> {
-
     @handlerEvent(Action.Create)
     public async create(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         LOGGER.info('create');
         LOGGER.info(callbackContext);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
 
         LOGGER.info(request);
         LOGGER.info(model);
@@ -40,21 +45,23 @@ class Resource extends BaseResource<ResourceModel> {
                 const client: IAM = session.client('IAM') as IAM;
                 const createSamlProviderRequest: CreateSAMLProviderRequest = {
                     Name: model.name,
-                    SAMLMetadataDocument: model.metadataDocument
+                    SAMLMetadataDocument: model.metadataDocument,
                 };
                 LOGGER.info(createSamlProviderRequest);
-                const response = await client.createSAMLProvider(createSamlProviderRequest).promise();
-                
+                const response = await client
+                    .createSAMLProvider(createSamlProviderRequest)
+                    .promise();
+
                 LOGGER.info(response);
                 model.arn = response.SAMLProviderArn;
             }
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             throw new exceptions.InternalFailure(err.message);
         }
         return progress;
     }
-    
+
     /**
      * CloudFormation invokes this handler when the resource is updated
      * as part of a stack update operation.
@@ -68,12 +75,14 @@ class Resource extends BaseResource<ResourceModel> {
     public async update(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         LOGGER.info('update');
         LOGGER.info(callbackContext);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
 
         LOGGER.info(request);
         LOGGER.info(model);
@@ -83,15 +92,17 @@ class Resource extends BaseResource<ResourceModel> {
                 const client: IAM = session.client('IAM') as IAM;
                 const updateSamlProviderRequest: UpdateSAMLProviderRequest = {
                     SAMLProviderArn: model.arn,
-                    SAMLMetadataDocument: model.metadataDocument
+                    SAMLMetadataDocument: model.metadataDocument,
                 };
 
                 LOGGER.info(updateSamlProviderRequest);
-                const response = await client.updateSAMLProvider(updateSamlProviderRequest).promise();
-                
+                const response = await client
+                    .updateSAMLProvider(updateSamlProviderRequest)
+                    .promise();
+
                 LOGGER.info(response);
             }
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             throw new exceptions.InternalFailure(err.message);
         }
@@ -112,27 +123,31 @@ class Resource extends BaseResource<ResourceModel> {
     public async delete(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         LOGGER.info('delete');
         LOGGER.info(callbackContext);
 
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >();
 
         try {
             if (session instanceof SessionProxy) {
                 const client: IAM = session.client('IAM') as IAM;
                 const deleteSamlProviderRequest: DeleteSAMLProviderRequest = {
-                    SAMLProviderArn: model.arn
+                    SAMLProviderArn: model.arn,
                 };
 
                 LOGGER.info(deleteSamlProviderRequest);
-                const response = await client.deleteSAMLProvider(deleteSamlProviderRequest).promise();
+                const response = await client
+                    .deleteSAMLProvider(deleteSamlProviderRequest)
+                    .promise();
                 progress.status = OperationStatus.Success;
                 LOGGER.info(response);
             }
-        } catch(err) {
+        } catch (err) {
             LOGGER.log(err);
             throw new exceptions.InternalFailure(err.message);
         }
@@ -152,11 +167,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async read(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.success<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
         return progress;
     }
 
@@ -173,11 +190,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async list(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
+        const progress = ProgressEvent.builder<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >()
             .status(OperationStatus.Success)
             .resourceModels([model])
             .build();
@@ -186,7 +205,6 @@ class Resource extends BaseResource<ResourceModel> {
 }
 
 const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
-
 
 export const entrypoint = resource.entrypoint;
 
