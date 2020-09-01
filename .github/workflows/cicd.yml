@@ -41,6 +41,7 @@ jobs:
         run: |
           npm run lint
           npm test
+      - name: Upload Coverage
         id: codecov
         run: |
           curl -s https://codecov.io/bash > codecov.sh
