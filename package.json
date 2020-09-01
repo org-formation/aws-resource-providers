@@ -9,7 +9,7 @@
         "build": "npx lerna run build",
         "lint": "npx eslint --ext .ts,.js .",
         "lint:fix": "npx eslint --fix --ext .ts,.js .",
-        "test": "npx jest --runInBand --no-cache",
+        "test": "npx jest --runInBand --no-cache --updateSnapshot",
         "test:debug": "npx --node-arg=--inspect jest --runInBand",
         "test:integration": "npx lerna run test:integration",
         "validate": "npx lerna run validate -- -vv"
