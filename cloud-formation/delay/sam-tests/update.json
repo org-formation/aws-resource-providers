@@ -1,0 +1,12 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ResourceId": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+        "Duration": "PT1M"
+    },
+    "previousResourceState": {
+        "ResourceId": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+        "Duration": "PT10S"
+    },
+    "logicalResourceIdentifier": "MyResource"
+}

@@ -14,9 +14,6 @@ rpdk.log*
 node_modules/
 coverage/
 
-# contains credentials
-sam-tests/
-
 .DS_Store
 .vscode
 utils

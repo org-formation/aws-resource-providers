@@ -1,7 +1,11 @@
+import { IAM } from 'aws-sdk';
+import { v4 as uuidv4 } from 'uuid';
+import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
 import {
     exceptions,
     OperationStatus,
     ResourceHandlerRequest,
+    SessionProxy,
     UnmodeledRequest,
 } from 'cfn-rpdk';
 import createOperation from '../sam-tests/create.json';
@@ -9,56 +13,56 @@ import deleteOperation from '../sam-tests/delete.json';
 import listOperation from '../sam-tests/list.json';
 import readOperation from '../sam-tests/read.json';
 import updateOperation from '../sam-tests/update.json';
-import { CallbackContext, resource, Resource } from '../src/handlers';
+import { resource, Resource } from '../src/handlers';
 import { ResourceModel } from '../src/models';
 
+const IDENTIFIER = 'f3390613-b2b5-4c31-a4c6-66813dff96a6';
+
+jest.mock('aws-sdk');
+jest.mock('uuid', () => {
+    return {
+        v4: () => IDENTIFIER,
+    };
+});
+
 describe('when calling handler', () => {
-    test('parse valid duration', () => {
-        [
-            ['PT0S', 0],
-            ['PT0020M', 1200],
-            ['PT12H', 43200],
-            ['PT02H40M36S', 9636],
-        ].forEach((item: [string, number]) => {
-            const duration = item[0];
-            const seconds = Resource['parseDuration'](duration);
-            expect(seconds).toBe(item[1]);
-        });
+    let session: SessionProxy;
+    let iam: AwsServiceMockBuilder<IAM>;
+
+    beforeAll(() => {
+        session = new SessionProxy({});
     });
 
-    test('parse invalid duration', () => {
-        [
-            null,
-            '',
-            'PT000',
-            '-PT10S',
-            'P1Y2M3W4DT5H6M7S',
-            'PT12H1S',
-            'PT23H58M22S',
-        ].forEach((duration: string) => {
-            const parseDuration = () => {
-                Resource['parseDuration'](duration);
-            };
-            expect(parseDuration).toThrow(exceptions.InvalidRequest);
+    beforeEach(async () => {
+        iam = on(IAM);
+        iam.mock('getAccountPasswordPolicy').resolve({
+            PasswordPolicy: {
+                MinimumPasswordLength: 6,
+            },
         });
+        iam.mock('updateAccountPasswordPolicy').resolve({});
+
+        iam.mock('deleteAccountPasswordPolicy').resolve({});
+        session['client'] = () => iam.instance;
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     test('create operation', async () => {
         const request = UnmodeledRequest.fromUnmodeled(createOperation).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const callbackContext: CallbackContext = {
-            Remaining: null,
-        };
-        const progress = await resource.create(null, request, callbackContext);
-        expect(progress).toMatchObject({
-            status: OperationStatus.InProgress,
+        const progress = await resource.create(session, request, {});
+        const model = request.desiredResourceState;
+        model.resourceId = IDENTIFIER;
+        expect(progress.serialize()).toMatchObject({
+            status: OperationStatus.Success,
             message: '',
-            callbackContext: {
-                Remaining: -540,
-            },
-            callbackDelaySeconds: 60,
-            resourceModel: request.desiredResourceState,
+            callbackDelaySeconds: 0,
+            resourceModel: model.serialize(),
         });
     });
 
@@ -66,17 +70,11 @@ describe('when calling handler', () => {
         const request = UnmodeledRequest.fromUnmodeled(updateOperation).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const callbackContext: CallbackContext = {
-            Remaining: 700,
-        };
-        const progress = await resource.update(null, request, callbackContext);
+        const progress = await resource.update(session, request, {});
         expect(progress).toMatchObject({
-            status: OperationStatus.InProgress,
+            status: OperationStatus.Success,
             message: '',
-            callbackContext: {
-                Remaining: 100,
-            },
-            callbackDelaySeconds: 600,
+            callbackDelaySeconds: 0,
             resourceModel: request.desiredResourceState,
         });
     });
@@ -85,22 +83,20 @@ describe('when calling handler', () => {
         const request = UnmodeledRequest.fromUnmodeled(deleteOperation).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const callbackContext: CallbackContext = {
-            Remaining: 0,
-        };
-        const progress = await resource.delete(null, request, callbackContext);
+        const progress = await resource.delete(session, request, {});
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
             callbackDelaySeconds: 0,
         });
+        expect(progress.resourceModel).toBeUndefined();
     });
 
     test('read operation', async () => {
         const request = UnmodeledRequest.fromUnmodeled(readOperation).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.read(null, request, {});
+        const progress = await resource.read(session, request, {});
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -113,7 +109,8 @@ describe('when calling handler', () => {
         const request = UnmodeledRequest.fromUnmodeled(listOperation).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.list(null, request, {});
+        const progress = await resource.list(session, request, {});
+        expect(iam.instance.getAccountPasswordPolicy).toHaveBeenCalledTimes(1);
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',

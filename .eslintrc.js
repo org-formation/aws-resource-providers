@@ -26,12 +26,11 @@ module.exports = {
             },
         },
     },
-    ignorePatterns: ['*.d.ts', '*.generated.ts'],
+    ignorePatterns: ['*.d.ts', '*.generated.ts', '**/src/models.ts'],
     rules: {
         // Require use of the `import { foo } from 'bar';` form instead of `import foo = require('bar');`
         '@typescript-eslint/no-require-imports': ['error'],
 
-        '@typescript-eslint/ban-ts-ignore': ['warn'],
         '@typescript-eslint/no-empty-function': ['warn'],
 
         // Require all imported dependencies are actually declared in package.json

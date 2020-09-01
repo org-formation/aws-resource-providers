@@ -28,7 +28,7 @@
     "npm": ">=6.0.0"
   },
   "dependencies": {
-    "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.0/cfn-rpdk-0.3.0.tgz",
+    "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
     "class-transformer": "^0.3.1",
     "uuid": "^7.0.3"
   },
