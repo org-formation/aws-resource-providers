@@ -4,7 +4,7 @@
     "description": "A community driven repository where you can find AWS Resource Type Providers for different purposes.",
     "scripts": {
         "bootstrap": "npm ci --optional && npx lerna bootstrap",
-        "reset": "npm run cleanup && npx rimraf -rf node_modules && npm run bootstrap",
+        "reset": "npm run cleanup && npx rimraf -rf **/node_modules && npm run bootstrap",
         "cleanup": "npx lerna run cleanup --stream --parallel",
         "build": "npx lerna run build",
         "lint": "npx eslint --ext .ts,.js .",
