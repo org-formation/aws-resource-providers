@@ -53,5 +53,5 @@
                 "s3:PutAccountPublicAccessBlock"
             ]
         }
-    }
+    }   
 }

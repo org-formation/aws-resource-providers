@@ -8,7 +8,9 @@ import { S3Control, STS } from 'aws-sdk'
 import { WrapHandler, ResourceProviderHandler, HandlerArgs } from './common';
 import { PutPublicAccessBlockRequest, DeletePublicAccessBlockRequest } from 'aws-sdk/clients/s3control';
 
-const upsertAccountPublicAccessBlockHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
+class Resource extends BaseResource<ResourceModel> { }
+
+const upsertAccountPublicAccessBlockHandler: ResourceProviderHandler<S3Control, ResourceModel> = async (action: Action, args: HandlerArgs, service: S3Control): Promise<ResourceModel> => {
     const model = args.request.desiredResourceState;
 
     const accountId = args.request.awsAccountId;
@@ -27,12 +29,14 @@ const upsertAccountPublicAccessBlockHandler: ResourceProviderHandler<S3Control> 
     const response = await service.putPublicAccessBlock(request).promise();
     console.info({ action, message: 'after invoke putPublicAccessBlock', response });
 
-    model.resourceId = accountId;
+    const result = new ResourceModel(model);
+    result.resourceId = accountId;
 
-    console.info({action, message: 'done', model});
+    console.info({action, message: 'done', result});
+    return result;
 }
 
-const deletePublicAccountBlockHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
+const deletePublicAccountBlockHandler: ResourceProviderHandler<S3Control, ResourceModel> = async (action: Action, args: HandlerArgs, service: S3Control) : Promise<null>  => {
 
     const request: DeletePublicAccessBlockRequest = {
         AccountId: args.request.awsAccountId
@@ -43,15 +47,15 @@ const deletePublicAccountBlockHandler: ResourceProviderHandler<S3Control> = asyn
     console.info({ action, message: 'after invoke deletePublicAccessBlock', response });
 
     console.info({action, message: 'done'});
+
+    return Promise.resolve(null);
 }
 
-const emptyHandler: ResourceProviderHandler<S3Control> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
+const emptyHandler: ResourceProviderHandler<S3Control, ResourceModel> = async (action: Action, args: HandlerArgs, service: S3Control) : Promise<null>  => {
     console.info({action, message: 'not implemented yet'});
-    return Promise.resolve();
+    return Promise.resolve(null);
 };
 
-
-class Resource extends BaseResource<ResourceModel> { }
 
 const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 resource.addHandler(Action.Create, WrapHandler(Action.Create, 'S3Control', upsertAccountPublicAccessBlockHandler));

@@ -25,7 +25,6 @@ Resources:
                 Action:
                 - "s3:GetAccountPublicAccessBlock"
                 - "s3:PutAccountPublicAccessBlock"
-                - "sts:GetCallerIdentity"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
