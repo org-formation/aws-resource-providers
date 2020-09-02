@@ -52,7 +52,7 @@ const deletePublicAccountBlockHandler: ResourceProviderHandler<S3Control, Resour
     return Promise.resolve(null);
 }
 
-const readPublicAccountBlockHandler: ResourceProviderHandler<S3Control, ResourceModel> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
+const readPublicAccountBlockHandler: ResourceProviderHandler<S3Control, ResourceModel> = async (action: Action, args: HandlerArgs, service: S3Control): Promise<ResourceModel>  => {
     const accountId = args.request.awsAccountId;
 
     const request: GetPublicAccessBlockRequest = {
