@@ -1,12 +1,13 @@
 import {
     Action,
     BaseResource,
-    SessionProxy
+    SessionProxy,
+    exceptions
 } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { S3Control, STS } from 'aws-sdk'
 import { WrapHandler, ResourceProviderHandler, HandlerArgs } from './common';
-import { PutPublicAccessBlockRequest, DeletePublicAccessBlockRequest } from 'aws-sdk/clients/s3control';
+import { PutPublicAccessBlockRequest, DeletePublicAccessBlockRequest, GetPublicAccessBlockRequest } from 'aws-sdk/clients/s3control';
 
 class Resource extends BaseResource<ResourceModel> { }
 
@@ -51,17 +52,47 @@ const deletePublicAccountBlockHandler: ResourceProviderHandler<S3Control, Resour
     return Promise.resolve(null);
 }
 
-const emptyHandler: ResourceProviderHandler<S3Control, ResourceModel> = async (action: Action, args: HandlerArgs, service: S3Control) : Promise<null>  => {
-    console.info({action, message: 'not implemented yet'});
-    return Promise.resolve(null);
-};
+const readPublicAccountBlockHandler: ResourceProviderHandler<S3Control, ResourceModel> = async (action: Action, args: HandlerArgs, service: S3Control)  => {
+    const accountId = args.request.awsAccountId;
 
+    const request: GetPublicAccessBlockRequest = {
+        AccountId: accountId
+    };
+
+    console.info({ action, message: 'before invoke getPublicAccessBlock', request });
+    try {
+        const response = await service.getPublicAccessBlock(request).promise();
+        console.info({ action, message: 'after invoke getPublicAccessBlock', response });
+
+        const publicAccessBlock = response.PublicAccessBlockConfiguration;
+
+        const result = new ResourceModel();
+        result.blockPublicAcls = publicAccessBlock.BlockPublicAcls;
+        result.blockPublicPolicy = publicAccessBlock.BlockPublicPolicy;
+        result.ignorePublicAcls = publicAccessBlock.IgnorePublicAcls;
+        result.restrictPublicBuckets = publicAccessBlock.RestrictPublicBuckets;
+        result.resourceId = accountId;
+
+        console.info({action, message: 'done', result});
+
+        return Promise.resolve(result);
+    } catch (err) {
+        if (err && err.code === 'NoSuchPublicAccessBlockConfiguration') {
+            throw new exceptions.NotFound(
+                ResourceModel.TYPE_NAME,
+                request.AccountId
+            );
+        } else { // Raise the original exception
+            throw err;
+        }
+    }
+}
 
 const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 resource.addHandler(Action.Create, WrapHandler(Action.Create, 'S3Control', upsertAccountPublicAccessBlockHandler));
 resource.addHandler(Action.Update, WrapHandler(Action.Update, 'S3Control', upsertAccountPublicAccessBlockHandler));
 resource.addHandler(Action.Delete, WrapHandler(Action.Delete, 'S3Control', deletePublicAccountBlockHandler));
-resource.addHandler(Action.Read, WrapHandler(Action.Read, 'S3Control', emptyHandler));
+resource.addHandler(Action.Read, WrapHandler(Action.Read, 'S3Control', readPublicAccountBlockHandler));
 
 export const entrypoint = resource.entrypoint;
 
