@@ -9,6 +9,8 @@ dist/
 
 # RPDK logs
 rpdk.log*
+sam.log
+cfn.log
 
 # Node.js
 node_modules/

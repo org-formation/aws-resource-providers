@@ -1,11 +1,10 @@
 {
+    "extends": "@tsconfig/node10/tsconfig.json",
     "compilerOptions": {
-        "target": "ES2017",
-        "module": "commonjs",
         "noImplicitAny": true,
         "allowJs": true,
         "alwaysStrict": true,
-        "esModuleInterop": true,
+        "strict": false,
         "removeComments": true,
         "moduleResolution": "node",
         "sourceMap": false,
@@ -14,9 +13,9 @@
         "outDir": "dist"
     },
     "include": [
-        "**/src/**/*.ts"
+        "src/**/*.ts"
     ],
     "exclude": [
-        "node_modules"
+        "**/node_modules"
     ]
 }
