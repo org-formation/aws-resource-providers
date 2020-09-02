@@ -66,22 +66,28 @@ describe('when calling handler', () => {
             ...new Error(),
             code: 'ServiceUnavailableException',
         });
+        const mockUpdate = iam.mock('updateAccountPasswordPolicy').reject({
+            ...new Error(),
+            code: 'ServiceUnavailableException',
+        });
         const spyRetrieve = jest.spyOn<any, any>(resource, 'retrievePasswordPolicy');
+        const spyUpsert = jest.spyOn<any, any>(resource, 'upsertPasswordPolicy');
         const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.create(session, request, {});
+        await expect(resource.create(session, request, {})).rejects.toThrow(
+            exceptions.InternalFailure
+        );
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveReturnedWith(
             Promise.reject(exceptions.ServiceInternalError)
         );
-        expect(progress.serialize()).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModel: request.desiredResourceState.serialize(),
-        });
+        expect(mockUpdate.mock).toHaveBeenCalledTimes(1);
+        expect(spyUpsert).toHaveBeenCalledTimes(1);
+        expect(spyUpsert).toHaveReturnedWith(
+            Promise.reject(exceptions.InternalFailure)
+        );
     });
 
     test('create operation fail with contain identifier', async () => {
