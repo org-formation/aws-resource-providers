@@ -52,11 +52,6 @@
             "permissions": [
                 "s3:PutAccountPublicAccessBlock"
             ]
-        },
-        "list": {
-            "permissions": [
-                "s3:GetAccountPublicAccessBlock"
-            ]
         }
     }
 }
