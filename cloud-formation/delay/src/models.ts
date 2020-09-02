@@ -1,6 +1,6 @@
 // This is a generated file. Modifications will be overwritten.
-import { BaseModel, Dict, Optional, transformValue } from 'cfn-rpdk';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { BaseModel, Dict, integer, Integer, Optional, transformValue } from 'cfn-rpdk';
+import { Exclude, Expose, Type, Transform } from 'class-transformer';
 
 export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
