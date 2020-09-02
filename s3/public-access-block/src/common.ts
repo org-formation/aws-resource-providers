@@ -39,21 +39,16 @@ const wrapHandlerInternal = async <TService extends any>(action: Action, handler
 
     console.info({ action, request, callbackContext, env: process.env });
 
-    try {
-        if (session instanceof SessionProxy) {
-            const service = session.client(handlerFunc.serviceName as any) as TService;
+    if (session instanceof SessionProxy) {
+        const service = session.client(handlerFunc.serviceName as any) as TService;
 
-            console.info({ action, message: 'before perform' });
-            await handlerFunc.perform(action, handlerArgs, service);
-            console.info({ action, message: 'after perform' });
+        console.info({ action, message: 'before perform' });
+        await handlerFunc.perform(action, handlerArgs, service);
+        console.info({ action, message: 'after perform' });
 
-            progress.status = OperationStatus.Success;
-            return progress;
-        } else {
-            throw new exceptions.InternalFailure('session is no SessionProxy');
-        }
-    } catch (err) {
-        console.error(err);
-        throw new exceptions.InternalFailure(err.message);
+        progress.status = OperationStatus.Success;
+        return progress;
+    } else {
+        throw new exceptions.InternalFailure('session is no SessionProxy');
     }
 }
