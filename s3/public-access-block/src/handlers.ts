@@ -57,7 +57,6 @@ const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 resource.addHandler(Action.Create, WrapHandler(Action.Create, 'S3Control', upsertAccountPublicAccessBlockHandler));
 resource.addHandler(Action.Update, WrapHandler(Action.Update, 'S3Control', upsertAccountPublicAccessBlockHandler));
 resource.addHandler(Action.Delete, WrapHandler(Action.Delete, 'S3Control', deletePublicAccountBlockHandler));
-resource.addHandler(Action.List, WrapHandler(Action.List, 'S3Control', emptyHandler));
 resource.addHandler(Action.Read, WrapHandler(Action.Read, 'S3Control', emptyHandler));
 
 export const entrypoint = resource.entrypoint;
