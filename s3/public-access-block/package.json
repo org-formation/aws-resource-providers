@@ -1,7 +1,7 @@
 {
-    "name": "community-servicequotas-cloudformation",
+    "name": "community-s3-publicaccessblock",
     "version": "0.1.0",
-    "description": "AWS custom resource provider named Community::ServiceQuotas::CloudFormation.",
+    "description": "AWS custom resource provider named Community::S3::PublicAccessBlock.",
     "main": "dist/handlers.js",
     "files": [
         "dist"
@@ -15,13 +15,14 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.0/cfn-rpdk-0.3.0.tgz",
-        "class-transformer": "^0.3.1",
-        "community-resource-providers-common": "https://github.com/org-formation/aws-resource-providers/releases/download/common-0.1.0/community-resource-providers-common-0.1.2.tgz"
+        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
+        "class-transformer": "^0.3.1"
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
-        "typescript": "^3.8.3",
+        "typescript": "^3.8.3"
+    },
+    "optionalDependencies": {
         "aws-sdk": "^2.656.0"
     }
 }
