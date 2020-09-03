@@ -10,7 +10,7 @@
     "build": "npx tsc",
     "prepack": "npm run build",
     "submit": "cfn generate && npm run build && cfn submit -vv --region us-east-1 --set-default",
-    "package": "cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
+    "package": "cfn generate && npm run build && cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
     "publish": "npm run package && aws s3 cp ${npm_package_name}-${npm_package_version}.zip s3://community-resource-provider-catalog/${npm_package_name}-${npm_package_version}.zip",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

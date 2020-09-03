@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  S3AccountPublicAccessBlock:
+    Type: 'Community::S3::PublicAccessBlock'
+    Properties:
+      BlockPublicAcls: true
+      BlockPublicPolicy: false
+      IgnorePublicAcls: true
+      RestrictPublicBuckets: true

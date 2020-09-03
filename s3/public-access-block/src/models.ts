@@ -6,11 +6,47 @@ export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
 
     @Exclude()
-    public static readonly TYPE_NAME: string = 'Community::CloudFormation::Delay';
+    public static readonly TYPE_NAME: string = 'Community::S3::PublicAccessBlock';
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';
 
+    @Expose({ name: 'BlockPublicAcls' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Boolean, 'blockPublicAcls', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    blockPublicAcls?: Optional<boolean>;
+    @Expose({ name: 'BlockPublicPolicy' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Boolean, 'blockPublicPolicy', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    blockPublicPolicy?: Optional<boolean>;
+    @Expose({ name: 'IgnorePublicAcls' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Boolean, 'ignorePublicAcls', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    ignorePublicAcls?: Optional<boolean>;
+    @Expose({ name: 'RestrictPublicBuckets' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Boolean, 'restrictPublicBuckets', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    restrictPublicBuckets?: Optional<boolean>;
     @Expose({ name: 'ResourceId' })
     @Transform(
         (value: any, obj: any) =>
@@ -20,15 +56,6 @@ export class ResourceModel extends BaseModel {
         }
     )
     resourceId?: Optional<string>;
-    @Expose({ name: 'Duration' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'duration', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    duration?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {
