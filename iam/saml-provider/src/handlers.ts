@@ -48,7 +48,7 @@ class Resource extends BaseResource<ResourceModel> {
                 LOGGER.info(response);
                 model.arn = response.SAMLProviderArn;
             } else {
-                throw new Error('no aws session found - did you forget to register the execution role?');
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
         } catch(err) {
             LOGGER.log(err);
@@ -92,6 +92,8 @@ class Resource extends BaseResource<ResourceModel> {
                 const response = await client.updateSAMLProvider(updateSamlProviderRequest).promise();
                 
                 LOGGER.info(response);
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
         } catch(err) {
             LOGGER.log(err);
@@ -133,6 +135,8 @@ class Resource extends BaseResource<ResourceModel> {
                 const response = await client.deleteSAMLProvider(deleteSamlProviderRequest).promise();
                 progress.status = OperationStatus.Success;
                 LOGGER.info(response);
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
         } catch(err) {
             LOGGER.log(err);

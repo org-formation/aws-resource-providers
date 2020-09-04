@@ -63,7 +63,7 @@ class Resource extends BaseResource<ResourceModel> {
                     'successfully retrieved.'
                 );
             } else {
-                throw new Error('no aws session found - did you forget to register the execution role?');
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
         } catch(err) {
             LOGGER.log(err);
@@ -115,6 +115,8 @@ class Resource extends BaseResource<ResourceModel> {
                     `[${result.resourceId}] [${logicalResourceId}]`,
                     'successfully upserted.'
                 );
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
         } catch(err) {
             LOGGER.log(err);
@@ -264,6 +266,8 @@ class Resource extends BaseResource<ResourceModel> {
                         `[${model.resourceId}] [${request.logicalResourceIdentifier}]`,
                         'successfully deleted.'
                     );
+                } else {
+                    throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
                 }
             } catch(err) {
                 LOGGER.log(err);

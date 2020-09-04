@@ -50,7 +50,7 @@ class Resource extends BaseResource<ResourceModel> {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
                 await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
             } else {
-                throw new Error('no aws session found - did you forget to register the execution role?');
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch (err) {
@@ -88,6 +88,8 @@ class Resource extends BaseResource<ResourceModel> {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
                 await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch (err) {
