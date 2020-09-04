@@ -56,6 +56,6 @@ const wrapHandlerInternal = async <TService extends any, TResource extends Resou
         progress.status = OperationStatus.Success;
         return progress;
     } else {
-        throw new exceptions.InternalFailure('session is no SessionProxy');
+        throw new exceptions.InternalFailure('session is no SessionProxy - did you forget to register the execution role?');
     }
 }

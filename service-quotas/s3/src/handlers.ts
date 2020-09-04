@@ -43,12 +43,14 @@ class Resource extends BaseResource<ResourceModel> {
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
         LOGGER.info({ handler: 'create', request, callbackContext, env: process.env });
-        model.resourceId = 's3-quotas'; // there can only be one
+        model.resourceId = request.awsAccountId; // there can only be one
 
         try {
             if (session instanceof SessionProxy) {
                 const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
                 await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
+            } else {
+                throw new Error('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch (err) {

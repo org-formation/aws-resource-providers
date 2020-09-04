@@ -62,6 +62,8 @@ class Resource extends BaseResource<ResourceModel> {
                     `[${result.resourceId}] [${logicalResourceId}]`,
                     'successfully retrieved.'
                 );
+            } else {
+                throw new Error('no aws session found - did you forget to register the execution role?');
             }
         } catch(err) {
             LOGGER.log(err);

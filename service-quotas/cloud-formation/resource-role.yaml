@@ -24,6 +24,7 @@ Resources:
               - Effect: Allow
                 Action:
                 - "cloudformation:DescribeAccountLimits"
+                - "servicequotas:GetAWSDefaultServiceQuota"
                 - "servicequotas:getServiceQuota"
                 - "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota"
                 - "servicequotas:requestServiceQuotaIncrease"

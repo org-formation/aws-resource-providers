@@ -47,6 +47,8 @@ class Resource extends BaseResource<ResourceModel> {
                 
                 LOGGER.info(response);
                 model.arn = response.SAMLProviderArn;
+            } else {
+                throw new Error('no aws session found - did you forget to register the execution role?');
             }
         } catch(err) {
             LOGGER.log(err);
