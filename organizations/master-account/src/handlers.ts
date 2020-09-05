@@ -48,6 +48,8 @@ class Resource extends BaseResource<ResourceModel> {
 
                 model.id = '123123123123';
                 model.arn = 'aws::arn::account::' + model.id;
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             // Setting Status to success will signal to CloudFormation that the operation is complete
             progress.status = OperationStatus.Success;

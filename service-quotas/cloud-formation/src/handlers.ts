@@ -13,6 +13,7 @@ import {
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk';
 import * as Quotas from 'community-resource-providers-common/lib/service-quotas';
+import { AnyARecord } from 'dns';
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
@@ -58,14 +59,10 @@ class Resource extends BaseResource<ResourceModel> {
 
         try {
             if (session instanceof SessionProxy) {
-                const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-                await Quotas.UpsertQuotas(
-                    serviceQuotas,
-                    new ResourceModel(),
-                    model,
-                    quotaCodeForPropertyName,
-                    LOGGER
-                );
+                const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
+                await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch (err) {
@@ -103,14 +100,10 @@ class Resource extends BaseResource<ResourceModel> {
 
         try {
             if (session instanceof SessionProxy) {
-                const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-                await Quotas.UpsertQuotas(
-                    serviceQuotas,
-                    previous,
-                    desired,
-                    quotaCodeForPropertyName,
-                    LOGGER
-                );
+                const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
+                await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch (err) {

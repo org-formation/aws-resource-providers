@@ -43,7 +43,7 @@ class Resource extends BaseResource<ResourceModel> {
         try {
             if (session instanceof SessionProxy) {
                 const client = session.client('S3');
-            }
+            } 
             // Setting Status to success will signal to CloudFormation that the operation is complete
             progress.status = OperationStatus.Success;
         } catch (err) {

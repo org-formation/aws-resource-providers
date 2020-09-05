@@ -9,9 +9,9 @@
     "scripts": {
         "build": "npx tsc",
         "prepack": "cfn generate && npm run build",
-        "submit": "npm run prepack && cfn submit -vv --region us-east-1 --set-default",
-        "version": "npm run prepack && cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
-        "publish": "npm run package && aws s3 cp ${npm_package_name}-${npm_package_version}.zip s3://community-resource-provider-catalog/${npm_package_name}-${npm_package_version}.zip",
+        "submit": "npm run prepack && cfn submit -vv --region eu-west-1 --set-default",
+        "package": "npm run prepack && cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
+        "version": "npm run package && aws s3 cp ${npm_package_name}-${npm_package_version}.zip s3://community-resource-provider-catalog/${npm_package_name}-${npm_package_version}.zip && aws s3 cp resource-role.yaml s3://community-resource-provider-catalog/${npm_package_name}-resource-role-${npm_package_version}.yml",
         "test": "npx jest",
         "test:integration": "cfn test",
         "validate": "cfn validate"
