@@ -39,29 +39,22 @@ class Resource extends BaseResource<ResourceModel> {
         const progress = ProgressEvent.progress<
             ProgressEvent<ResourceModel, CallbackContext>
         >(model);
-        try {
-            LOGGER.info(request);
-            LOGGER.info(model);
 
-            if (session instanceof SessionProxy) {
-                const client = session.client('Organizations') as Organizations;
+        LOGGER.info(request);
+        LOGGER.info(model);
 
-                model.id = '123123123123';
-                model.arn = 'aws::arn::account::' + model.id;
-            } else {
-                throw new exceptions.InternalFailure(
-                    'no aws session found - did you forget to register the execution role?'
-                );
-            }
-            // Setting Status to success will signal to CloudFormation that the operation is complete
-            progress.status = OperationStatus.Success;
-        } catch (err) {
-            LOGGER.log(err);
-            // exceptions module lets CloudFormation know the type of failure that occurred
-            throw new exceptions.InternalFailure(err.message);
-            // this can also be done by returning a failed progress event
-            // return ProgressEvent.failed(HandlerErrorCode.InternalFailure, err.message);
+        if (session instanceof SessionProxy) {
+            const client = session.client('Organizations') as Organizations;
+
+            model.id = '123123123123';
+            model.arn = 'aws::arn::account::' + model.id;
+        } else {
+            throw new exceptions.InvalidCredentials(
+                'no aws session found - did you forget to register the execution role?'
+            );
         }
+        // Setting Status to success will signal to CloudFormation that the operation is complete
+        progress.status = OperationStatus.Success;
         return progress;
     }
 

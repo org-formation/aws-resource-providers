@@ -3,8 +3,8 @@ module.exports = {
     testEnvironment: 'node',
     coverageThreshold: {
         global: {
-            branches: 50,
-            statements: 60,
+            branches: 20,
+            statements: 20,
         },
     },
     collectCoverage: true,

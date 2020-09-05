@@ -103,29 +103,24 @@ export class Resource extends BaseResource<ResourceModel> {
     ): Promise<PasswordPolicy> {
         let result: PasswordPolicy = null;
         if (session instanceof SessionProxy) {
-            try {
-                const client = session.client('IAM') as IAM;
-                const params = JSON.parse(JSON.stringify(request));
-                delete params['ResourceId'];
-                delete params['ExpirePasswords'];
-                console.info('updateAccountPasswordPolicy input', params);
-                const response = await client
-                    .updateAccountPasswordPolicy(params)
-                    .promise();
-                console.info('updateAccountPasswordPolicy response', response);
-                result = PasswordPolicy.deserialize({
-                    ...params,
-                    ResourceId: resourceId || uuidv4(),
-                });
-                LOGGER.info(
-                    PasswordPolicy.TYPE_NAME,
-                    `[${result.resourceId}] [${logicalResourceId}]`,
-                    'successfully upserted.'
-                );
-            } catch (err) {
-                LOGGER.log(err);
-                throw new exceptions.InternalFailure(err.message);
-            }
+            const client = session.client('IAM') as IAM;
+            const params = JSON.parse(JSON.stringify(request));
+            delete params['ResourceId'];
+            delete params['ExpirePasswords'];
+            console.info('updateAccountPasswordPolicy input', params);
+            const response = await client
+                .updateAccountPasswordPolicy(params)
+                .promise();
+            console.info('updateAccountPasswordPolicy response', response);
+            result = PasswordPolicy.deserialize({
+                ...params,
+                ResourceId: resourceId || uuidv4(),
+            });
+            LOGGER.info(
+                PasswordPolicy.TYPE_NAME,
+                `[${result.resourceId}] [${logicalResourceId}]`,
+                'successfully upserted.'
+            );
         } else {
             throw new exceptions.InvalidCredentials(
                 'no aws session found - did you forget to register the execution role?'
@@ -264,21 +259,16 @@ export class Resource extends BaseResource<ResourceModel> {
         );
         if (model) {
             if (session instanceof SessionProxy) {
-                try {
-                    const client = session.client('IAM') as IAM;
-                    const response = await client
-                        .deleteAccountPasswordPolicy()
-                        .promise();
-                    console.info('deleteAccountPasswordPolicy response', response);
-                    LOGGER.info(
-                        this.typeName,
-                        `[${model.resourceId}] [${request.logicalResourceIdentifier}]`,
-                        'successfully deleted.'
-                    );
-                } catch (err) {
-                    LOGGER.log(err);
-                    throw new exceptions.InternalFailure(err.message);
-                }
+                const client = session.client('IAM') as IAM;
+                const response = await client
+                    .deleteAccountPasswordPolicy()
+                    .promise();
+                console.info('deleteAccountPasswordPolicy response', response);
+                LOGGER.info(
+                    this.typeName,
+                    `[${model.resourceId}] [${request.logicalResourceIdentifier}]`,
+                    'successfully deleted.'
+                );
             } else {
                 throw new exceptions.InvalidCredentials(
                     'no aws session found - did you forget to register the execution role?'

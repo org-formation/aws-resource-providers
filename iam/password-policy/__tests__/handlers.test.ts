@@ -95,7 +95,9 @@ describe('when calling handler', () => {
         ).toModeled<ResourceModel>(resource['modelCls']);
         await expect(
             resource['invokeHandler'](session, request, Action.Create, {})
-        ).rejects.toThrow(exceptions.InternalFailure);
+        ).rejects.toMatchObject({
+            code: 'ServiceUnavailableException',
+        });
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveReturnedWith(
@@ -183,9 +185,11 @@ describe('when calling handler', () => {
         const request = UnmodeledRequest.fromUnmodeled(
             fixtureMap.get(Action.Delete)
         ).toModeled<ResourceModel>(resource['modelCls']);
-        await expect(
-            resource['invokeHandler'](session, request, Action.Delete, {})
-        ).rejects.toThrow(exceptions.NotFound);
+        await resource['invokeHandler'](session, request, Action.Delete, {}).catch(
+            (e: exceptions.BaseHandlerException) => {
+                expect(e).toEqual(expect.any(exceptions.NotFound));
+            }
+        );
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveReturnedWith(Promise.reject(exceptions.NotFound));
@@ -201,7 +205,9 @@ describe('when calling handler', () => {
         ).toModeled<ResourceModel>(resource['modelCls']);
         await expect(
             resource['invokeHandler'](session, request, Action.Delete, {})
-        ).rejects.toThrow(exceptions.InternalFailure);
+        ).rejects.toMatchObject({
+            code: 'ServiceUnavailableException',
+        });
         expect(mockDelete.mock).toHaveBeenCalledTimes(1);
     });
 

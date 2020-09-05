@@ -1,6 +1,6 @@
 import { Action, BaseResource, SessionProxy, exceptions } from 'cfn-rpdk';
 import { ResourceModel } from './models';
-import { S3Control, STS } from 'aws-sdk';
+import { S3Control } from 'aws-sdk';
 import { WrapHandler, ResourceProviderHandler, HandlerArgs } from './common';
 import {
     PutPublicAccessBlockRequest,
@@ -105,7 +105,7 @@ const readPublicAccountBlockHandler: ResourceProviderHandler<
     }
 };
 
-const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
+export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 resource.addHandler(
     Action.Create,
     WrapHandler(Action.Create, 'S3Control', upsertAccountPublicAccessBlockHandler)

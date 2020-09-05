@@ -45,10 +45,6 @@
             "permissions": [
                 "iam:DeleteSamlProvider"
             ]
-        },
-        "list": {
-            "permissions": [
-            ]
         }
     }
 }
