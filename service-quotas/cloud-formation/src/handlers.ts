@@ -59,10 +59,18 @@ class Resource extends BaseResource<ResourceModel> {
 
         try {
             if (session instanceof SessionProxy) {
-                const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
+                const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
+                // await Quotas.UpsertQuotas(
+                //     serviceQuotas,
+                //     new ResourceModel(),
+                //     model,
+                //     quotaCodeForPropertyName,
+                //     LOGGER
+                // );
             } else {
-                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
+                throw new exceptions.InternalFailure(
+                    'no aws session found - did you forget to register the execution role?'
+                );
             }
             progress.status = OperationStatus.Success;
         } catch (err) {
@@ -100,10 +108,18 @@ class Resource extends BaseResource<ResourceModel> {
 
         try {
             if (session instanceof SessionProxy) {
-                const serviceQuotas = session.client("ServiceQuotas") as ServiceQuotas;
-                await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
+                const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
+                // await Quotas.UpsertQuotas(
+                //     serviceQuotas,
+                //     (previous as unkown) as BaseModel,
+                //     desired,
+                //     quotaCodeForPropertyName,
+                //     LOGGER
+                // );
             } else {
-                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
+                throw new exceptions.InternalFailure(
+                    'no aws session found - did you forget to register the execution role?'
+                );
             }
             progress.status = OperationStatus.Success;
         } catch (err) {

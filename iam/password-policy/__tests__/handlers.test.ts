@@ -59,9 +59,9 @@ describe('when calling handler', () => {
 
     test('create operation successful', async () => {
         const spyUuid = jest.spyOn(uuid, 'v4');
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Create)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](
             session,
             request,
@@ -90,9 +90,9 @@ describe('when calling handler', () => {
         });
         const spyRetrieve = jest.spyOn<any, any>(resource, 'retrievePasswordPolicy');
         const spyUpsert = jest.spyOn<any, any>(resource, 'upsertPasswordPolicy');
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Create)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         await expect(
             resource['invokeHandler'](session, request, Action.Create, {})
         ).rejects.toThrow(exceptions.InternalFailure);
@@ -109,9 +109,9 @@ describe('when calling handler', () => {
     });
 
     test('create operation fail with contain identifier', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Create)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         request.desiredResourceState.resourceId = IDENTIFIER;
         await expect(
             resource['invokeHandler'](session, request, Action.Create, {})
@@ -119,9 +119,9 @@ describe('when calling handler', () => {
     });
 
     test('update operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Update)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](
             session,
             request,
@@ -137,9 +137,9 @@ describe('when calling handler', () => {
     });
 
     test('update operation fail not found', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Update)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         request.desiredResourceState.resourceId = undefined;
         await expect(
             resource['invokeHandler'](session, request, Action.Update, {})
@@ -147,9 +147,9 @@ describe('when calling handler', () => {
     });
 
     test('update operation fail not updatable', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Update)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         request.previousResourceState.resourceId = undefined;
         await expect(
             resource['invokeHandler'](session, request, Action.Update, {})
@@ -157,9 +157,9 @@ describe('when calling handler', () => {
     });
 
     test('delete operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Delete)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](
             session,
             request,
@@ -180,9 +180,9 @@ describe('when calling handler', () => {
             code: 'NoSuchEntity',
         });
         const spyRetrieve = jest.spyOn<any, any>(resource, 'retrievePasswordPolicy');
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Delete)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         await expect(
             resource['invokeHandler'](session, request, Action.Delete, {})
         ).rejects.toThrow(exceptions.NotFound);
@@ -196,9 +196,9 @@ describe('when calling handler', () => {
             ...new Error(),
             code: 'ServiceUnavailableException',
         });
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Delete)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         await expect(
             resource['invokeHandler'](session, request, Action.Delete, {})
         ).rejects.toThrow(exceptions.InternalFailure);
@@ -206,9 +206,9 @@ describe('when calling handler', () => {
     });
 
     test('read operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Read)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Read)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](
             session,
             request,
@@ -224,9 +224,9 @@ describe('when calling handler', () => {
     });
 
     test('list operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.List)).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.List)
+        ).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](
             session,
             request,
@@ -248,10 +248,13 @@ describe('when calling handler', () => {
             const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
                 ResourceModel
             >(resource['modelCls']);
-            promises.push(resource['invokeHandler'](null, request, action, {})
-                .catch((e: exceptions.BaseHandlerException) => {
-                    expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
-                }));
+            promises.push(
+                resource['invokeHandler'](null, request, action, {}).catch(
+                    (e: exceptions.BaseHandlerException) => {
+                        expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
+                    }
+                )
+            );
         });
         expect.assertions(promises.length);
         await Promise.all(promises);

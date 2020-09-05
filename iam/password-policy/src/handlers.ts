@@ -284,7 +284,6 @@ export class Resource extends BaseResource<ResourceModel> {
                     'no aws session found - did you forget to register the execution role?'
                 );
             }
-            
         }
         progress.status = OperationStatus.Success;
         LOGGER.info('DELETE progress', progress);

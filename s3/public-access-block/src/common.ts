@@ -84,6 +84,8 @@ const wrapHandlerInternal = async <
         progress.status = OperationStatus.Success;
         return progress;
     } else {
-        throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
+        throw new exceptions.InternalFailure(
+            'no aws session found - did you forget to register the execution role?'
+        );
     }
 };
