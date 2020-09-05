@@ -109,8 +109,7 @@ class Resource extends BaseResource<ResourceModel> {
             }
 
             if (
-                model.defaultEbsEncryptionKeyId !==
-                prevModel.defaultEbsEncryptionKeyId
+                model.defaultEbsEncryptionKeyId !== prevModel.defaultEbsEncryptionKeyId
             ) {
                 const ec2client = session.client('EC2') as EC2;
                 if (typeof model.defaultEbsEncryptionKeyId === 'string') {

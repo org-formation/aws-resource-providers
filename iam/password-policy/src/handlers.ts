@@ -108,9 +108,7 @@ export class Resource extends BaseResource<ResourceModel> {
             delete params['ResourceId'];
             delete params['ExpirePasswords'];
             console.info('updateAccountPasswordPolicy input', params);
-            const response = await client
-                .updateAccountPasswordPolicy(params)
-                .promise();
+            const response = await client.updateAccountPasswordPolicy(params).promise();
             console.info('updateAccountPasswordPolicy response', response);
             result = PasswordPolicy.deserialize({
                 ...params,
@@ -260,9 +258,7 @@ export class Resource extends BaseResource<ResourceModel> {
         if (model) {
             if (session instanceof SessionProxy) {
                 const client = session.client('IAM') as IAM;
-                const response = await client
-                    .deleteAccountPasswordPolicy()
-                    .promise();
+                const response = await client.deleteAccountPasswordPolicy().promise();
                 console.info('deleteAccountPasswordPolicy response', response);
                 LOGGER.info(
                     this.typeName,
