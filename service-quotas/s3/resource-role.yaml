@@ -23,6 +23,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "iam:CreateServiceLinkedRole"
                 - "servicequotas:GetAWSDefaultServiceQuota"
                 - "servicequotas:getServiceQuota"
                 - "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota"

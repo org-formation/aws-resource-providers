@@ -32,7 +32,8 @@
                 "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
                 "servicequotas:getServiceQuota",
                 "cloudformation:DescribeAccountLimits",
-                "servicequotas:GetAWSDefaultServiceQuota"
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
             ]
         },
         "read": {
@@ -45,7 +46,8 @@
                 "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
                 "servicequotas:getServiceQuota",
                 "cloudformation:DescribeAccountLimits",
-                "servicequotas:GetAWSDefaultServiceQuota"
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
             ]
         },
         "delete": {
