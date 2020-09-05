@@ -105,23 +105,23 @@ describe('when calling handler', () => {
         expect(progress.resourceModel).toBeNull();
     });
 
-    // test('read operation successful', async () => {
-    //     const request = UnmodeledRequest.fromUnmodeled(
-    //         fixtureMap.get(Action.Read)
-    //     ).toModeled<ResourceModel>(resource['modelCls']);
-    //     const progress = await resource['invokeHandler'](
-    //         session,
-    //         request,
-    //         Action.Read,
-    //         {}
-    //     );
-    //     expect(progress).toMatchObject({
-    //         status: OperationStatus.Success,
-    //         message: '',
-    //         callbackDelaySeconds: 0,
-    //         resourceModel: request.desiredResourceState,
-    //     });
-    // });
+    test('read operation successful', async () => {
+        const request = UnmodeledRequest.fromUnmodeled(
+            fixtureMap.get(Action.Read)
+        ).toModeled<ResourceModel>(resource['modelCls']);
+        const progress = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Read,
+            {}
+        );
+        expect(progress).toMatchObject({
+            status: OperationStatus.Success,
+            message: '',
+            callbackDelaySeconds: 0,
+            resourceModel: request.desiredResourceState,
+        });
+    });
 
     test('all operations fail without session', async () => {
         const promises: any[] = [];

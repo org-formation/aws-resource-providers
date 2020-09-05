@@ -1,8 +1,6 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
-    "desiredResourceState": {
-        "Duration": "PT10S"
-    },
+    "desiredResourceState": {},
     "previousResourceState": null,
     "logicalResourceIdentifier": "MyResource"
 }
