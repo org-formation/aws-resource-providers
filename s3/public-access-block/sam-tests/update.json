@@ -1,18 +1,19 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "ResourceId": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+        "ResourceId": "123456789012",
         "BlockPublicAcls": false,
         "BlockPublicPolicy": false,
         "IgnorePublicAcls": true,
         "RestrictPublicBuckets": true
     },
     "previousResourceState": {
-        "ResourceId": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+        "ResourceId": "123456789012",
         "BlockPublicAcls": true,
         "BlockPublicPolicy": false,
         "IgnorePublicAcls": true,
         "RestrictPublicBuckets": true
     },
+    "awsAccountId": "123456789012",
     "logicalResourceIdentifier": "MyResource"
 }
