@@ -1,7 +1,13 @@
 import { IAM } from 'aws-sdk';
 import uuid from 'uuid';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { exceptions, OperationStatus, SessionProxy, UnmodeledRequest } from 'cfn-rpdk';
+import {
+    Action,
+    exceptions,
+    OperationStatus,
+    SessionProxy,
+    UnmodeledRequest,
+} from 'cfn-rpdk';
 import createFixture from '../sam-tests/create.json';
 import deleteFixture from '../sam-tests/delete.json';
 import listFixture from '../sam-tests/list.json';
@@ -22,9 +28,16 @@ jest.mock('uuid', () => {
 describe('when calling handler', () => {
     let session: SessionProxy;
     let iam: AwsServiceMockBuilder<IAM>;
+    let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
         session = new SessionProxy({});
+        fixtureMap = new Map<Action, Record<string, any>>();
+        fixtureMap.set(Action.Create, createFixture);
+        fixtureMap.set(Action.Read, readFixture);
+        fixtureMap.set(Action.Update, updateFixture);
+        fixtureMap.set(Action.Delete, deleteFixture);
+        fixtureMap.set(Action.List, listFixture);
     });
 
     beforeEach(async () => {
@@ -46,10 +59,15 @@ describe('when calling handler', () => {
 
     test('create operation successful', async () => {
         const spyUuid = jest.spyOn(uuid, 'v4');
-        const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.create(session, request, {});
+        const progress = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Create,
+            {}
+        );
         const model = request.desiredResourceState;
         model.resourceId = IDENTIFIER;
         expect(spyUuid).toHaveBeenCalledTimes(1);
@@ -72,12 +90,12 @@ describe('when calling handler', () => {
         });
         const spyRetrieve = jest.spyOn<any, any>(resource, 'retrievePasswordPolicy');
         const spyUpsert = jest.spyOn<any, any>(resource, 'upsertPasswordPolicy');
-        const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        await expect(resource.create(session, request, {})).rejects.toThrow(
-            exceptions.InternalFailure
-        );
+        await expect(
+            resource['invokeHandler'](session, request, Action.Create, {})
+        ).rejects.toThrow(exceptions.InternalFailure);
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveReturnedWith(
@@ -91,20 +109,25 @@ describe('when calling handler', () => {
     });
 
     test('create operation fail with contain identifier', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<
             ResourceModel
         >(resource['modelCls']);
         request.desiredResourceState.resourceId = IDENTIFIER;
-        await expect(resource.create(session, request, {})).rejects.toThrow(
-            exceptions.InvalidRequest
-        );
+        await expect(
+            resource['invokeHandler'](session, request, Action.Create, {})
+        ).rejects.toThrow(exceptions.InvalidRequest);
     });
 
     test('update operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(updateFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.update(session, request, {});
+        const progress = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Update,
+            {}
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -114,30 +137,35 @@ describe('when calling handler', () => {
     });
 
     test('update operation fail not found', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(updateFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<
             ResourceModel
         >(resource['modelCls']);
         request.desiredResourceState.resourceId = undefined;
-        await expect(resource.update(session, request, {})).rejects.toThrow(
-            exceptions.NotFound
-        );
+        await expect(
+            resource['invokeHandler'](session, request, Action.Update, {})
+        ).rejects.toThrow(exceptions.NotFound);
     });
 
     test('update operation fail not updatable', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(updateFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<
             ResourceModel
         >(resource['modelCls']);
         request.previousResourceState.resourceId = undefined;
-        await expect(resource.update(session, request, {})).rejects.toThrow(
-            exceptions.NotUpdatable
-        );
+        await expect(
+            resource['invokeHandler'](session, request, Action.Update, {})
+        ).rejects.toThrow(exceptions.NotUpdatable);
     });
 
     test('delete operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(deleteFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.delete(session, request, {});
+        const progress = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Delete,
+            {}
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -152,12 +180,12 @@ describe('when calling handler', () => {
             code: 'NoSuchEntity',
         });
         const spyRetrieve = jest.spyOn<any, any>(resource, 'retrievePasswordPolicy');
-        const request = UnmodeledRequest.fromUnmodeled(deleteFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        await expect(resource.delete(session, request, {})).rejects.toThrow(
-            exceptions.NotFound
-        );
+        await expect(
+            resource['invokeHandler'](session, request, Action.Delete, {})
+        ).rejects.toThrow(exceptions.NotFound);
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveReturnedWith(Promise.reject(exceptions.NotFound));
@@ -168,20 +196,25 @@ describe('when calling handler', () => {
             ...new Error(),
             code: 'ServiceUnavailableException',
         });
-        const request = UnmodeledRequest.fromUnmodeled(deleteFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        await expect(resource.delete(session, request, {})).rejects.toThrow(
-            exceptions.InternalFailure
-        );
+        await expect(
+            resource['invokeHandler'](session, request, Action.Delete, {})
+        ).rejects.toThrow(exceptions.InternalFailure);
         expect(mockDelete.mock).toHaveBeenCalledTimes(1);
     });
 
     test('read operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Read)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.read(session, request, {});
+        const progress = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Read,
+            {}
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -191,10 +224,15 @@ describe('when calling handler', () => {
     });
 
     test('list operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(listFixture).toModeled<
+        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.List)).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.list(session, request, {});
+        const progress = await resource['invokeHandler'](
+            session,
+            request,
+            Action.List,
+            {}
+        );
         expect(iam.instance.getAccountPasswordPolicy).toHaveBeenCalledTimes(1);
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
@@ -202,5 +240,20 @@ describe('when calling handler', () => {
             callbackDelaySeconds: 0,
             resourceModels: [request.desiredResourceState],
         });
+    });
+
+    test('all operations fail without session', async () => {
+        const promises: any[] = [];
+        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
+            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
+                ResourceModel
+            >(resource['modelCls']);
+            promises.push(resource['invokeHandler'](null, request, action, {})
+                .catch((e: exceptions.BaseHandlerException) => {
+                    expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
+                }));
+        });
+        expect.assertions(promises.length);
+        await Promise.all(promises);
     });
 });

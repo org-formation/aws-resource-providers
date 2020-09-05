@@ -46,8 +46,8 @@ export class Resource extends BaseResource<ResourceModel> {
         request?: PasswordPolicy
     ): Promise<PasswordPolicy> {
         let result: PasswordPolicy = null;
-        try {
-            if (session instanceof SessionProxy) {
+        if (session instanceof SessionProxy) {
+            try {
                 const client = session.client('IAM') as IAM;
                 const response = await client.getAccountPasswordPolicy().promise();
                 console.info('getAccountPasswordPolicy response', response);
@@ -64,18 +64,22 @@ export class Resource extends BaseResource<ResourceModel> {
                     `[${result.resourceId}] [${logicalResourceId}]`,
                     'successfully retrieved.'
                 );
+            } catch (err) {
+                LOGGER.log(err);
+                if (err && err.code === 'NoSuchEntity') {
+                    throw new exceptions.NotFound(
+                        PasswordPolicy.TYPE_NAME,
+                        resourceId || logicalResourceId
+                    );
+                } else {
+                    // Raise the original exception
+                    throw err;
+                }
             }
-        } catch (err) {
-            LOGGER.log(err);
-            if (err && err.code === 'NoSuchEntity') {
-                throw new exceptions.NotFound(
-                    PasswordPolicy.TYPE_NAME,
-                    resourceId || logicalResourceId
-                );
-            } else {
-                // Raise the original exception
-                throw err;
-            }
+        } else {
+            throw new exceptions.InvalidCredentials(
+                'no aws session found - did you forget to register the execution role?'
+            );
         }
         return Promise.resolve(result);
     }
@@ -98,8 +102,8 @@ export class Resource extends BaseResource<ResourceModel> {
         resourceId?: string
     ): Promise<PasswordPolicy> {
         let result: PasswordPolicy = null;
-        try {
-            if (session instanceof SessionProxy) {
+        if (session instanceof SessionProxy) {
+            try {
                 const client = session.client('IAM') as IAM;
                 const params = JSON.parse(JSON.stringify(request));
                 delete params['ResourceId'];
@@ -118,10 +122,14 @@ export class Resource extends BaseResource<ResourceModel> {
                     `[${result.resourceId}] [${logicalResourceId}]`,
                     'successfully upserted.'
                 );
+            } catch (err) {
+                LOGGER.log(err);
+                throw new exceptions.InternalFailure(err.message);
             }
-        } catch (err) {
-            LOGGER.log(err);
-            throw new exceptions.InternalFailure(err.message);
+        } else {
+            throw new exceptions.InvalidCredentials(
+                'no aws session found - did you forget to register the execution role?'
+            );
         }
         return Promise.resolve(result);
     }
@@ -142,7 +150,7 @@ export class Resource extends BaseResource<ResourceModel> {
     ): Promise<ProgressEvent> {
         console.info('CREATE request', request);
         console.info('CREATE callbackContext', callbackContext);
-        if (request.desiredResourceState.resourceId) {
+        if (request.desiredResourceState?.resourceId) {
             LOGGER.info(
                 this.typeName,
                 `[${request.desiredResourceState.resourceId}] [${request.logicalResourceIdentifier}]`,
@@ -196,7 +204,7 @@ export class Resource extends BaseResource<ResourceModel> {
     ): Promise<ProgressEvent> {
         console.info('UPDATE request', request);
         const resourceId = request.previousResourceState.resourceId;
-        if (!request.desiredResourceState.resourceId) {
+        if (!request.desiredResourceState?.resourceId) {
             throw new exceptions.NotFound(
                 this.typeName,
                 request.desiredResourceState.resourceId
@@ -255,8 +263,8 @@ export class Resource extends BaseResource<ResourceModel> {
             model.resourceId
         );
         if (model) {
-            try {
-                if (session instanceof SessionProxy) {
+            if (session instanceof SessionProxy) {
+                try {
                     const client = session.client('IAM') as IAM;
                     const response = await client
                         .deleteAccountPasswordPolicy()
@@ -267,11 +275,16 @@ export class Resource extends BaseResource<ResourceModel> {
                         `[${model.resourceId}] [${request.logicalResourceIdentifier}]`,
                         'successfully deleted.'
                     );
+                } catch (err) {
+                    LOGGER.log(err);
+                    throw new exceptions.InternalFailure(err.message);
                 }
-            } catch (err) {
-                LOGGER.log(err);
-                throw new exceptions.InternalFailure(err.message);
+            } else {
+                throw new exceptions.InvalidCredentials(
+                    'no aws session found - did you forget to register the execution role?'
+                );
             }
+            
         }
         progress.status = OperationStatus.Success;
         LOGGER.info('DELETE progress', progress);

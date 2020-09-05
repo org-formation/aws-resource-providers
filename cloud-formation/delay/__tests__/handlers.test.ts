@@ -1,4 +1,4 @@
-import { exceptions, OperationStatus, UnmodeledRequest } from 'cfn-rpdk';
+import { Action, exceptions, OperationStatus, UnmodeledRequest } from 'cfn-rpdk';
 import createFixture from '../sam-tests/create.json';
 import deleteFixture from '../sam-tests/delete.json';
 import listFixture from '../sam-tests/list.json';
@@ -45,7 +45,12 @@ describe('when calling handler', () => {
         const callbackContext: CallbackContext = {
             Remaining: null,
         };
-        const progress = await resource.create(null, request, callbackContext);
+        const progress = await resource['invokeHandler'](
+            null,
+            request,
+            Action.Create,
+            callbackContext
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.InProgress,
             message: '',
@@ -64,7 +69,12 @@ describe('when calling handler', () => {
         const callbackContext: CallbackContext = {
             Remaining: 700,
         };
-        const progress = await resource.update(null, request, callbackContext);
+        const progress = await resource['invokeHandler'](
+            null,
+            request,
+            Action.Update,
+            callbackContext
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.InProgress,
             message: '',
@@ -83,7 +93,12 @@ describe('when calling handler', () => {
         const callbackContext: CallbackContext = {
             Remaining: 0,
         };
-        const progress = await resource.delete(null, request, callbackContext);
+        const progress = await resource['invokeHandler'](
+            null,
+            request,
+            Action.Delete,
+            callbackContext
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -95,7 +110,12 @@ describe('when calling handler', () => {
         const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.read(null, request, {});
+        const progress = await resource['invokeHandler'](
+            null,
+            request,
+            Action.Read,
+            {}
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -108,7 +128,12 @@ describe('when calling handler', () => {
         const request = UnmodeledRequest.fromUnmodeled(listFixture).toModeled<
             ResourceModel
         >(resource['modelCls']);
-        const progress = await resource.list(null, request, {});
+        const progress = await resource['invokeHandler'](
+            null,
+            request,
+            Action.List,
+            {}
+        );
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
