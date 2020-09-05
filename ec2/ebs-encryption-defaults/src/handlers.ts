@@ -56,6 +56,8 @@ class Resource extends BaseResource<ResourceModel> {
                         await ec2client.modifyEbsDefaultKmsKeyId({ KmsKeyId: model.defaultEbsEncryptionKeyId}).promise();
                     }
                 }
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch(err) {
@@ -109,6 +111,8 @@ class Resource extends BaseResource<ResourceModel> {
                         await ec2client.resetEbsDefaultKmsKeyId().promise();
                     }
                 }
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch(err) {
@@ -152,7 +156,8 @@ class Resource extends BaseResource<ResourceModel> {
                 if (typeof model.defaultEbsEncryptionKeyId === 'string') {
                     await ec2client.resetEbsDefaultKmsKeyId().promise();
                 }
-            
+            } else {
+                throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
             }
             progress.status = OperationStatus.Success;
         } catch(err) {
