@@ -30,7 +30,8 @@
                 "servicequotas:requestServiceQuotaIncrease",
                 "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
                 "servicequotas:getServiceQuota",
-                "servicequotas:GetAWSDefaultServiceQuota"
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
             ]
         },
         "read": {
@@ -42,7 +43,8 @@
                 "servicequotas:requestServiceQuotaIncrease",
                 "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
                 "servicequotas:getServiceQuota",
-                "servicequotas:GetAWSDefaultServiceQuota"
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
             ]
         },
         "delete": {
