@@ -1,0 +1,14 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ResourceId": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+        "MinimumPasswordLength": 6,
+        "RequireLowercaseCharacters": false
+    },
+    "previousResourceState": {
+        "ResourceId": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+        "MinimumPasswordLength": 7,
+        "RequireLowercaseCharacters": true
+    },
+    "logicalResourceIdentifier": "MyResource"
+}

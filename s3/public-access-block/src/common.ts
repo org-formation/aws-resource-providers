@@ -1,42 +1,70 @@
 import {
-    Optional, SessionProxy,
-    exceptions, ResourceHandlerRequest, OperationStatus, ProgressEvent,
+    Optional,
+    SessionProxy,
+    exceptions,
+    ResourceHandlerRequest,
+    OperationStatus,
+    ProgressEvent,
     Action,
     HandlerSignature,
-    BaseResource
-} from "cfn-rpdk";
-import { ResourceModel } from "./models";
-import AWS from "aws-sdk";
+    BaseResource,
+} from 'cfn-rpdk';
+import { ResourceModel } from './models';
+import AWS from 'aws-sdk';
 
-
-type ServiceName = keyof (typeof AWS);
+type ServiceName = keyof typeof AWS;
 
 type CallbackContext = Record<string, any>;
 export type HandlerArgs = {
-    session: Optional<SessionProxy>,
-    request: ResourceHandlerRequest<ResourceModel>,
-    callbackContext: CallbackContext
-}
+    session: Optional<SessionProxy>;
+    request: ResourceHandlerRequest<ResourceModel>;
+    callbackContext: CallbackContext;
+};
 
 type HandlerFunc<TService, TResource> = {
+    serviceName: ServiceName;
+    perform: (
+        action: Action,
+        args: HandlerArgs,
+        service: TService
+    ) => Promise<TResource>;
+};
+
+export type ResourceProviderHandler<TService, TResource> = (
+    action: Action,
+    args: HandlerArgs,
+    service: TService
+) => Promise<TResource | null>;
+
+export const WrapHandler = <TService, TResource extends ResourceModel>(
+    action: Action,
     serviceName: ServiceName,
-    perform: (action: Action, args: HandlerArgs, service: TService) => Promise<TResource>
-}
+    perform: ResourceProviderHandler<TService, TResource>
+): HandlerSignature => {
+    return async (
+        session: Optional<SessionProxy>,
+        request: ResourceHandlerRequest<ResourceModel>,
+        callbackContext: CallbackContext
+    ): Promise<ProgressEvent> => {
+        const handlerArgs = { session, request, callbackContext };
+        return await wrapHandlerInternal(action, handlerArgs, { serviceName, perform });
+    };
+};
 
-export type ResourceProviderHandler<TService, TResource> = (action: Action, args: HandlerArgs, service: TService) => Promise<TResource | null>;
-
-export const WrapHandler = <TService, TResource extends ResourceModel>(action: Action, serviceName: ServiceName, perform: ResourceProviderHandler<TService, TResource>): HandlerSignature => {
-    return async (session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> => {
-        const handlerArgs = { session, request, callbackContext}
-        return await wrapHandlerInternal(action, handlerArgs, { serviceName, perform});
-    }
-}
-
-const wrapHandlerInternal = async <TService extends any, TResource extends ResourceModel>(action: Action, handlerArgs: HandlerArgs, handlerFunc: HandlerFunc<TService, TResource>): Promise<ProgressEvent> => {
+const wrapHandlerInternal = async <
+    TService extends any,
+    TResource extends ResourceModel
+>(
+    action: Action,
+    handlerArgs: HandlerArgs,
+    handlerFunc: HandlerFunc<TService, TResource>
+): Promise<ProgressEvent> => {
     const { session, request, callbackContext } = handlerArgs;
 
     const model: ResourceModel = request.desiredResourceState;
-    const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+    const progress = ProgressEvent.progress<
+        ProgressEvent<ResourceModel, CallbackContext>
+    >(model);
 
     console.info({ action, request, callbackContext, env: process.env });
 
@@ -56,6 +84,8 @@ const wrapHandlerInternal = async <TService extends any, TResource extends Resou
         progress.status = OperationStatus.Success;
         return progress;
     } else {
-        throw new exceptions.InternalFailure('no aws session found - did you forget to register the execution role?');
+        throw new exceptions.InvalidCredentials(
+            'no aws session found - did you forget to register the execution role?'
+        );
     }
-}
+};

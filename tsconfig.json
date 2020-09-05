@@ -1,0 +1,21 @@
+{
+    "extends": "@tsconfig/node10/tsconfig.json",
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "allowJs": true,
+        "alwaysStrict": true,
+        "strict": false,
+        "removeComments": true,
+        "moduleResolution": "node",
+        "sourceMap": false,
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "outDir": "dist"
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "**/node_modules"
+    ]
+}

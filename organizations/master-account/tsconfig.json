@@ -1,19 +1,9 @@
 {
+    "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "target": "ES2017",
-        "module": "commonjs",
-        "noImplicitAny": true,
-        "alwaysStrict": true,
-        "esModuleInterop": true,
-        "moduleResolution": "node",
-        "allowJs": true,
-        "experimentalDecorators": true,
         "outDir": "dist"
     },
     "include": [
         "src/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules"
     ]
 }

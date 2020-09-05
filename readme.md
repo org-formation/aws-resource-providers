@@ -1,8 +1,12 @@
 # AWS Resource Providers
 
+[![License MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/org-formation/aws-resource-providers/issues)
+
 A community driven repository where you can find AWS Resource Type Providers for different purposes (including org-formation ones)
 
 ## Resources
+
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/org-formation/aws-resource-providers/cicd/master)](https://github.com/org-formation/aws-resource-providers/actions?query=branch%3Amaster+workflow%3Acicd) [![Codecov](https://img.shields.io/codecov/c/gh/org-formation/aws-resource-providers)](https://codecov.io/gh/org-formation/aws-resource-providers) [![Node.js version](https://img.shields.io/badge/dynamic/json?color=brightgreen&url=https://raw.githubusercontent.com/org-formation/aws-resource-providers/master/package.json&query=$.engines.node&label=nodejs)](https://nodejs.org/)
 
 | Resource | Description | Status  | Docs
 |---|---|---|---|
@@ -13,3 +17,26 @@ A community driven repository where you can find AWS Resource Type Providers for
 | Community::EC2::EbsEncryptionDefaults    | Region level EBS encryption defaults: encryption enabled/disabled and KmsKeyId | in progress | [installation](ec2/ebs-encryption-defaults/installation.md) <br/> [docs](ec2/ebs-encryption-defaults/docs/README.md) <br/> [example](ec2/ebs-encryption-defaults/example.yml) |
 | Community::S3::PublicAccessBlock | Account level public access block (applies to all buckets within account) | in progress |  [installation](s3/public-access-block/installation.md) <br/> [docs](s3/public-access-block/docs/README.md) <br/> [example](s3/public-access-block/example.yml)  |
 | Community::CloudFormation::Delay | Resource that waits for a specified time period. | in progress | [installation](cloud-formation/delay/installation.md) <br/> [docs](cloud-formation/delay/docs/README.md) <br/> [example](cloud-formation/delay/example.yml) |
+
+
+Development
+-----------
+
+Check out the master branch and run [Lerna](https://lerna.js.org/) to get started:
+
+```
+npm run bootstrap
+```
+
+Now that you have the dependencies installed for every package, you can run this command in the individual package folder to compile them. By doing so in the root, all packages will be compiled.
+
+```
+npm run build
+```
+
+Linting is done via [TSLint](http://palantir.github.io/tslint/) and running unit tests via [Jest](https://jestjs.io/). The continuous integration runs these checks, but you can run them locally with:
+
+```
+npm run lint
+npm test
+```

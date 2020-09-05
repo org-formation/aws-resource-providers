@@ -1,0 +1,7 @@
+{
+  "packages": [
+    "**/*"
+  ],
+  "version": "independent",
+  "npmClientArgs": ["--no-optional"]
+}

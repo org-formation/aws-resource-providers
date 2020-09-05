@@ -53,10 +53,6 @@
         "delete": {
             "permissions": [
             ]
-        },
-        "list": {
-            "permissions": [
-            ]
         }
     }
 }

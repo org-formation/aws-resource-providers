@@ -14,35 +14,38 @@ import { ResourceModel } from './models';
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-interface CallbackContext extends Record<string, any> {
-    Remaining?: number
+export interface CallbackContext extends Record<string, any> {
+    Remaining?: number;
 }
 
-class Resource extends BaseResource<ResourceModel> {
-
-    private DEFAULT_DURATION = 60;
-    private MAX_DURATION = 43200; // 12 hours in seconds
+export class Resource extends BaseResource<ResourceModel> {
+    static DEFAULT_DURATION = 60;
+    static MAX_DURATION = 43200; // 12 hours in seconds
 
     /**
      * Used to parse and convert the duration (string) to seconds (number)
      *
      * @param duration Duration in ISO8601 format
      */
-    private parseDuration(duration: string): number {
+    static parseDuration(duration: string): number {
         const pattern = /^PT(?=[0-9])(([0-9]+)H)?(([0-9]+)M)?(([0-9]+)S)?$/;
         const timeParts = pattern.exec(duration);
         if (!timeParts) {
-            throw new exceptions.InvalidRequest(`Invalid duration format has been passed: ${duration}`);
+            throw new exceptions.InvalidRequest(
+                `Invalid duration format has been passed: ${duration}`
+            );
         }
-        const seconds = (
-            (
-                ( timeParts[2] === undefined ? 0 : parseInt(timeParts[2]) ) /* Hours */
-                * 60 + ( timeParts[4] === undefined ? 0 : parseInt(timeParts[4]) ) /* Minutes */
-            )
-            * 60 + ( timeParts[6] === undefined ? 0 : parseInt(timeParts[6]) ) /* Seconds */
-        );
+        const hours = timeParts[2] === undefined ? 0 : parseInt(timeParts[2]);
+        const minutes = timeParts[4] === undefined ? 0 : parseInt(timeParts[4]);
+        const seconds =
+            (hours * 60 + minutes) * 60 +
+            (timeParts[6] === undefined ? 0 : parseInt(timeParts[6]));
         if (seconds > this.MAX_DURATION) {
-            throw new exceptions.InvalidRequest(`Value (${seconds.toString()}) is greater than allowed duration (${this.MAX_DURATION})`);
+            throw new exceptions.InvalidRequest(
+                `Value (${seconds.toString()}) is greater than allowed duration (${
+                    this.MAX_DURATION
+                })`
+            );
         }
         return seconds;
     }
@@ -67,7 +70,9 @@ class Resource extends BaseResource<ResourceModel> {
         model = progress.resourceModel || model;
         if (remaining === null) {
             model.resourceId = resourceId;
-            remaining = model.duration ? this.parseDuration(model.duration) : this.DEFAULT_DURATION;
+            remaining = model.duration
+                ? Resource.parseDuration(model.duration)
+                : Resource.DEFAULT_DURATION;
         }
         LOGGER.info('OPERATION remaining', remaining);
 
@@ -80,7 +85,7 @@ class Resource extends BaseResource<ResourceModel> {
             };
             progress.callbackDelaySeconds = remaining < 600 ? remaining : 600;
         }
-        // LOGGER.debug('OPERATION progress', progress);
+        console.info('OPERATION progress', progress);
         return progress;
     }
 
@@ -97,13 +102,19 @@ class Resource extends BaseResource<ResourceModel> {
     public async create(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
-        // LOGGER.debug('CREATE request', request);
-        // LOGGER.debug('CREATE callbackContext', callbackContext);
+        console.info('CREATE request', request);
+        console.info('CREATE callbackContext', callbackContext);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        return this.buildProgress(progress, callbackContext, request.clientRequestToken);
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
+        return this.buildProgress(
+            progress,
+            callbackContext,
+            request.clientRequestToken
+        );
     }
 
     /**
@@ -119,13 +130,19 @@ class Resource extends BaseResource<ResourceModel> {
     public async update(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
-        // LOGGER.debug('UPDATE request', request);
-        // LOGGER.debug('UPDATE callbackContext', callbackContext);
+        console.info('UPDATE request', request);
+        console.info('UPDATE callbackContext', callbackContext);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        return this.buildProgress(progress, callbackContext, request.previousResourceState.resourceId);
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
+        return this.buildProgress(
+            progress,
+            callbackContext,
+            request.previousResourceState.resourceId
+        );
     }
 
     /**
@@ -142,12 +159,19 @@ class Resource extends BaseResource<ResourceModel> {
     public async delete(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
-        // LOGGER.debug('DELETE request', request);
-        // LOGGER.debug('DELETE callbackContext', callbackContext);
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
-        return this.buildProgress(progress, callbackContext, request.clientRequestToken, request.desiredResourceState);
+        console.info('DELETE request', request);
+        console.info('DELETE callbackContext', callbackContext);
+        const progress = ProgressEvent.progress<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >();
+        return this.buildProgress(
+            progress,
+            callbackContext,
+            request.clientRequestToken,
+            request.desiredResourceState
+        );
     }
 
     /**
@@ -163,11 +187,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async read(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
-        // LOGGER.debug('READ request', request);
+        console.info('READ request', request);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.success<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >(model);
         return progress;
     }
 
@@ -184,11 +210,13 @@ class Resource extends BaseResource<ResourceModel> {
     public async list(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext,
+        callbackContext: CallbackContext
     ): Promise<ProgressEvent> {
-        // LOGGER.debug('LIST request', request);
+        console.info('LIST request', request);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
+        const progress = ProgressEvent.builder<
+            ProgressEvent<ResourceModel, CallbackContext>
+        >()
             .status(OperationStatus.Success)
             .resourceModels([model])
             .build();
@@ -196,7 +224,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 }
 
-const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
+export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
 

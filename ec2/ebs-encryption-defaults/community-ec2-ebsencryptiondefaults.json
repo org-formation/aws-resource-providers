@@ -50,10 +50,6 @@
                 "ec2:DisableEbsEncryptionByDefault",
                 "ec2:ResetEbsDefaultKmsKeyId"
             ]
-        },
-        "list": {
-            "permissions": [
-            ]
         }
     }
 }

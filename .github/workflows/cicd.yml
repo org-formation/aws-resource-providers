@@ -1,0 +1,76 @@
+---
+# Continuous Integration/Delivery
+name: cicd
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    env:
+      SAM_CLI_TELEMETRY: "0"
+      AWS_REGION: "eu-central-1"
+      AWS_DEFAULT_REGION: "eu-central-1"
+      LOG_PATH: /tmp/debug-logs
+      PIP_LOG_FILE: /tmp/pip.log
+      NODE_OPTIONS: "--max_old_space_size=4096"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install Dependencies Python
+        id: install_python
+        run: |
+          mkdir "$LOG_PATH"
+          pip install --upgrade pip aws-sam-cli git+https://github.com/eduardomourar/cloudformation-cli-typescript-plugin.git#egg=cloudformation-cli-typescript-plugin
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies Node.js
+        id: install_nodejs
+        run: |
+          npm ci --optional && npx lerna bootstrap --ci && npm run build
+      - name: Run Automated Testing
+        id: automated_testing
+        run: |
+          npm run lint
+          npm test
+      - name: Upload Coverage
+        id: codecov
+        run: |
+          curl -s https://codecov.io/bash > codecov.sh
+          bash codecov.sh -f coverage/coverage-final.json -F unittests
+      - name: Upload Coverage Artifacts
+        id: upload_coverage
+        uses: actions/upload-artifact@v1
+        with:
+          name: coverage
+          path: coverage/
+      - name: Run Integration Tests
+        id: integration_testing
+        run: |
+          npm run validate > $GITHUB_WORKSPACE/rdpk.log
+      - name: Gather Debug Logs
+        id: gather_logs
+        continue-on-error: true
+        if: failure()
+        run: |
+          mkdir "$LOG_PATH/_logs" 2>&1 || :
+          cp -r "$(npm config get cache)/_logs" "$LOG_PATH" 2>&1 || :
+          cp "$GITHUB_WORKSPACE/npm-debug.log" "$LOG_PATH/_logs" 2>&1 || :
+          cp "$PIP_LOG_FILE" "$LOG_PATH" 2>&1 || :
+          cp "$GITHUB_WORKSPACE/rdpk.log" "$LOG_PATH" 2>&1 || :
+      - name: Upload Debug Artifacts
+        id: upload_logs
+        if: failure()
+        uses: actions/upload-artifact@v1
+        with:
+          name: debug-logs
+          path: ${{ env.LOG_PATH }}

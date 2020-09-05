@@ -50,10 +50,6 @@
         "delete": {
             "permissions": [
             ]
-        },
-        "list": {
-            "permissions": [
-            ]
         }
     }
 }
