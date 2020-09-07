@@ -1,11 +1,14 @@
 {
     "compilerOptions": {
-        "target": "ES2020",
+        "lib": ["es2018"],
         "module": "commonjs",
+        "target": "es2018",
         "noImplicitAny": true,
         "alwaysStrict": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
         "declaration": true,
         "allowJs": true,
         "experimentalDecorators": true,

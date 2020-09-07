@@ -1,7 +1,7 @@
+import { S3Control } from 'aws-sdk';
+import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { Action, BaseResource, exceptions } from 'cfn-rpdk';
 import { ResourceModel } from './models';
-import { S3Control } from 'aws-sdk';
-import { commonAws, HandlerArgs } from './common-decorator';
 
 class Resource extends BaseResource<ResourceModel> {
     private async upsertAccountPublicAccessBlock(

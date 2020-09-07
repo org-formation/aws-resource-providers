@@ -2,6 +2,7 @@
     "name": "community-s3-publicaccessblock",
     "version": "0.1.0",
     "description": "AWS custom resource provider named Community::S3::PublicAccessBlock.",
+    "private": true,
     "main": "dist/handlers.js",
     "files": [
         "dist"
@@ -20,7 +21,8 @@
     },
     "dependencies": {
         "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
-        "class-transformer": "^0.3.1"
+        "class-transformer": "^0.3.1",
+        "aws-resource-providers-common": "file://../../common"
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
