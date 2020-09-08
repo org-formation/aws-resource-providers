@@ -1,6 +1,6 @@
 import { S3Control } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {
@@ -34,8 +34,8 @@ class Resource extends BaseResource<ResourceModel> {
         return result;
     }
 
+    @handlerEvent(Action.Create)
     @commonAws({
-        action: Action.Create,
         serviceName: 'S3Control',
         debug: true,
     })
@@ -49,8 +49,8 @@ class Resource extends BaseResource<ResourceModel> {
         return this.upsertAccountPublicAccessBlock(action, service, model, accountId);
     }
 
+    @handlerEvent(Action.Update)
     @commonAws({
-        action: Action.Update,
         serviceName: 'S3Control',
         debug: true,
     })
@@ -64,8 +64,8 @@ class Resource extends BaseResource<ResourceModel> {
         return this.upsertAccountPublicAccessBlock(action, service, model, accountId);
     }
 
+    @handlerEvent(Action.Delete)
     @commonAws({
-        action: Action.Delete,
         serviceName: 'S3Control',
         debug: true,
     })
@@ -95,8 +95,8 @@ class Resource extends BaseResource<ResourceModel> {
         return Promise.resolve(null);
     }
 
+    @handlerEvent(Action.Read)
     @commonAws({
-        action: Action.Read,
         serviceName: 'S3Control',
         debug: true,
     })

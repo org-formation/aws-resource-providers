@@ -2,6 +2,7 @@
     "name": "community-ec2-ebsencryptiondefaults",
     "version": "0.1.0",
     "description": "AWS custom resource provider named Community::Organizations::EbsEncryptionDefaults.",
+    "private": true,
     "main": "dist/handlers.js",
     "files": [
         "dist"

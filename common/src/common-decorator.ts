@@ -3,7 +3,6 @@ import {
     BaseModel,
     BaseResource,
     exceptions,
-    handlerEvent,
     OperationStatus,
     Optional,
     ProgressEvent,
@@ -14,6 +13,7 @@ import * as Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
 type ServiceName = keyof ClientMap;
+type HandlerEvents = Map<Action, string | symbol>;
 
 export type HandlerArgs<
     R extends BaseModel,
@@ -25,8 +25,8 @@ export type HandlerArgs<
 };
 
 export interface commonAwsOptions {
-    action: Action;
     serviceName: ServiceName;
+    action?: Action;
     debug?: boolean;
 }
 
@@ -45,11 +45,12 @@ export function commonAws<
         propertyKey: string | symbol,
         descriptor: PropertyDescriptor
     ): PropertyDescriptor {
-        const { action, debug, serviceName } = options;
+        const { debug, serviceName } = options;
 
         if (descriptor === undefined) {
             descriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
         }
+
         const originalMethod = descriptor.value;
 
         // Wrapping the original method with new signature.
@@ -58,6 +59,19 @@ export function commonAws<
             request: ResourceHandlerRequest<ResourceModel>,
             callbackContext: T
         ): Promise<ProgressEvent> {
+            let action = options.action;
+            if (!action) {
+                const events: HandlerEvents = Reflect.getMetadata(
+                    'handlerEvents',
+                    target
+                );
+                events.forEach((value: string | symbol, key: Action) => {
+                    if (value === propertyKey) {
+                        action = key;
+                    }
+                });
+            }
+
             const handlerArgs = { session, request, callbackContext };
 
             const model: ResourceModel = request.desiredResourceState;
@@ -80,8 +94,13 @@ export function commonAws<
                 if (debug) console.info({ action, message: 'after perform' });
 
                 if (modified !== undefined) {
-                    progress.resourceModel = modified;
-                    progress.resourceModels = null;
+                    if (Array.isArray(modified)) {
+                        progress.resourceModel = null;
+                        progress.resourceModels = modified;
+                    } else {
+                        progress.resourceModel = modified;
+                        progress.resourceModels = null;
+                    }
                 }
 
                 progress.status = OperationStatus.Success;
@@ -92,16 +111,6 @@ export function commonAws<
                 );
             }
         };
-        if (descriptor) {
-            const modifiedDescriptor = handlerEvent(action)(
-                target,
-                propertyKey,
-                descriptor
-            );
-            if (typeof descriptor.value === 'function' && modifiedDescriptor) {
-                return modifiedDescriptor;
-            }
-        }
         return descriptor;
     };
 }

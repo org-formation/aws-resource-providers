@@ -2,6 +2,7 @@
     "name": "community-cloudformation-delay",
     "version": "0.1.0",
     "description": "CloudFormation Resource Provider for AWS CloudFormation Delay",
+    "private": true,
     "main": "dist/handlers.js",
     "files": [
         "dist"

@@ -68,7 +68,7 @@ describe('when calling handler', () => {
             callbackContext: {
                 Remaining: -540,
             },
-            callbackDelaySeconds: 60,
+            callbackDelaySeconds: Resource.DEFAULT_DURATION,
             resourceModel: request.desiredResourceState,
         });
     });

@@ -20,9 +20,9 @@
         "validate": "cfn validate"
     },
     "dependencies": {
+        "aws-resource-providers-common": "https://github.com/org-formation/aws-resource-providers/releases/download/common-0.1.0/aws-resource-providers-common-0.2.0.tgz",
         "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
-        "class-transformer": "^0.3.1",
-        "aws-resource-providers-common": "file://../../common"
+        "class-transformer": "^0.3.1"
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
