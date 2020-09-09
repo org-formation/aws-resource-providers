@@ -1,17 +1,7 @@
 import { config, IAM } from 'aws-sdk';
+import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { v4 as uuidv4 } from 'uuid';
-import {
-    Action,
-    BaseResource,
-    Dict,
-    exceptions,
-    handlerEvent,
-    OperationStatus,
-    Optional,
-    ProgressEvent,
-    ResourceHandlerRequest,
-    SessionProxy,
-} from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Optional } from 'cfn-rpdk';
 
 import { ResourceModel } from './models';
 
@@ -33,53 +23,46 @@ export class Resource extends BaseResource<ResourceModel> {
     /**
      * Retrieves the password policy for the AWS account.
      *
-     * @param session Current AWS session passed through from caller
+     * @param service AWS service from current session passed through from caller
      * @param logicalResourceId The logical name of the resource as specified
      * in the template
      * @param resourceId The resource unique identifier
      * @param request The current state for the password policy
      */
     private async retrievePasswordPolicy(
-        session: SessionProxy,
+        service: IAM,
         logicalResourceId?: string,
         resourceId?: string,
         request?: PasswordPolicy
     ): Promise<PasswordPolicy> {
         let result: PasswordPolicy = null;
-        if (session instanceof SessionProxy) {
-            try {
-                const client = session.client('IAM') as IAM;
-                const response = await client.getAccountPasswordPolicy().promise();
-                console.info('getAccountPasswordPolicy response', response);
-                const passwordPolicy =
-                    request && Object.keys(request).length && request.serialize
-                        ? request.serialize()
-                        : JSON.parse(JSON.stringify(response.PasswordPolicy));
-                result = PasswordPolicy.deserialize({
-                    ...passwordPolicy,
-                    ResourceId: resourceId,
-                });
-                LOGGER.info(
-                    PasswordPolicy.TYPE_NAME,
-                    `[${result.resourceId}] [${logicalResourceId}]`,
-                    'successfully retrieved.'
-                );
-            } catch (err) {
-                LOGGER.log(err);
-                if (err && err.code === 'NoSuchEntity') {
-                    throw new exceptions.NotFound(
-                        PasswordPolicy.TYPE_NAME,
-                        resourceId || logicalResourceId
-                    );
-                } else {
-                    // Raise the original exception
-                    throw err;
-                }
-            }
-        } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
+        try {
+            const response = await service.getAccountPasswordPolicy().promise();
+            console.info('getAccountPasswordPolicy response', response);
+            const passwordPolicy =
+                request && Object.keys(request).length && request.serialize
+                    ? request.serialize()
+                    : JSON.parse(JSON.stringify(response.PasswordPolicy));
+            result = PasswordPolicy.deserialize({
+                ...passwordPolicy,
+                ResourceId: resourceId,
+            });
+            LOGGER.info(
+                PasswordPolicy.TYPE_NAME,
+                `[${result.resourceId}] [${logicalResourceId}]`,
+                'successfully retrieved.'
             );
+        } catch (err) {
+            LOGGER.log(err);
+            if (err && err.code === 'NoSuchEntity') {
+                throw new exceptions.NotFound(
+                    PasswordPolicy.TYPE_NAME,
+                    resourceId || logicalResourceId
+                );
+            } else {
+                // Raise the original exception
+                throw err;
+            }
         }
         return Promise.resolve(result);
     }
@@ -89,241 +72,213 @@ export class Resource extends BaseResource<ResourceModel> {
      * support partial updates. No parameters are required, but if you do not specify a
      * parameter, that parameter's value reverts to its default value.
      *
-     * @param session Current AWS session passed through from caller
+     * @param service AWS service from current session passed through from caller
      * @param request The updated options for the password policy
      * @param logicalResourceId The logical name of the resource as specified
      * in the template
      * @param resourceId The resource unique identifier
      */
     private async upsertPasswordPolicy(
-        session: SessionProxy,
+        service: IAM,
         request: PasswordPolicy,
         logicalResourceId?: string,
         resourceId?: string
     ): Promise<PasswordPolicy> {
         let result: PasswordPolicy = null;
-        if (session instanceof SessionProxy) {
-            const client = session.client('IAM') as IAM;
-            const params = JSON.parse(JSON.stringify(request));
-            delete params['ResourceId'];
-            delete params['ExpirePasswords'];
-            console.info('updateAccountPasswordPolicy input', params);
-            const response = await client.updateAccountPasswordPolicy(params).promise();
-            console.info('updateAccountPasswordPolicy response', response);
-            result = PasswordPolicy.deserialize({
-                ...params,
-                ResourceId: resourceId || uuidv4(),
-            });
-            LOGGER.info(
-                PasswordPolicy.TYPE_NAME,
-                `[${result.resourceId}] [${logicalResourceId}]`,
-                'successfully upserted.'
-            );
-        } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
-        }
+        const params = JSON.parse(JSON.stringify(request));
+        delete params['ResourceId'];
+        delete params['ExpirePasswords'];
+        console.info('updateAccountPasswordPolicy input', params);
+        const response = await service.updateAccountPasswordPolicy(params).promise();
+        console.info('updateAccountPasswordPolicy response', response);
+        result = PasswordPolicy.deserialize({
+            ...params,
+            ResourceId: resourceId || uuidv4(),
+        });
+        LOGGER.info(
+            PasswordPolicy.TYPE_NAME,
+            `[${result.resourceId}] [${logicalResourceId}]`,
+            'successfully upserted.'
+        );
         return Promise.resolve(result);
     }
 
     /**
      * CloudFormation invokes this handler when the resource is initially created
      * during stack create operations.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to enable handlers to process re-invocation
      */
     @handlerEvent(Action.Create)
+    @commonAws({
+        serviceName: 'IAM',
+        debug: true,
+    })
     public async create(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: Dict
-    ): Promise<ProgressEvent> {
-        console.info('CREATE request', request);
-        console.info('CREATE callbackContext', callbackContext);
-        if (request.desiredResourceState?.resourceId) {
+        action: Action,
+        args: HandlerArgs<PasswordPolicy>,
+        service: IAM
+    ): Promise<PasswordPolicy> {
+        const { desiredResourceState, logicalResourceIdentifier } = args.request;
+        if (desiredResourceState?.resourceId) {
             LOGGER.info(
                 this.typeName,
-                `[${request.desiredResourceState.resourceId}] [${request.logicalResourceIdentifier}]`,
+                `[${desiredResourceState.resourceId}] [${logicalResourceIdentifier}]`,
                 'cannot contain identifier.'
             );
             throw new exceptions.InvalidRequest(
                 'Resource identifier cannot be provided during creation.'
             );
         }
-        let model: PasswordPolicy = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel>>(model);
+        let model: PasswordPolicy = desiredResourceState;
         try {
-            await this.retrievePasswordPolicy(
-                session,
-                request.logicalResourceIdentifier
-            );
+            await this.retrievePasswordPolicy(service, logicalResourceIdentifier);
             throw new exceptions.AlreadyExists(
                 PasswordPolicy.TYPE_NAME,
-                request.logicalResourceIdentifier
+                logicalResourceIdentifier
             );
         } catch (err) {}
         model = await this.upsertPasswordPolicy(
-            session,
+            service,
             model,
-            request.logicalResourceIdentifier
+            logicalResourceIdentifier
         );
-        progress.resourceModel = model;
-        progress.status = OperationStatus.Success;
         console.info('CREATE model primary identifier', model.getPrimaryIdentifier());
         console.info(
             'CREATE model additional identifiers',
             model.getAdditionalIdentifiers()
         );
-        LOGGER.info('CREATE progress', progress);
-        return progress;
+        return Promise.resolve(model);
     }
 
     /**
      * CloudFormation invokes this handler when the resource is updated
      * as part of a stack update operation.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to enable handlers to process re-invocation
      */
     @handlerEvent(Action.Update)
+    @commonAws({
+        serviceName: 'IAM',
+        debug: true,
+    })
     public async update(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: Dict
-    ): Promise<ProgressEvent> {
-        console.info('UPDATE request', request);
-        const resourceId = request.previousResourceState.resourceId;
-        if (!request.desiredResourceState?.resourceId) {
+        action: Action,
+        args: HandlerArgs<PasswordPolicy>,
+        service: IAM
+    ): Promise<PasswordPolicy> {
+        const {
+            desiredResourceState,
+            logicalResourceIdentifier,
+            previousResourceState,
+        } = args.request;
+        const resourceId = previousResourceState.resourceId;
+        if (!desiredResourceState?.resourceId) {
             throw new exceptions.NotFound(
                 this.typeName,
-                request.desiredResourceState.resourceId
+                desiredResourceState.resourceId
             );
-        } else if (request.desiredResourceState.resourceId !== resourceId) {
+        } else if (desiredResourceState.resourceId !== resourceId) {
             LOGGER.info(
                 this.typeName,
-                `[NEW ${request.desiredResourceState.resourceId}] [${request.logicalResourceIdentifier}]`,
+                `[NEW ${desiredResourceState.resourceId}] [${logicalResourceIdentifier}]`,
                 `does not match identifier from saved resource [OLD ${resourceId}].`
             );
             throw new exceptions.NotUpdatable(
                 'No resource matching the provided identifier.'
             );
         }
-        let model: PasswordPolicy = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel>>(model);
+        let model: PasswordPolicy = desiredResourceState;
         await this.retrievePasswordPolicy(
-            session,
-            request.logicalResourceIdentifier,
+            service,
+            logicalResourceIdentifier,
             resourceId
         );
         model = await this.upsertPasswordPolicy(
-            session,
+            service,
             model,
-            request.logicalResourceIdentifier,
+            logicalResourceIdentifier,
             resourceId
         );
-        console.info('UPDATE model', model);
-        progress.resourceModel = model;
-        progress.status = OperationStatus.Success;
-        LOGGER.info('UPDATE progress', progress);
-        return progress;
+        return Promise.resolve(model);
     }
 
     /**
      * CloudFormation invokes this handler when the resource is deleted, either when
      * the resource is deleted from the stack as part of a stack update operation,
      * or the stack itself is deleted.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to enable handlers to process re-invocation
      */
     @handlerEvent(Action.Delete)
+    @commonAws({
+        serviceName: 'IAM',
+        debug: true,
+    })
     public async delete(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: Dict
-    ): Promise<ProgressEvent> {
-        console.info('DELETE request', request);
-        let model: PasswordPolicy = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel>>();
+        action: Action,
+        args: HandlerArgs<PasswordPolicy>,
+        service: IAM
+    ): Promise<null> {
+        const { desiredResourceState, logicalResourceIdentifier } = args.request;
+
+        let model: PasswordPolicy = desiredResourceState;
         model = await this.retrievePasswordPolicy(
-            session,
-            request.logicalResourceIdentifier,
+            service,
+            logicalResourceIdentifier,
             model.resourceId
         );
         if (model) {
-            if (session instanceof SessionProxy) {
-                const client = session.client('IAM') as IAM;
-                const response = await client.deleteAccountPasswordPolicy().promise();
-                console.info('deleteAccountPasswordPolicy response', response);
-                LOGGER.info(
-                    this.typeName,
-                    `[${model.resourceId}] [${request.logicalResourceIdentifier}]`,
-                    'successfully deleted.'
-                );
-            } else {
-                throw new exceptions.InvalidCredentials(
-                    'no aws session found - did you forget to register the execution role?'
-                );
-            }
+            const response = await service.deleteAccountPasswordPolicy().promise();
+            console.info('deleteAccountPasswordPolicy response', response);
+            LOGGER.info(
+                this.typeName,
+                `[${model.resourceId}] [${logicalResourceIdentifier}]`,
+                'successfully deleted.'
+            );
         }
-        progress.status = OperationStatus.Success;
-        LOGGER.info('DELETE progress', progress);
-        return progress;
+        return Promise.resolve(null);
     }
 
     /**
      * CloudFormation invokes this handler as part of a stack update operation when
      * detailed information about the resource's current state is required.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to enable handlers to process re-invocation
      */
     @handlerEvent(Action.Read)
+    @commonAws({
+        serviceName: 'IAM',
+        debug: true,
+    })
     public async read(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: Dict
-    ): Promise<ProgressEvent> {
-        console.info('READ request', request);
-        const model: PasswordPolicy = await this.retrievePasswordPolicy(
-            session,
-            request.logicalResourceIdentifier,
-            request.desiredResourceState.resourceId,
-            request.desiredResourceState
+        action: Action,
+        args: HandlerArgs<PasswordPolicy>,
+        service: IAM
+    ): Promise<PasswordPolicy> {
+        const { desiredResourceState, logicalResourceIdentifier } = args.request;
+        return await this.retrievePasswordPolicy(
+            service,
+            logicalResourceIdentifier,
+            desiredResourceState.resourceId,
+            desiredResourceState
         );
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel>>(model);
-        LOGGER.info('READ progress', progress);
-        return progress;
     }
 
     /**
      * CloudFormation invokes this handler when summary information about multiple
      * resources of this resource provider is required.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to enable handlers to process re-invocation
      */
     @handlerEvent(Action.List)
+    @commonAws({
+        serviceName: 'IAM',
+        debug: true,
+    })
     public async list(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: Dict
-    ): Promise<ProgressEvent> {
-        console.info('LIST request', request);
+        action: Action,
+        args: HandlerArgs<PasswordPolicy>,
+        service: IAM
+    ): Promise<PasswordPolicy[]> {
+        const { desiredResourceState, logicalResourceIdentifier } = args.request;
         const models: Array<PasswordPolicy> = [];
         try {
             const model: PasswordPolicy = await this.retrievePasswordPolicy(
-                session,
-                request.logicalResourceIdentifier,
-                request.desiredResourceState.resourceId,
-                request.desiredResourceState
+                service,
+                logicalResourceIdentifier,
+                desiredResourceState.resourceId,
+                desiredResourceState
             );
             models.push(model);
         } catch (err) {
@@ -331,12 +286,7 @@ export class Resource extends BaseResource<ResourceModel> {
                 throw err;
             }
         }
-        const progress = ProgressEvent.builder<ProgressEvent<PasswordPolicy>>()
-            .status(OperationStatus.Success)
-            .resourceModels(models)
-            .build();
-        LOGGER.info('LIST progress', progress);
-        return progress;
+        return Promise.resolve(models);
     }
 }
 

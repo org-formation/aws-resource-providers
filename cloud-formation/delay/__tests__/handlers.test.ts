@@ -8,6 +8,17 @@ import { CallbackContext, resource, Resource } from '../src/handlers';
 import { ResourceModel } from '../src/models';
 
 describe('when calling handler', () => {
+    let fixtureMap: Map<Action, Record<string, any>>;
+
+    beforeAll(() => {
+        fixtureMap = new Map<Action, Record<string, any>>();
+        fixtureMap.set(Action.Create, createFixture);
+        fixtureMap.set(Action.Read, readFixture);
+        fixtureMap.set(Action.Update, updateFixture);
+        fixtureMap.set(Action.Delete, deleteFixture);
+        fixtureMap.set(Action.List, listFixture);
+    });
+
     test('parse valid duration', () => {
         [
             ['PT0S', 0],
@@ -55,9 +66,9 @@ describe('when calling handler', () => {
             status: OperationStatus.InProgress,
             message: '',
             callbackContext: {
-                Remaining: -590,
+                Remaining: -540,
             },
-            callbackDelaySeconds: 10,
+            callbackDelaySeconds: Resource.DEFAULT_DURATION,
             resourceModel: request.desiredResourceState,
         });
     });
@@ -140,5 +151,18 @@ describe('when calling handler', () => {
             callbackDelaySeconds: 0,
             resourceModels: [request.desiredResourceState],
         });
+    });
+
+    test('all operations successful without session', async () => {
+        const promises: any[] = [];
+        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
+            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
+                ResourceModel
+            >(resource['modelCls']);
+            expect(request).toBeDefined();
+            promises.push(resource['invokeHandler'](null, request, action, {}));
+        });
+        expect.assertions(promises.length);
+        await Promise.all(promises);
     });
 });

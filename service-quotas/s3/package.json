@@ -2,6 +2,7 @@
     "name": "community-servicequotas-s3",
     "version": "0.1.0",
     "description": "AWS custom resource provider named Community::ServiceQuotas::S3.",
+    "private": true,
     "main": "dist/handlers.js",
     "files": [
         "dist"

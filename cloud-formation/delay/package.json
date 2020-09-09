@@ -2,6 +2,7 @@
     "name": "community-cloudformation-delay",
     "version": "0.1.0",
     "description": "CloudFormation Resource Provider for AWS CloudFormation Delay",
+    "private": true,
     "main": "dist/handlers.js",
     "files": [
         "dist"
@@ -12,7 +13,7 @@
         "submit": "npm run prepack && cfn submit -vv --region us-east-1 --set-default",
         "package": "npm run prepack && cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
         "version": "npm run package && aws s3 cp ${npm_package_name}-${npm_package_version}.zip s3://community-resource-provider-catalog/${npm_package_name}-${npm_package_version}.zip",
-        "test": "npx jest",
+        "test": "npx jest --config ../../jest.config.js --rootDir .",
         "test:integration": "npx npm-run-all -p -r samstart cfntest",
         "cfntest": "cfn test -vv >> cfn.log",
         "samstart": "sam local start-lambda -l sam.log",
