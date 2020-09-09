@@ -1,18 +1,7 @@
 # Distribution / packaging
-build/
 lib/
-
-# Unit test / coverage reports
-.cache
-.hypothesis/
-.pytest_cache/
-
-# RPDK logs
-rpdk.log
+dist/
 
 # Node.js
 node_modules/
 coverage/
-
-# contains credentials
-sam-tests/
