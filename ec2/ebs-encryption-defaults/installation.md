@@ -29,3 +29,18 @@ aws cloudformation set-type-default-version \
   --type-name Community::Organizations::EbsEncryptionDefaults \
   --type RESOURCE
 ```
+
+## Installation using org-formation task
+For more information on AWS Organization Formation, see: https://github.com/org-formation/org-formation-cli
+
+``` yaml
+CommunityEc2EbsEncryptionDefaultsRP:
+  Type: register-type
+  SchemaHandlerPackage: s3://community-resource-provider-catalog/community-ec2-ebsencryptiondefaults-0.1.0.zip
+  ResourceType: 'Community::Organizations::EbsEncryptionDefaults'
+  MaxConcurrentTasks: 10
+  OrganizationBinding:
+    IncludeMasterAccount: true
+    Account: '*'
+    Region: us-east-1
+```

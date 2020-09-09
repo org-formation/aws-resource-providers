@@ -30,3 +30,19 @@ aws cloudformation set-type-default-version \
   --type-name Community::ServiceQuotas::CloudFormation \
   --type RESOURCE
 ```
+
+
+## Installation using org-formation task
+For more information on AWS Organization Formation, see: https://github.com/org-formation/org-formation-cli
+
+``` yaml
+CommunityServiceQuotasCfnRP:
+  Type: register-type
+  SchemaHandlerPackage: s3://community-resource-provider-catalog/community-servicequotas-cloudformation-0.1.0.zip
+  ResourceType: 'Community::ServiceQuotas::CloudFormation'
+  MaxConcurrentTasks: 10
+  OrganizationBinding:
+    IncludeMasterAccount: true
+    Account: '*'
+    Region: us-east-1
+```
