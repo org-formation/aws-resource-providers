@@ -13,6 +13,7 @@ import * as Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
 type ServiceName = keyof ClientMap;
+type Client = InstanceType<ClientMap[ServiceName]>;
 type HandlerEvents = Map<Action, string | symbol>;
 
 export type HandlerArgs<
@@ -28,6 +29,10 @@ export interface commonAwsOptions {
     serviceName: ServiceName;
     action?: Action;
     debug?: boolean;
+}
+
+interface Session {
+    client: (...args: any[]) => Client;
 }
 
 /**
@@ -55,7 +60,7 @@ export function commonAws<
 
         // Wrapping the original method with new signature.
         descriptor.value = async function (
-            session: Optional<SessionProxy>,
+            session: Optional<SessionProxy | Session>,
             request: ResourceHandlerRequest<ResourceModel>,
             callbackContext: T
         ): Promise<ProgressEvent> {
@@ -82,7 +87,10 @@ export function commonAws<
             if (debug)
                 console.info({ action, request, callbackContext, env: process.env });
 
-            if (session instanceof SessionProxy) {
+            if (
+                session &&
+                (session instanceof SessionProxy || session.client instanceof Function)
+            ) {
                 const service = session.client(serviceName as any);
 
                 if (debug) console.info({ action, message: 'before perform' });
