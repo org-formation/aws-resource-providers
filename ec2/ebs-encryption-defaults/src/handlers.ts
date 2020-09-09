@@ -1,205 +1,124 @@
-import {
-    Action,
-    BaseResource,
-    exceptions,
-    handlerEvent,
-    HandlerErrorCode,
-    OperationStatus,
-    Optional,
-    ProgressEvent,
-    ResourceHandlerRequest,
-    SessionProxy,
-} from 'cfn-rpdk';
+import { Action, BaseResource, handlerEvent } from 'cfn-rpdk';
+import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { ResourceModel } from './models';
 import { EC2 } from 'aws-sdk';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-type CallbackContext = Record<string, any>;
-
 class Resource extends BaseResource<ResourceModel> {
-    /**
-     * CloudFormation invokes this handler when the resource is initially created
-     * during stack create operations.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
-    @handlerEvent(Action.Create)
-    public async create(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
 
-        LOGGER.info({ handler: 'create', request, callbackContext, env: process.env });
+    @handlerEvent(Action.Create)
+    @commonAws({
+        serviceName: 'EC2',
+        debug: true,
+    })
+    public async create(
+        action: Action,
+        args: HandlerArgs<ResourceModel>,
+        service: EC2
+    ): Promise<ResourceModel> {
+        const { desiredResourceState } = args.request;
+        const model: ResourceModel = desiredResourceState;
+
         model.resourceId = 'region-defaults'; // there can only be one
 
-        if (session instanceof SessionProxy) {
-            if (
-                model.defaultEbsEncryptionKeyId !== undefined ||
-                model.enableEbsEncryptionByDefault !== undefined
-            ) {
-                const ec2client = session.client('EC2') as EC2;
-
-                if (model.enableEbsEncryptionByDefault === true) {
-                    await ec2client.enableEbsEncryptionByDefault().promise();
-                } else if (model.enableEbsEncryptionByDefault === false) {
-                    await ec2client.disableEbsEncryptionByDefault().promise();
-                }
-
-                if (typeof model.defaultEbsEncryptionKeyId === 'string') {
-                    await ec2client
-                        .modifyEbsDefaultKmsKeyId({
-                            KmsKeyId: model.defaultEbsEncryptionKeyId,
-                        })
-                        .promise();
-                }
-            }
-            progress.status = OperationStatus.Success;
-        } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
-        }
-        return progress;
-    }
-
-    /**
-     * CloudFormation invokes this handler when the resource is updated
-     * as part of a stack update operation.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
-    @handlerEvent(Action.Update)
-    public async update(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        const prevModel: ResourceModel = request.previousResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
-        LOGGER.info({ handler: 'update', request, callbackContext });
-
-        if (session instanceof SessionProxy) {
-            if (
-                model.enableEbsEncryptionByDefault !==
-                prevModel.enableEbsEncryptionByDefault
-            ) {
-                const ec2client = session.client('EC2') as EC2;
-
-                if (model.enableEbsEncryptionByDefault === true) {
-                    await ec2client.enableEbsEncryptionByDefault().promise();
-                } else {
-                    await ec2client.disableEbsEncryptionByDefault().promise();
-                }
-            }
-
-            if (
-                model.defaultEbsEncryptionKeyId !== prevModel.defaultEbsEncryptionKeyId
-            ) {
-                const ec2client = session.client('EC2') as EC2;
-                if (typeof model.defaultEbsEncryptionKeyId === 'string') {
-                    await ec2client
-                        .modifyEbsDefaultKmsKeyId({
-                            KmsKeyId: model.defaultEbsEncryptionKeyId,
-                        })
-                        .promise();
-                } else {
-                    await ec2client.resetEbsDefaultKmsKeyId().promise();
-                }
-            }
-            progress.status = OperationStatus.Success;
-        } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
-        }
-        return progress;
-    }
-
-    /**
-     * CloudFormation invokes this handler when the resource is deleted, either when
-     * the resource is deleted from the stack as part of a stack update operation,
-     * or the stack itself is deleted.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
-    @handlerEvent(Action.Delete)
-    public async delete(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
-        LOGGER.info({ handler: 'delete', request, callbackContext });
-
-        if (session instanceof SessionProxy) {
-            const ec2client = session.client('EC2') as EC2;
-
+        if (
+            model.defaultEbsEncryptionKeyId !== undefined ||
+            model.enableEbsEncryptionByDefault !== undefined
+        ) {
             if (model.enableEbsEncryptionByDefault === true) {
-                await ec2client.disableEbsEncryptionByDefault().promise();
+                await service.enableEbsEncryptionByDefault().promise();
+            } else if (model.enableEbsEncryptionByDefault === false) {
+                await service.disableEbsEncryptionByDefault().promise();
             }
 
             if (typeof model.defaultEbsEncryptionKeyId === 'string') {
-                await ec2client.resetEbsDefaultKmsKeyId().promise();
+                await service
+                    .modifyEbsDefaultKmsKeyId({
+                        KmsKeyId: model.defaultEbsEncryptionKeyId,
+                    })
+                    .promise();
             }
-            progress.status = OperationStatus.Success;
-        } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
         }
-        return progress;
+        return Promise.resolve(model);
     }
 
-    /**
-     * CloudFormation invokes this handler as part of a stack update operation when
-     * detailed information about the resource's current state is required.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
-    @handlerEvent(Action.Read)
-    public async read(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        // TODO: put code here
-        if (session instanceof SessionProxy) {
-            const ec2client = session.client('EC2') as EC2;
-        } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
+    @handlerEvent(Action.Update)
+    @commonAws({
+        serviceName: 'EC2',
+        debug: true,
+    })
+    public async update(
+        action: Action,
+        args: HandlerArgs<ResourceModel>,
+        service: EC2
+    ): Promise<ResourceModel> {
+        const { desiredResourceState, previousResourceState } = args.request;
+        const model: ResourceModel = desiredResourceState;
+        const prevModel: ResourceModel = previousResourceState;
+
+        if (
+            model.enableEbsEncryptionByDefault !==
+            prevModel.enableEbsEncryptionByDefault
+        ) {
+            if (model.enableEbsEncryptionByDefault === true) {
+                await service.enableEbsEncryptionByDefault().promise();
+            } else {
+                await service.disableEbsEncryptionByDefault().promise();
+            }
         }
-        const progress = ProgressEvent.success<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
-        return progress;
+
+        if (model.defaultEbsEncryptionKeyId !== prevModel.defaultEbsEncryptionKeyId) {
+            if (typeof model.defaultEbsEncryptionKeyId === 'string') {
+                await service
+                    .modifyEbsDefaultKmsKeyId({
+                        KmsKeyId: model.defaultEbsEncryptionKeyId,
+                    })
+                    .promise();
+            } else {
+                await service.resetEbsDefaultKmsKeyId().promise();
+            }
+        }
+        return Promise.resolve(model);
+    }
+
+    @handlerEvent(Action.Delete)
+    @commonAws({
+        serviceName: 'EC2',
+        debug: true,
+    })
+    public async delete(
+        action: Action,
+        args: HandlerArgs<ResourceModel>,
+        service: EC2
+    ): Promise<null> {
+        const { desiredResourceState } = args.request;
+        const model: ResourceModel = desiredResourceState;
+
+        if (model.enableEbsEncryptionByDefault === true) {
+            await service.disableEbsEncryptionByDefault().promise();
+        }
+
+        if (typeof model.defaultEbsEncryptionKeyId === 'string') {
+            await service.resetEbsDefaultKmsKeyId().promise();
+        }
+        return Promise.resolve(null);
+    }
+
+    @handlerEvent(Action.Read)
+    @commonAws({
+        serviceName: 'EC2',
+        debug: true,
+    })
+    public async read(
+        action: Action,
+        args: HandlerArgs<ResourceModel>,
+        service: EC2
+    ): Promise<ResourceModel> {
+        const { desiredResourceState } = args.request;
+        const model: ResourceModel = desiredResourceState;
+        return Promise.resolve(model);
     }
 }
 
