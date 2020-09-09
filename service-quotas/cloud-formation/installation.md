@@ -21,7 +21,7 @@ aws cloudformation register-type \
   --type-name Community::ServiceQuotas::CloudFormation \
   --type RESOURCE \
   --schema-handler-package s3://community-resource-provider-catalog/community-servicequotas-cloudformation-0.1.0.zip \
-  --execution-tole <role-arn-from-output>
+  --execution-role <role-arn-from-output>
 
 aws cloudformation describe-type-registration --registration-token <registration-token> 
 
