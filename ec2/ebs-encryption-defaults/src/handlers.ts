@@ -7,7 +7,6 @@ import { EC2 } from 'aws-sdk';
 const LOGGER = console;
 
 class Resource extends BaseResource<ResourceModel> {
-
     @handlerEvent(Action.Create)
     @commonAws({
         serviceName: 'EC2',
