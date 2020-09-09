@@ -19,7 +19,8 @@ aws cloudformation describe-stacks \
 aws cloudformation register-type \
   --type-name Community::IAM::PasswordPolicy \
   --type RESOURCE \
-  --schema-handler-package s3://community-resource-provider-catalog/community-iam-passwordpolicy-0.2.0.zip
+  --schema-handler-package s3://community-resource-provider-catalog/community-iam-passwordpolicy-0.2.0.zip \
+  --execution-tole <role-arn-from-output>
 
 aws cloudformation describe-type-registration --registration-token <registration-token> 
 
