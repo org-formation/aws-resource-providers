@@ -43,6 +43,7 @@ describe('when calling handler', () => {
             approvalRuleTemplate: {
                 approvalRuleTemplateName: 'test',
                 approvalRuleTemplateId: IDENTIFIER,
+                approvalRuleTemplateDescription: 'test',
             },
         });
         codecommit.mock('deleteApprovalRuleTemplate').resolve({});
@@ -54,7 +55,7 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test.only('create operation successful', async () => {
+    test('create operation successful - code commit approval rule template', async () => {
         const request = UnmodeledRequest.fromUnmodeled(
             fixtureMap.get(Action.Create)
         ).toModeled<ResourceModel>(resource['modelCls']);
@@ -74,7 +75,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('update operation successful', async () => {
+    test('update operation successful - code commit approval rule template', async () => {
         const request = UnmodeledRequest.fromUnmodeled(
             fixtureMap.get(Action.Update)
         ).toModeled<ResourceModel>(resource['modelCls']);
@@ -92,7 +93,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('delete operation successful', async () => {
+    test('delete operation successful - code commit approval rule template', async () => {
         const request = UnmodeledRequest.fromUnmodeled(
             fixtureMap.get(Action.Delete)
         ).toModeled<ResourceModel>(resource['modelCls']);
@@ -110,7 +111,7 @@ describe('when calling handler', () => {
         expect(progress.resourceModel).toBeNull();
     });
 
-    test('read operation successful', async () => {
+    test('read operation successful - code commit approval rule template', async () => {
         const request = UnmodeledRequest.fromUnmodeled(
             fixtureMap.get(Action.Read)
         ).toModeled<ResourceModel>(resource['modelCls']);
@@ -128,7 +129,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('all operations fail without session', async () => {
+    test('all operations fail without session - code commit approval rule template', async () => {
         const promises: any[] = [];
         fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
             const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
