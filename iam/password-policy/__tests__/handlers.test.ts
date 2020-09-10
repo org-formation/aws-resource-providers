@@ -173,7 +173,7 @@ describe('when calling handler', () => {
             message: '',
             callbackDelaySeconds: 0,
         });
-        expect(progress.resourceModel).toBeUndefined();
+        expect(progress.resourceModel).toBeNull();
     });
 
     test('delete operation fail not found', async () => {

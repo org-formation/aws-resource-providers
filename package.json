@@ -2,6 +2,7 @@
     "name": "aws-resource-providers",
     "version": "0.1.0",
     "description": "A community driven repository where you can find AWS Resource Type Providers for different purposes.",
+    "private": true,
     "scripts": {
         "bootstrap": "npm ci --optional && npx lerna bootstrap",
         "reset": "npm run cleanup && npx rimraf -rf **/node_modules && npm run bootstrap",
