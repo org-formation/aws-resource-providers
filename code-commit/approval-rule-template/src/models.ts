@@ -11,7 +11,7 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     protected readonly IDENTIFIER_KEY_APPROVALRULETEMPLATEID: string = '/properties/ApprovalRuleTemplateId';
 
-    @Expose({ name: 'ApprovalRuleTemplateId' })
+    @Expose({ name: 'approvalRuleTemplateId' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'approvalRuleTemplateId', value, obj, []),
@@ -20,7 +20,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     approvalRuleTemplateId?: Optional<string>;
-    @Expose({ name: 'ApprovalRuleTemplateName' })
+    @Expose({ name: 'approvalRuleTemplateName' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'approvalRuleTemplateName', value, obj, []),
@@ -29,7 +29,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     approvalRuleTemplateName?: Optional<string>;
-    @Expose({ name: 'ApprovalRuleTemplateDescription' })
+    @Expose({ name: 'approvalRuleTemplateDescription' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'approvalRuleTemplateDescription', value, obj, []),
@@ -38,10 +38,10 @@ export class ResourceModel extends BaseModel {
         }
     )
     approvalRuleTemplateDescription?: Optional<string>;
-    @Expose({ name: 'ApprovalRuleTemplateContent' })
+    @Expose({ name: 'approvalRuleTemplateContent' })
     @Type(() => TemplateContent)
     approvalRuleTemplateContent?: Optional<TemplateContent>;
-    @Expose({ name: 'CreationDate' })
+    @Expose({ name: 'creationDate' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'creationDate', value, obj, []),
@@ -50,7 +50,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     creationDate?: Optional<string>;
-    @Expose({ name: 'LastModifiedDate' })
+    @Expose({ name: 'lastModifiedDate' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'lastModifiedDate', value, obj, []),
@@ -59,7 +59,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     lastModifiedDate?: Optional<string>;
-    @Expose({ name: 'LastModifiedUser' })
+    @Expose({ name: 'lastModifiedUser' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'lastModifiedUser', value, obj, []),
@@ -68,7 +68,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     lastModifiedUser?: Optional<string>;
-    @Expose({ name: 'RuleContentSha256' })
+    @Expose({ name: 'ruleContentSha256' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'ruleContentSha256', value, obj, []),
