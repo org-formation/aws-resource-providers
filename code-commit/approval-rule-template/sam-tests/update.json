@@ -1,0 +1,37 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "approvalRuleTemplateId": "123456789012",
+        "approvalRuleTemplateName": "test2",
+        "approvalRuleTemplateDescription": "test2",
+        "approvalRuleTemplateContent": {
+            "DestinationReferences": "refs/heads/master",
+            "Statements": [
+                {
+                    "NumberOfApprovalsNeeded": 2,
+                    "ApprovalPoolMembers": [
+                        "arn:aws:sts::123456789012:assumed-role/CodeCommitReview/*"
+                    ]
+                }
+            ]
+        }
+    },
+    "previousResourceState": {
+        "approvalRuleTemplateId": "123456789012",
+        "approvalRuleTemplateName": "test",
+        "approvalRuleTemplateDescription": "test",
+        "approvalRuleTemplateContent": {
+            "DestinationReferences": "refs/heads/master",
+            "Statements": [
+                {
+                    "NumberOfApprovalsNeeded": 2,
+                    "ApprovalPoolMembers": [
+                        "arn:aws:sts::123456789012:assumed-role/CodeCommitReview/*"
+                    ]
+                }
+            ]
+        }
+    },
+    "awsAccountId": "123456789012",
+    "logicalResourceIdentifier": "MyResource"
+}
