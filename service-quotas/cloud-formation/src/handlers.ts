@@ -1,4 +1,4 @@
-import { Action, BaseResource, exceptions, handlerEvent, HandlerErrorCode, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk';
 import * as Quotas from 'community-resource-providers-common/lib/service-quotas';
@@ -87,11 +87,10 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Delete)
-    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
+    public async delete(session: Optional<SessionProxy>): Promise<ProgressEvent> {
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
         if (session instanceof SessionProxy) {
-            const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
+            session.client('ServiceQuotas') as ServiceQuotas;
         } else {
             throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
@@ -109,12 +108,12 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Read)
-    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
+    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
         const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
         if (session instanceof SessionProxy) {
-            const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
+            session.client('ServiceQuotas') as ServiceQuotas;
         } else {
             throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }

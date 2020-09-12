@@ -1,7 +1,7 @@
 import * as Aws from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
 import { Action, BaseModel, BaseResource, BaseResourceHandlerRequest, exceptions, handlerEvent, OperationStatus, SessionProxy } from 'cfn-rpdk';
-import { commonAws, HandlerArgs } from '../src/common-decorator';
+import { commonAws } from '../src/common-decorator';
 
 jest.mock('aws-sdk');
 
@@ -13,7 +13,7 @@ class Resource extends BaseResource {
         serviceName: 'S3Control',
         debug: true,
     })
-    public async create(action: Action, args: HandlerArgs<Model>, service: Aws.IAM): Promise<Model> {
+    public async create(): Promise<Model> {
         const model = new Model();
         return model;
     }

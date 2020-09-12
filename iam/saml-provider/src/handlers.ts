@@ -116,11 +116,10 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Read)
-    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
+    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
         if (session instanceof SessionProxy) {
-            const client: IAM = session.client('IAM') as IAM;
         } else {
             throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }

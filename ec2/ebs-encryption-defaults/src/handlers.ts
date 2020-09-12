@@ -4,14 +4,11 @@ import { ResourceModel } from './models';
 import { EC2 } from 'aws-sdk';
 
 // Use this logger to forward log messages to CloudWatch Logs.
-const LOGGER = console;
+//const LOGGER = console;
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
+    @commonAws({ serviceName: 'EC2', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: EC2): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
         const model: ResourceModel = desiredResourceState;
@@ -37,10 +34,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
+    @commonAws({ serviceName: 'EC2', debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: EC2): Promise<ResourceModel> {
         const { desiredResourceState, previousResourceState } = args.request;
         const model: ResourceModel = desiredResourceState;
@@ -69,10 +63,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
+    @commonAws({ serviceName: 'EC2', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: EC2): Promise<null> {
         const { desiredResourceState } = args.request;
         const model: ResourceModel = desiredResourceState;
@@ -88,11 +79,8 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
-    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: EC2): Promise<ResourceModel> {
+    @commonAws({ serviceName: 'EC2', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
         const model: ResourceModel = desiredResourceState;
         return Promise.resolve(model);

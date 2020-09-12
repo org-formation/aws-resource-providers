@@ -1,7 +1,7 @@
-import { config, IAM } from 'aws-sdk';
+import { IAM } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { v4 as uuidv4 } from 'uuid';
-import { Action, BaseResource, exceptions, handlerEvent, Optional } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Optional, CfnResponse } from 'cfn-rpdk';
 
 import { ResourceModel } from './models';
 
@@ -192,12 +192,12 @@ export class Resource extends BaseResource<ResourceModel> {
 
 export const resource = new Resource(PasswordPolicy.TYPE_NAME, PasswordPolicy);
 
-export const entrypoint = (...args: [any, any]) => {
+export const entrypoint = (...args: [any, any]): Promise<CfnResponse<ResourceModel>> => {
     console.info('entrypoint input', ...args);
     return resource.entrypoint(...args);
 };
 
-export const testEntrypoint = (...args: [any, any]) => {
+export const testEntrypoint = (...args: [any, any]): Promise<CfnResponse<ResourceModel>> => {
     console.info('testEntrypoint input', ...args);
     return resource.testEntrypoint(...args);
 };

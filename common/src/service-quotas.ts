@@ -4,7 +4,7 @@ import { RequestServiceQuotaIncreaseRequest } from 'aws-sdk/clients/servicequota
 
 export type QuotaID = { QuotaCode: string; ServiceCode: string };
 
-export const UpsertQuotas = async (service: ServiceQuotas, previous: BaseModel, desired: BaseModel, quotaCodeForPropertyName: Record<string, QuotaID>, logger: Console) => {
+export const UpsertQuotas = async (service: ServiceQuotas, previous: BaseModel, desired: BaseModel, quotaCodeForPropertyName: Record<string, QuotaID>, logger: Console): Promise<void> => {
     for (const [key, val] of Object.entries(desired)) {
         const prevVal = (previous as any)[key];
         logger.info({ key, val, prevVal, valType: typeof val });
