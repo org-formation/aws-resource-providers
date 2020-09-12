@@ -1,5 +1,9 @@
 import { ServiceQuotas } from 'aws-sdk';
-import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
+import {
+    on,
+    AwsServiceMockBuilder,
+    AwsFunctionMockBuilder,
+} from '@jurijzahn8019/aws-promise-jest-mock';
 import {
     Action,
     exceptions,
@@ -8,10 +12,17 @@ import {
     OperationStatus,
 } from 'cfn-rpdk';
 import createFixture from '../sam-tests/create.json';
+import readFixture from '../sam-tests/read.json';
+import deleteFixture from '../sam-tests/delete.json';
 import updateDecreaseBucketsFixture from '../sam-tests/update-decrease-buckets.json';
 import updateFixture from '../sam-tests/update.json';
 import { resource } from '../src/handlers';
 import { ResourceModel } from '../src/models';
+import {
+    ListRequestedServiceQuotaChangeHistoryByQuotaResponse,
+    GetServiceQuotaResponse,
+    GetAWSDefaultServiceQuotaResponse,
+} from 'aws-sdk/clients/servicequotas';
 
 jest.mock('aws-sdk');
 
@@ -20,16 +31,17 @@ const IDENTIFIER = '123456789012';
 describe('when calling handler', () => {
     let session: SessionProxy;
     let serviceQuotas: AwsServiceMockBuilder<ServiceQuotas>;
-    let listRequestedServiceQuotaChangeHistoryByQuotaMock: any;
-    let getServiceQuotaMock: any;
-    let requestServiceQuotaIncreaseMock: any;
+    let listRequestedServiceQuotaChangeHistoryByQuotaMock: AwsFunctionMockBuilder<ServiceQuotas>;
+    let getServiceQuotaMock: AwsFunctionMockBuilder<ServiceQuotas>;
+    let requestServiceQuotaIncreaseMock: AwsFunctionMockBuilder<ServiceQuotas>;
+    let getAWSDefaultServiceQuota: AwsFunctionMockBuilder<ServiceQuotas>;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
         session = new SessionProxy({});
         fixtureMap = new Map<Action, Record<string, any>>();
         fixtureMap.set(Action.Create, createFixture);
-        //fixtureMap.set(Action.Read, readFixture);
+        fixtureMap.set(Action.Read, readFixture);
         fixtureMap.set(Action.Update, updateFixture);
         //fixtureMap.set(Action.Delete, deleteFixture);
     });
@@ -43,6 +55,9 @@ describe('when calling handler', () => {
         requestServiceQuotaIncreaseMock = serviceQuotas
             .mock('requestServiceQuotaIncrease')
             .resolve({});
+        getAWSDefaultServiceQuota = serviceQuotas
+            .mock('getAWSDefaultServiceQuota')
+            .resolve({});
         session['client'] = () => serviceQuotas.instance;
     });
 
@@ -51,7 +66,7 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test('all operations fail without session', async () => {
+    test('service quotas s3 all operations fail without session', async () => {
         const promises: any[] = [];
         fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
             const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
@@ -160,5 +175,115 @@ describe('when calling handler', () => {
         );
         expect(getServiceQuotaMock.mock).toBeCalledTimes(0);
         expect(requestServiceQuotaIncreaseMock.mock).toBeCalledTimes(0);
+    });
+
+    test('service quotas s3 read operation successful (from change history)', async () => {
+        const history: ListRequestedServiceQuotaChangeHistoryByQuotaResponse = {
+            RequestedQuotas: [{ Status: 'CASE_OPENED', DesiredValue: 123 }],
+        };
+        listRequestedServiceQuotaChangeHistoryByQuotaMock.resolve(history as any);
+
+        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
+            ResourceModel
+        >(resource['modelCls']);
+
+        const response = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Read,
+            {}
+        );
+        const resourceModel = response.resourceModel as ResourceModel;
+        expect(resourceModel.buckets).toBe(123);
+
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
+            1
+        );
+        expect(
+            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
+        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(getServiceQuotaMock.mock).toBeCalledTimes(0);
+    });
+
+    test('service quotas s3 read operation successful (from service quota)', async () => {
+        const error = {
+            code: 'NoSuchResourceException',
+            message: 'not found',
+            name: 'Error',
+        } as Error;
+        const getQuotaResponse: GetServiceQuotaResponse = { Quota: { Value: 124 } };
+
+        listRequestedServiceQuotaChangeHistoryByQuotaMock.reject(error);
+        getServiceQuotaMock.resolve(getQuotaResponse as any);
+
+        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
+            ResourceModel
+        >(resource['modelCls']);
+
+        const response = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Read,
+            {}
+        );
+        const resourceModel = response.resourceModel as ResourceModel;
+        expect(resourceModel.buckets).toBe(124);
+
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
+            1
+        );
+        expect(
+            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
+        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
+        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
+            QuotaCode: 'L-DC2B2D3D',
+            ServiceCode: 's3',
+        });
+    });
+
+    test('service quotas s3 read operation successful (from aws default)', async () => {
+        const error = {
+            code: 'NoSuchResourceException',
+            message: 'not found',
+            name: 'Error',
+        } as Error;
+        const getQuotaResponse: GetAWSDefaultServiceQuotaResponse = {
+            Quota: { Value: 125 },
+        };
+
+        listRequestedServiceQuotaChangeHistoryByQuotaMock.reject(error);
+        getServiceQuotaMock.reject(error);
+        getAWSDefaultServiceQuota.resolve(getQuotaResponse as any);
+
+        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
+            ResourceModel
+        >(resource['modelCls']);
+
+        const response = await resource['invokeHandler'](
+            session,
+            request,
+            Action.Read,
+            {}
+        );
+        const resourceModel = response.resourceModel as ResourceModel;
+        expect(resourceModel.buckets).toBe(125);
+
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
+            1
+        );
+        expect(
+            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
+        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
+        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
+            QuotaCode: 'L-DC2B2D3D',
+            ServiceCode: 's3',
+        });
+        expect(getAWSDefaultServiceQuota.mock).toBeCalledTimes(1);
+        expect(getAWSDefaultServiceQuota.mock).toHaveBeenCalledWith({
+            QuotaCode: 'L-DC2B2D3D',
+            ServiceCode: 's3',
+        });
     });
 });
