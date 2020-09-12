@@ -1,14 +1,4 @@
-import {
-    Action,
-    BaseModel,
-    BaseResource,
-    exceptions,
-    OperationStatus,
-    Optional,
-    ProgressEvent,
-    ResourceHandlerRequest,
-    SessionProxy,
-} from 'cfn-rpdk';
+import { Action, BaseModel, BaseResource, exceptions, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import * as Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
@@ -16,10 +6,7 @@ type ServiceName = keyof ClientMap;
 type Client = InstanceType<ClientMap[ServiceName]>;
 type HandlerEvents = Map<Action, string | symbol>;
 
-export type HandlerArgs<
-    R extends BaseModel,
-    T extends Record<string, any> = Record<string, any>
-> = {
+export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Record<string, any>> = {
     session: Optional<SessionProxy>;
     request: ResourceHandlerRequest<R>;
     callbackContext: T;
@@ -41,15 +28,8 @@ interface Session {
  *
  * @returns {MethodDecorator}
  */
-export function commonAws<
-    T extends Record<string, any>,
-    ResourceModel extends BaseModel
->(options: commonAwsOptions): MethodDecorator {
-    return function (
-        target: BaseResource<ResourceModel>,
-        propertyKey: string | symbol,
-        descriptor: PropertyDescriptor
-    ): PropertyDescriptor {
+export function commonAws<T extends Record<string, any>, ResourceModel extends BaseModel>(options: commonAwsOptions): MethodDecorator {
+    return function (target: BaseResource<ResourceModel>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
         const { debug, serviceName } = options;
 
         if (descriptor === undefined) {
@@ -59,17 +39,10 @@ export function commonAws<
         const originalMethod = descriptor.value;
 
         // Wrapping the original method with new signature.
-        descriptor.value = async function (
-            session: Optional<SessionProxy | Session>,
-            request: ResourceHandlerRequest<ResourceModel>,
-            callbackContext: T
-        ): Promise<ProgressEvent> {
+        descriptor.value = async function (session: Optional<SessionProxy | Session>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: T): Promise<ProgressEvent> {
             let action = options.action;
             if (!action) {
-                const events: HandlerEvents = Reflect.getMetadata(
-                    'handlerEvents',
-                    target
-                );
+                const events: HandlerEvents = Reflect.getMetadata('handlerEvents', target);
                 events.forEach((value: string | symbol, key: Action) => {
                     if (value === propertyKey) {
                         action = key;
@@ -80,25 +53,15 @@ export function commonAws<
             const handlerArgs = { session, request, callbackContext };
 
             const model: ResourceModel = request.desiredResourceState;
-            const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, T>>(
-                model
-            );
+            const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, T>>(model);
 
-            if (debug)
-                console.info({ action, request, callbackContext, env: process.env });
+            if (debug) console.info({ action, request, callbackContext, env: process.env });
 
-            if (
-                session &&
-                (session instanceof SessionProxy || session.client instanceof Function)
-            ) {
+            if (session && (session instanceof SessionProxy || session.client instanceof Function)) {
                 const service = session.client(serviceName as any);
 
                 if (debug) console.info({ action, message: 'before perform' });
-                const modified = await originalMethod.apply(this, [
-                    action,
-                    handlerArgs,
-                    service,
-                ]);
+                const modified = await originalMethod.apply(this, [action, handlerArgs, service]);
                 if (debug) console.info({ action, message: 'after perform' });
 
                 if (modified !== undefined) {
@@ -114,9 +77,7 @@ export function commonAws<
                 progress.status = OperationStatus.Success;
                 return Promise.resolve(progress);
             } else {
-                throw new exceptions.InvalidCredentials(
-                    'no aws session found - did you forget to register the execution role?'
-                );
+                throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
             }
         };
         return descriptor;

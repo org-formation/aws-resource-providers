@@ -1,15 +1,4 @@
-import {
-    Action,
-    BaseResource,
-    exceptions,
-    handlerEvent,
-    HandlerErrorCode,
-    OperationStatus,
-    Optional,
-    ProgressEvent,
-    ResourceHandlerRequest,
-    SessionProxy,
-} from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, HandlerErrorCode, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { Organizations } from 'aws-sdk';
 // Use this logger to forward log messages to CloudWatch Logs.
@@ -22,10 +11,7 @@ const convertArnToId = (arn: string) => {
     return allParts[allParts.length - 1];
 };
 
-const parentIdOrRootId = async (
-    client: Organizations,
-    parentId?: string
-): Promise<string> => {
+const parentIdOrRootId = async (client: Organizations, parentId?: string): Promise<string> => {
     if (typeof parentId !== 'string' || parentId === '') {
         const roots = await client.listRoots().promise();
         return roots.Roots[0].Id;
@@ -48,18 +34,12 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Create)
-    public async create(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: any
-    ): Promise<ProgressEvent> {
+    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: any): Promise<ProgressEvent> {
         LOGGER.info('create');
         LOGGER.info(callbackContext);
 
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
         try {
             LOGGER.info(request);
@@ -73,9 +53,7 @@ class Resource extends BaseResource<ResourceModel> {
                     ParentId: parentId,
                 };
                 LOGGER.info(createRequest);
-                const result = await client
-                    .createOrganizationalUnit(createRequest)
-                    .promise();
+                const result = await client.createOrganizationalUnit(createRequest).promise();
                 LOGGER.info(result);
                 model.id = result.OrganizationalUnit.Id; //would this work?
                 model.arn = result.OrganizationalUnit.Arn; //would this work?
@@ -101,18 +79,12 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Update)
-    public async update(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         LOGGER.info('update');
 
         const model: ResourceModel = request.desiredResourceState;
         const prevModel: ResourceModel = request.previousResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
         LOGGER.info(request);
         LOGGER.info(model);
@@ -139,16 +111,10 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Delete)
-    public async delete(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         LOGGER.info('delete');
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
         LOGGER.info(request);
         LOGGER.info(model);
         try {
@@ -159,9 +125,7 @@ class Resource extends BaseResource<ResourceModel> {
                     OrganizationalUnitId: convertArnToId(model.arn), //would have been better if this is done using Id
                 };
                 LOGGER.info(deleteRequest);
-                const result = await client
-                    .deleteOrganizationalUnit(deleteRequest)
-                    .promise();
+                const result = await client.deleteOrganizationalUnit(deleteRequest).promise();
                 LOGGER.info(result);
             }
             progress.status = OperationStatus.Success;
@@ -185,16 +149,10 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Read)
-    public async read(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.success<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
         return progress;
     }
 
@@ -208,19 +166,10 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.List)
-    public async list(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async list(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.builder<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >()
-            .status(OperationStatus.Success)
-            .resourceModels([model])
-            .build();
+        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>().status(OperationStatus.Success).resourceModels([model]).build();
         return progress;
     }
 }

@@ -1,15 +1,4 @@
-import {
-    Action,
-    BaseResource,
-    exceptions,
-    handlerEvent,
-    HandlerErrorCode,
-    OperationStatus,
-    Optional,
-    ProgressEvent,
-    ResourceHandlerRequest,
-    SessionProxy,
-} from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, HandlerErrorCode, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 
 // Use this logger to forward log messages to CloudWatch Logs.
@@ -28,15 +17,9 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Create)
-    public async create(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
         // TODO: put code here
 
         // Example:
@@ -66,15 +49,9 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Update)
-    public async update(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
         // TODO: put code here
         progress.status = OperationStatus.Success;
         return progress;
@@ -91,15 +68,9 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Delete)
-    public async delete(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >();
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
         // TODO: put code here
         progress.status = OperationStatus.Success;
         return progress;
@@ -115,16 +86,10 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Read)
-    public async read(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.success<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
         return progress;
     }
 
@@ -138,19 +103,10 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.List)
-    public async list(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async list(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
-        const progress = ProgressEvent.builder<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >()
-            .status(OperationStatus.Success)
-            .resourceModels([model])
-            .build();
+        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>().status(OperationStatus.Success).resourceModels([model]).build();
         return progress;
     }
 }

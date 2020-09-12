@@ -33,15 +33,7 @@ describe('when calling handler', () => {
     });
 
     test('parse invalid duration', () => {
-        [
-            null,
-            '',
-            'PT000',
-            '-PT10S',
-            'P1Y2M3W4DT5H6M7S',
-            'PT12H1S',
-            'PT23H58M22S',
-        ].forEach((duration: string) => {
+        [null, '', 'PT000', '-PT10S', 'P1Y2M3W4DT5H6M7S', 'PT12H1S', 'PT23H58M22S'].forEach((duration: string) => {
             const parseDuration = () => {
                 Resource['parseDuration'](duration);
             };
@@ -50,18 +42,11 @@ describe('when calling handler', () => {
     });
 
     test('create operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<ResourceModel>(resource['modelCls']);
         const callbackContext: CallbackContext = {
             Remaining: null,
         };
-        const progress = await resource['invokeHandler'](
-            null,
-            request,
-            Action.Create,
-            callbackContext
-        );
+        const progress = await resource['invokeHandler'](null, request, Action.Create, callbackContext);
         expect(progress).toMatchObject({
             status: OperationStatus.InProgress,
             message: '',
@@ -74,18 +59,11 @@ describe('when calling handler', () => {
     });
 
     test('update operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(updateFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(updateFixture).toModeled<ResourceModel>(resource['modelCls']);
         const callbackContext: CallbackContext = {
             Remaining: 700,
         };
-        const progress = await resource['invokeHandler'](
-            null,
-            request,
-            Action.Update,
-            callbackContext
-        );
+        const progress = await resource['invokeHandler'](null, request, Action.Update, callbackContext);
         expect(progress).toMatchObject({
             status: OperationStatus.InProgress,
             message: '',
@@ -98,18 +76,11 @@ describe('when calling handler', () => {
     });
 
     test('delete operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(deleteFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+        const request = UnmodeledRequest.fromUnmodeled(deleteFixture).toModeled<ResourceModel>(resource['modelCls']);
         const callbackContext: CallbackContext = {
             Remaining: 0,
         };
-        const progress = await resource['invokeHandler'](
-            null,
-            request,
-            Action.Delete,
-            callbackContext
-        );
+        const progress = await resource['invokeHandler'](null, request, Action.Delete, callbackContext);
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -118,15 +89,8 @@ describe('when calling handler', () => {
     });
 
     test('read operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
-        const progress = await resource['invokeHandler'](
-            null,
-            request,
-            Action.Read,
-            {}
-        );
+        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<ResourceModel>(resource['modelCls']);
+        const progress = await resource['invokeHandler'](null, request, Action.Read, {});
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -136,15 +100,8 @@ describe('when calling handler', () => {
     });
 
     test('list operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(listFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
-        const progress = await resource['invokeHandler'](
-            null,
-            request,
-            Action.List,
-            {}
-        );
+        const request = UnmodeledRequest.fromUnmodeled(listFixture).toModeled<ResourceModel>(resource['modelCls']);
+        const progress = await resource['invokeHandler'](null, request, Action.List, {});
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -156,9 +113,7 @@ describe('when calling handler', () => {
     test('all operations successful without session', async () => {
         const promises: any[] = [];
         fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
-                ResourceModel
-            >(resource['modelCls']);
+            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);
             expect(request).toBeDefined();
             promises.push(resource['invokeHandler'](null, request, action, {}));
         });
