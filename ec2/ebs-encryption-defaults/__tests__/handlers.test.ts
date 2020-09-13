@@ -37,15 +37,11 @@ describe('when calling handler', () => {
     test('all operations fail without session', async () => {
         const promises: any[] = [];
         fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
-                ResourceModel
-            >(resource['modelCls']);
+            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);
             promises.push(
-                resource['invokeHandler'](null, request, action, {}).catch(
-                    (e: exceptions.BaseHandlerException) => {
-                        expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
-                    }
-                )
+                resource['invokeHandler'](null, request, action, {}).catch((e: exceptions.BaseHandlerException) => {
+                    expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
+                })
             );
         });
         expect.assertions(promises.length);

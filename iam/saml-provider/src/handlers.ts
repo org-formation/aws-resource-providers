@@ -1,21 +1,7 @@
-import {
-    Action,
-    BaseResource,
-    exceptions,
-    handlerEvent,
-    OperationStatus,
-    Optional,
-    ProgressEvent,
-    ResourceHandlerRequest,
-    SessionProxy,
-} from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { IAM } from 'aws-sdk';
-import {
-    CreateSAMLProviderRequest,
-    UpdateSAMLProviderRequest,
-    DeleteSAMLProviderRequest,
-} from 'aws-sdk/clients/iam';
+import { CreateSAMLProviderRequest, UpdateSAMLProviderRequest, DeleteSAMLProviderRequest } from 'aws-sdk/clients/iam';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
@@ -24,17 +10,11 @@ type CallbackContext = Record<string, any>;
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    public async create(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         LOGGER.info('create');
         LOGGER.info(callbackContext);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
         LOGGER.info(request);
         LOGGER.info(model);
@@ -46,16 +26,12 @@ class Resource extends BaseResource<ResourceModel> {
                 SAMLMetadataDocument: model.metadataDocument,
             };
             LOGGER.info(createSamlProviderRequest);
-            const response = await client
-                .createSAMLProvider(createSamlProviderRequest)
-                .promise();
+            const response = await client.createSAMLProvider(createSamlProviderRequest).promise();
 
             LOGGER.info(response);
             model.arn = response.SAMLProviderArn;
         } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
+            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
         return progress;
     }
@@ -70,17 +46,11 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Update)
-    public async update(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         LOGGER.info('update');
         LOGGER.info(callbackContext);
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
         LOGGER.info(request);
         LOGGER.info(model);
@@ -93,15 +63,11 @@ class Resource extends BaseResource<ResourceModel> {
             };
 
             LOGGER.info(updateSamlProviderRequest);
-            const response = await client
-                .updateSAMLProvider(updateSamlProviderRequest)
-                .promise();
+            const response = await client.updateSAMLProvider(updateSamlProviderRequest).promise();
 
             LOGGER.info(response);
         } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
+            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
         return progress;
     }
@@ -117,18 +83,12 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Delete)
-    public async delete(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
         LOGGER.info('delete');
         LOGGER.info(callbackContext);
 
         const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >();
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
 
         if (session instanceof SessionProxy) {
             const client: IAM = session.client('IAM') as IAM;
@@ -137,15 +97,11 @@ class Resource extends BaseResource<ResourceModel> {
             };
 
             LOGGER.info(deleteSamlProviderRequest);
-            const response = await client
-                .deleteSAMLProvider(deleteSamlProviderRequest)
-                .promise();
+            const response = await client.deleteSAMLProvider(deleteSamlProviderRequest).promise();
             progress.status = OperationStatus.Success;
             LOGGER.info(response);
         } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
+            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
         return progress;
     }
@@ -160,23 +116,14 @@ class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Read)
-    public async read(
-        session: Optional<SessionProxy>,
-        request: ResourceHandlerRequest<ResourceModel>,
-        callbackContext: CallbackContext
-    ): Promise<ProgressEvent> {
+    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
         const model: ResourceModel = request.desiredResourceState;
         // TODO: put code here
         if (session instanceof SessionProxy) {
-            const client: IAM = session.client('IAM') as IAM;
         } else {
-            throw new exceptions.InvalidCredentials(
-                'no aws session found - did you forget to register the execution role?'
-            );
+            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
-        const progress = ProgressEvent.success<
-            ProgressEvent<ResourceModel, CallbackContext>
-        >(model);
+        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
         return progress;
     }
 }
