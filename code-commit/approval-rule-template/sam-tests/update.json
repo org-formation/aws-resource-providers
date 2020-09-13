@@ -8,7 +8,7 @@
             "DestinationReferences": "refs/heads/master",
             "Statements": [
                 {
-                    "NumberOfApprovalsNeeded": 2,
+                    "NumberOfApprovalsNeeded": 3,
                     "ApprovalPoolMembers": [
                         "arn:aws:sts::123456789012:assumed-role/CodeCommitReview/*"
                     ]

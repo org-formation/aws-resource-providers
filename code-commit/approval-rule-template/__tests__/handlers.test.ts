@@ -40,6 +40,9 @@ describe('when calling handler', () => {
                 approvalRuleTemplateDescription: 'test',
             },
         });
+        codecommit.mock('updateApprovalRuleTemplateContent').resolve({});
+        codecommit.mock('updateApprovalRuleTemplateDescription').resolve({});
+        codecommit.mock('updateApprovalRuleTemplateName').resolve({});
         codecommit.mock('deleteApprovalRuleTemplate').resolve({});
         session['client'] = () => codecommit.instance;
     });
@@ -54,12 +57,12 @@ describe('when calling handler', () => {
         const progress = await resource['invokeHandler'](session, request, Action.Create, {});
         const model = request.desiredResourceState;
         model.approvalRuleTemplateId = IDENTIFIER;
-        expect(progress.serialize()).toMatchObject({
+        expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
             callbackDelaySeconds: 0,
-            resourceModel: model.serialize(),
         });
+        expect(progress.resourceModel.serialize()).toMatchObject(model.serialize());
     });
 
     test('update operation successful - code commit approval rule template', async () => {
