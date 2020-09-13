@@ -9,20 +9,13 @@ class Resource extends BaseResource<ResourceModel> {
         serviceName: 'CodeCommit',
         debug: true,
     })
-    public async create(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: CodeCommit
-    ): Promise<ResourceModel> {
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
 
         const request: CodeCommit.CreateApprovalRuleTemplateInput = {
             approvalRuleTemplateName: desiredResourceState.approvalRuleTemplateName,
-            approvalRuleTemplateDescription:
-                desiredResourceState.approvalRuleTemplateDescription,
-            approvalRuleTemplateContent: JSON.stringify(
-                desiredResourceState.approvalRuleTemplateContent
-            ),
+            approvalRuleTemplateDescription: desiredResourceState.approvalRuleTemplateDescription,
+            approvalRuleTemplateContent: JSON.stringify(desiredResourceState.approvalRuleTemplateContent),
         };
 
         console.info({
@@ -38,8 +31,7 @@ class Resource extends BaseResource<ResourceModel> {
         });
 
         const result = ResourceModel.deserialize(response.approvalRuleTemplate);
-        result.approvalRuleTemplateContent =
-            desiredResourceState.approvalRuleTemplateContent;
+        result.approvalRuleTemplateContent = desiredResourceState.approvalRuleTemplateContent;
 
         console.info({ action, message: 'done', result });
         return result;
@@ -50,21 +42,13 @@ class Resource extends BaseResource<ResourceModel> {
         serviceName: 'CodeCommit',
         debug: true,
     })
-    public async update(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: CodeCommit
-    ): Promise<ResourceModel> {
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
         const { desiredResourceState, previousResourceState } = args.request;
         const model = desiredResourceState;
 
-        if (
-            model.approvalRuleTemplateName !==
-            previousResourceState.approvalRuleTemplateName
-        ) {
+        if (model.approvalRuleTemplateName !== previousResourceState.approvalRuleTemplateName) {
             const request: CodeCommit.UpdateApprovalRuleTemplateNameInput = {
-                oldApprovalRuleTemplateName:
-                    previousResourceState.approvalRuleTemplateName,
+                oldApprovalRuleTemplateName: previousResourceState.approvalRuleTemplateName,
                 newApprovalRuleTemplateName: model.approvalRuleTemplateName,
             };
             console.info({
@@ -72,9 +56,7 @@ class Resource extends BaseResource<ResourceModel> {
                 message: 'before invoke updateApprovalRuleTemplateName',
                 request,
             });
-            const response = await service
-                .updateApprovalRuleTemplateName(request)
-                .promise();
+            const response = await service.updateApprovalRuleTemplateName(request).promise();
             console.info({
                 action,
                 message: 'after invoke updateApprovalRuleTemplateName',
@@ -82,10 +64,7 @@ class Resource extends BaseResource<ResourceModel> {
             });
         }
 
-        if (
-            model.approvalRuleTemplateDescription !==
-            previousResourceState.approvalRuleTemplateDescription
-        ) {
+        if (model.approvalRuleTemplateDescription !== previousResourceState.approvalRuleTemplateDescription) {
             const request: CodeCommit.UpdateApprovalRuleTemplateDescriptionInput = {
                 approvalRuleTemplateName: model.approvalRuleTemplateName,
                 approvalRuleTemplateDescription: model.approvalRuleTemplateDescription,
@@ -95,9 +74,7 @@ class Resource extends BaseResource<ResourceModel> {
                 message: 'before invoke updateApprovalRuleTemplateDescription',
                 request,
             });
-            const response = await service
-                .updateApprovalRuleTemplateDescription(request)
-                .promise();
+            const response = await service.updateApprovalRuleTemplateDescription(request).promise();
             console.info({
                 action,
                 message: 'after invoke updateApprovalRuleTemplateDescription',
@@ -105,10 +82,7 @@ class Resource extends BaseResource<ResourceModel> {
             });
         }
 
-        if (
-            model.approvalRuleTemplateContent !==
-            previousResourceState.approvalRuleTemplateContent
-        ) {
+        if (model.approvalRuleTemplateContent !== previousResourceState.approvalRuleTemplateContent) {
             const request: CodeCommit.UpdateApprovalRuleTemplateContentInput = {
                 approvalRuleTemplateName: model.approvalRuleTemplateName,
                 existingRuleContentSha256: model.ruleContentSha256,
@@ -119,9 +93,7 @@ class Resource extends BaseResource<ResourceModel> {
                 message: 'before invoke updateApprovalRuleTemplateContent',
                 request,
             });
-            const response = await service
-                .updateApprovalRuleTemplateContent(request)
-                .promise();
+            const response = await service.updateApprovalRuleTemplateContent(request).promise();
             console.info({
                 action,
                 message: 'after invoke updateApprovalRuleTemplateContent',
@@ -138,11 +110,7 @@ class Resource extends BaseResource<ResourceModel> {
         serviceName: 'CodeCommit',
         debug: true,
     })
-    public async delete(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: CodeCommit
-    ): Promise<null> {
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<null> {
         const { desiredResourceState } = args.request;
 
         const request: CodeCommit.DeleteApprovalRuleTemplateInput = {
@@ -171,11 +139,7 @@ class Resource extends BaseResource<ResourceModel> {
         serviceName: 'CodeCommit',
         debug: true,
     })
-    public async read(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: CodeCommit
-    ): Promise<ResourceModel> {
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
 
         const request: CodeCommit.GetApprovalRuleTemplateInput = {
@@ -204,10 +168,7 @@ class Resource extends BaseResource<ResourceModel> {
             return Promise.resolve(result);
         } catch (err) {
             if (err && err.code === 'ApprovalRuleTemplateDoesNotExistException') {
-                throw new exceptions.NotFound(
-                    ResourceModel.TYPE_NAME,
-                    desiredResourceState.approvalRuleTemplateId
-                );
+                throw new exceptions.NotFound(ResourceModel.TYPE_NAME, desiredResourceState.approvalRuleTemplateId);
             } else {
                 // Raise the original exception
                 throw err;
