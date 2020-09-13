@@ -19,10 +19,8 @@ class Resource extends BaseResource<ResourceModel> {
         const response = await service.createApprovalRuleTemplate(request).promise();
         console.info({ action, message: 'after invoke createApprovalRuleTemplate', response });
 
-        const result = ResourceModel.deserialize({
-            ...response.approvalRuleTemplate,
-            approvalRuleTemplateContent: desiredResourceState.approvalRuleTemplateContent,
-        });
+        const result = ResourceModel.deserialize(response.approvalRuleTemplate);
+        result.approvalRuleTemplateContent = desiredResourceState.approvalRuleTemplateContent;
 
         console.info({ action, message: 'done', result });
         return result;
