@@ -5,10 +5,7 @@ import { ResourceModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({
-        serviceName: 'CodeCommit',
-        debug: true,
-    })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
 
@@ -18,69 +15,24 @@ class Resource extends BaseResource<ResourceModel> {
             approvalRuleTemplateContent: JSON.stringify(desiredResourceState.approvalRuleTemplateContent),
         };
 
-        console.info({
-            action,
-            message: 'before invoke createApprovalRuleTemplate',
-            request,
-        });
+        console.info({ action, message: 'after createApprovalRuleTemplate', request });
         const response = await service.createApprovalRuleTemplate(request).promise();
-        console.info({
-            action,
-            message: 'after invoke createApprovalRuleTemplate',
-            response,
-        });
+        console.info({ action, message: 'after invoke createApprovalRuleTemplate', response });
 
-        const result = ResourceModel.deserialize(response.approvalRuleTemplate);
-        result.approvalRuleTemplateContent = desiredResourceState.approvalRuleTemplateContent;
+        const result = ResourceModel.deserialize({
+            ...response.approvalRuleTemplate,
+            approvalRuleTemplateContent: desiredResourceState.approvalRuleTemplateContent,
+        });
 
         console.info({ action, message: 'done', result });
         return result;
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({
-        serviceName: 'CodeCommit',
-        debug: true,
-    })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
         const { desiredResourceState, previousResourceState } = args.request;
         const model = desiredResourceState;
-
-        if (model.approvalRuleTemplateName !== previousResourceState.approvalRuleTemplateName) {
-            const request: CodeCommit.UpdateApprovalRuleTemplateNameInput = {
-                oldApprovalRuleTemplateName: previousResourceState.approvalRuleTemplateName,
-                newApprovalRuleTemplateName: model.approvalRuleTemplateName,
-            };
-            console.info({
-                action,
-                message: 'before invoke updateApprovalRuleTemplateName',
-                request,
-            });
-            const response = await service.updateApprovalRuleTemplateName(request).promise();
-            console.info({
-                action,
-                message: 'after invoke updateApprovalRuleTemplateName',
-                response,
-            });
-        }
-
-        if (model.approvalRuleTemplateDescription !== previousResourceState.approvalRuleTemplateDescription) {
-            const request: CodeCommit.UpdateApprovalRuleTemplateDescriptionInput = {
-                approvalRuleTemplateName: model.approvalRuleTemplateName,
-                approvalRuleTemplateDescription: model.approvalRuleTemplateDescription,
-            };
-            console.info({
-                action,
-                message: 'before invoke updateApprovalRuleTemplateDescription',
-                request,
-            });
-            const response = await service.updateApprovalRuleTemplateDescription(request).promise();
-            console.info({
-                action,
-                message: 'after invoke updateApprovalRuleTemplateDescription',
-                response,
-            });
-        }
 
         if (model.approvalRuleTemplateContent !== previousResourceState.approvalRuleTemplateContent) {
             const request: CodeCommit.UpdateApprovalRuleTemplateContentInput = {
@@ -88,17 +40,29 @@ class Resource extends BaseResource<ResourceModel> {
                 existingRuleContentSha256: model.ruleContentSha256,
                 newRuleContent: JSON.stringify(model.approvalRuleTemplateContent),
             };
-            console.info({
-                action,
-                message: 'before invoke updateApprovalRuleTemplateContent',
-                request,
-            });
+            console.info({ action, message: 'after updateApprovalRuleTemplateContent', request });
             const response = await service.updateApprovalRuleTemplateContent(request).promise();
-            console.info({
-                action,
-                message: 'after invoke updateApprovalRuleTemplateContent',
-                response,
-            });
+            console.info({ action, message: 'after invoke updateApprovalRuleTemplateContent', response });
+        }
+
+        if (model.approvalRuleTemplateDescription !== previousResourceState.approvalRuleTemplateDescription) {
+            const request: CodeCommit.UpdateApprovalRuleTemplateDescriptionInput = {
+                approvalRuleTemplateName: model.approvalRuleTemplateName,
+                approvalRuleTemplateDescription: model.approvalRuleTemplateDescription,
+            };
+            console.info({ action, message: 'after updateApprovalRuleTemplateDescription', request });
+            const response = await service.updateApprovalRuleTemplateDescription(request).promise();
+            console.info({ action, message: 'after invoke updateApprovalRuleTemplateDescription', response });
+        }
+
+        if (model.approvalRuleTemplateName !== previousResourceState.approvalRuleTemplateName) {
+            const request: CodeCommit.UpdateApprovalRuleTemplateNameInput = {
+                oldApprovalRuleTemplateName: previousResourceState.approvalRuleTemplateName,
+                newApprovalRuleTemplateName: model.approvalRuleTemplateName,
+            };
+            console.info({ action, message: 'after invoke updateApprovalRuleTemplateName', request });
+            const response = await service.updateApprovalRuleTemplateName(request).promise();
+            console.info({ action, message: 'after invoke updateApprovalRuleTemplateName', response });
         }
 
         console.info({ action, message: 'done', model });
@@ -106,10 +70,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({
-        serviceName: 'CodeCommit',
-        debug: true,
-    })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<null> {
         const { desiredResourceState } = args.request;
 
@@ -117,17 +78,9 @@ class Resource extends BaseResource<ResourceModel> {
             approvalRuleTemplateName: desiredResourceState.approvalRuleTemplateName,
         };
 
-        console.info({
-            action,
-            message: 'before invoke deleteApprovalRuleTemplate',
-            request,
-        });
+        console.info({ action, message: 'after invoke deleteApprovalRuleTemplate', request });
         const response = await service.deleteApprovalRuleTemplate(request).promise();
-        console.info({
-            action,
-            message: 'after invoke deleteApprovalRuleTemplate',
-            response,
-        });
+        console.info({ action, message: 'after invoke deleteApprovalRuleTemplate', response });
 
         console.info({ action, message: 'done' });
 
@@ -135,10 +88,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({
-        serviceName: 'CodeCommit',
-        debug: true,
-    })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
 
@@ -146,18 +96,10 @@ class Resource extends BaseResource<ResourceModel> {
             approvalRuleTemplateName: desiredResourceState.approvalRuleTemplateName,
         };
 
-        console.info({
-            action,
-            message: 'before invoke getPublicAccessBlock',
-            request,
-        });
+        console.info({ action, message: 'after invoke getApprovalRuleTemplate', request });
         try {
             const response = await service.getApprovalRuleTemplate(request).promise();
-            console.info({
-                action,
-                message: 'after invoke getPublicAccessBlock',
-                response,
-            });
+            console.info({ action, message: 'after invoke getApprovalRuleTemplate', response });
 
             const approvalRuleTemplate = response.approvalRuleTemplate;
 
