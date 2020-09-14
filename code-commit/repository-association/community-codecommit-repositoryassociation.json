@@ -1,0 +1,67 @@
+{
+    "typeName": "Community::CodeCommit::RepositoryAssociation",
+    "description": "Resource that allows for the association of a particular approval rule template to CodeCommit repositories.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {},
+    "properties": {
+        "Arn": {
+            "type": "string",
+            "description": "The Amazon Resource Name (ARN) of the template repository association."
+        },
+        "ApprovalRuleTemplateName": {
+            "type": "string",
+            "description": "The name of the approval rule template for which you want to list repositories that are associated with that template."
+        },
+        "RepositoryNames": {
+            "type": "array",
+            "description": "A list of repository names that are associated with the specified approval rule template.",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "ApprovalRuleTemplateName",
+        "RepositoryNames"
+    ],
+    "createOnlyProperties": [
+        "/properties/Arn",
+        "/properties/ApprovalRuleTemplateName"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn",
+        "/properties/ApprovalRuleTemplateName"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "additionalIdentifiers": [
+        [
+            "/properties/ApprovalRuleTemplateName"
+        ]
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories",
+                "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories"
+            ]
+        }
+    }   
+}

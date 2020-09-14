@@ -1,0 +1,13 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ApprovalRuleTemplateName": "test",
+        "RepositoryNames": [
+            "repo1",
+            "repo2"
+        ]
+    },
+    "previousResourceState": null,
+    "awsAccountId": "123456789012",
+    "logicalResourceIdentifier": "MyResource"
+}
