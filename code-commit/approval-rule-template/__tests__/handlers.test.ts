@@ -40,9 +40,9 @@ describe('when calling handler', () => {
                 approvalRuleTemplateDescription: 'test',
             },
         });
-        codecommit.mock('updateApprovalRuleTemplateContent').resolve({});
-        codecommit.mock('updateApprovalRuleTemplateDescription').resolve({});
-        codecommit.mock('updateApprovalRuleTemplateName').resolve({});
+        codecommit.mock('updateApprovalRuleTemplateContent').resolve({ approvalRuleTemplate: {} });
+        codecommit.mock('updateApprovalRuleTemplateDescription').resolve({ approvalRuleTemplate: {} });
+        codecommit.mock('updateApprovalRuleTemplateName').resolve({ approvalRuleTemplate: {} });
         codecommit.mock('deleteApprovalRuleTemplate').resolve({});
         session['client'] = () => codecommit.instance;
     });

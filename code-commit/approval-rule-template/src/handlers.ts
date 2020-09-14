@@ -24,8 +24,8 @@ class Resource extends BaseResource<ResourceModel> {
         result.approvalRuleTemplateName = response.approvalRuleTemplate.approvalRuleTemplateName;
         result.approvalRuleTemplateDescription = response.approvalRuleTemplate.approvalRuleTemplateDescription;
         result.approvalRuleTemplateContent = desiredResourceState.approvalRuleTemplateContent;
-        result.creationDate = response.approvalRuleTemplate.creationDate.toUTCString();
-        result.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate.toUTCString();
+        result.creationDate = response.approvalRuleTemplate.creationDate?.toUTCString();
+        result.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate?.toUTCString();
         result.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
         result.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
 
@@ -48,6 +48,10 @@ class Resource extends BaseResource<ResourceModel> {
             console.info({ action, message: 'after updateApprovalRuleTemplateContent', request });
             const response = await service.updateApprovalRuleTemplateContent(request).promise();
             console.info({ action, message: 'after invoke updateApprovalRuleTemplateContent', response });
+
+            model.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate?.toUTCString();
+            model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
+            model.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
         }
 
         if (model.approvalRuleTemplateDescription !== previousResourceState.approvalRuleTemplateDescription) {
@@ -58,6 +62,9 @@ class Resource extends BaseResource<ResourceModel> {
             console.info({ action, message: 'after updateApprovalRuleTemplateDescription', request });
             const response = await service.updateApprovalRuleTemplateDescription(request).promise();
             console.info({ action, message: 'after invoke updateApprovalRuleTemplateDescription', response });
+
+            model.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate?.toUTCString();
+            model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
         }
 
         if (model.approvalRuleTemplateName !== previousResourceState.approvalRuleTemplateName) {
@@ -68,6 +75,9 @@ class Resource extends BaseResource<ResourceModel> {
             console.info({ action, message: 'after invoke updateApprovalRuleTemplateName', request });
             const response = await service.updateApprovalRuleTemplateName(request).promise();
             console.info({ action, message: 'after invoke updateApprovalRuleTemplateName', response });
+
+            model.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate?.toUTCString();
+            model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
         }
 
         console.info({ action, message: 'done', model });
@@ -111,8 +121,8 @@ class Resource extends BaseResource<ResourceModel> {
             result.approvalRuleTemplateName = response.approvalRuleTemplate.approvalRuleTemplateName;
             result.approvalRuleTemplateDescription = response.approvalRuleTemplate.approvalRuleTemplateDescription;
             result.approvalRuleTemplateContent = desiredResourceState.approvalRuleTemplateContent;
-            result.creationDate = response.approvalRuleTemplate.creationDate.toUTCString();
-            result.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate.toUTCString();
+            result.creationDate = response.approvalRuleTemplate.creationDate?.toUTCString();
+            result.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate?.toUTCString();
             result.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
             result.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
 

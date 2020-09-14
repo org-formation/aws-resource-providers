@@ -3,9 +3,9 @@ Resources:
   ApprovalRuleTemplate:
     Type: 'Community::CodeCommit::ApprovalRuleTemplate'
     Properties:
-      approvalRuleTemplateName: 'test'
-      approvalRuleTemplateDescription: 'test'
-      approvalRuleTemplateContent:
+      ApprovalRuleTemplateName: 'test'
+      ApprovalRuleTemplateDescription: 'test'
+      ApprovalRuleTemplateContent:
         DestinationReferences: 'refs/heads/master'
         Statements:
           - NumberOfApprovalsNeeded: 2

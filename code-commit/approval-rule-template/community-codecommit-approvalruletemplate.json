@@ -91,18 +91,24 @@
         "ApprovalRuleTemplateContent"
     ],
     "createOnlyProperties": [
-        "/properties/ApprovalRuleTemplateId"
+        "/properties/ApprovalRuleTemplateId",
+        "/properties/CreationDate"
     ],
     "readOnlyProperties": [
         "/properties/ApprovalRuleTemplateId",
+        "/properties/ApprovalRuleTemplateName",
         "/properties/CreationDate",
         "/properties/LastModifiedDate",
         "/properties/LastModifiedUser",
-        "/properties/RuleContentSha256",
-        "/properties/ApprovalRuleTemplateContent/Version"
+        "/properties/RuleContentSha256"
     ],
     "primaryIdentifier": [
         "/properties/ApprovalRuleTemplateId"
+    ],
+    "additionalIdentifiers": [
+        [
+            "/properties/ApprovalRuleTemplateName"
+        ]
     ],
     "handlers": {
         "create": {

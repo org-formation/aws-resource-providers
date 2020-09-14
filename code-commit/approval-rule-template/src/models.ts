@@ -10,8 +10,10 @@ export class ResourceModel extends BaseModel {
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_APPROVALRULETEMPLATEID: string = '/properties/ApprovalRuleTemplateId';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_APPROVALRULETEMPLATENAME: string = '/properties/ApprovalRuleTemplateName';
 
-    @Expose({ name: 'approvalRuleTemplateId' })
+    @Expose({ name: 'ApprovalRuleTemplateId' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'approvalRuleTemplateId', value, obj, []),
@@ -20,7 +22,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     approvalRuleTemplateId?: Optional<string>;
-    @Expose({ name: 'approvalRuleTemplateName' })
+    @Expose({ name: 'ApprovalRuleTemplateName' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'approvalRuleTemplateName', value, obj, []),
@@ -29,7 +31,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     approvalRuleTemplateName?: Optional<string>;
-    @Expose({ name: 'approvalRuleTemplateDescription' })
+    @Expose({ name: 'ApprovalRuleTemplateDescription' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'approvalRuleTemplateDescription', value, obj, []),
@@ -38,10 +40,10 @@ export class ResourceModel extends BaseModel {
         }
     )
     approvalRuleTemplateDescription?: Optional<string>;
-    @Expose({ name: 'approvalRuleTemplateContent' })
+    @Expose({ name: 'ApprovalRuleTemplateContent' })
     @Type(() => TemplateContent)
     approvalRuleTemplateContent?: Optional<TemplateContent>;
-    @Expose({ name: 'creationDate' })
+    @Expose({ name: 'CreationDate' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'creationDate', value, obj, []),
@@ -50,7 +52,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     creationDate?: Optional<string>;
-    @Expose({ name: 'lastModifiedDate' })
+    @Expose({ name: 'LastModifiedDate' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'lastModifiedDate', value, obj, []),
@@ -59,7 +61,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     lastModifiedDate?: Optional<string>;
-    @Expose({ name: 'lastModifiedUser' })
+    @Expose({ name: 'LastModifiedUser' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'lastModifiedUser', value, obj, []),
@@ -68,7 +70,7 @@ export class ResourceModel extends BaseModel {
         }
     )
     lastModifiedUser?: Optional<string>;
-    @Expose({ name: 'ruleContentSha256' })
+    @Expose({ name: 'RuleContentSha256' })
     @Transform(
         (value: any, obj: any) =>
             transformValue(String, 'ruleContentSha256', value, obj, []),
@@ -92,8 +94,22 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getAdditionalIdentifiers(): Array<Dict> {
         const identifiers: Array<Dict> = new Array<Dict>();
+        if (this.getIdentifier_ApprovalRuleTemplateName() != null) {
+            identifiers.push(this.getIdentifier_ApprovalRuleTemplateName());
+        }
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
+    }
+
+    @Exclude()
+    public getIdentifier_ApprovalRuleTemplateName(): Dict {
+        const identifier: Dict = {};
+        if ((this as any).approvalRuleTemplateName != null) {
+            identifier[this.IDENTIFIER_KEY_APPROVALRULETEMPLATENAME] = (this as any).approvalRuleTemplateName;
+        }
+
+        // only return the identifier if it can be used, i.e. if all components are present
+        return Object.keys(identifier).length === 1 ? identifier : null;
     }
 }
 
