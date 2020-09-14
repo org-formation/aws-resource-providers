@@ -67,6 +67,7 @@ describe('when calling handler', () => {
     });
 
     test('create operation fail generic', async () => {
+        expect.assertions(7);
         const mockGet = iam.mock('getAccountPasswordPolicy').reject({
             ...new Error(),
             code: 'ServiceUnavailableException',
@@ -78,21 +79,28 @@ describe('when calling handler', () => {
         const spyRetrieve = jest.spyOn<any, any>(resource, 'retrievePasswordPolicy');
         const spyUpsert = jest.spyOn<any, any>(resource, 'upsertPasswordPolicy');
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
-        await expect(resource['invokeHandler'](session, request, Action.Create, {})).rejects.toMatchObject({
-            code: 'ServiceUnavailableException',
-        });
+        try {
+            await resource['invokeHandler'](session, request, Action.Create, {});
+        } catch (e) {
+            expect(e).toMatchObject({ code: 'ServiceUnavailableException' });
+        }
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveBeenCalledTimes(1);
-        expect(spyRetrieve).toHaveReturnedWith(Promise.reject(exceptions.ServiceInternalError));
+        expect(spyRetrieve).toHaveReturned();
         expect(mockUpdate.mock).toHaveBeenCalledTimes(1);
         expect(spyUpsert).toHaveBeenCalledTimes(1);
-        expect(spyUpsert).toHaveReturnedWith(Promise.reject(exceptions.InternalFailure));
+        expect(spyUpsert).toHaveReturned();
     });
 
     test('create operation fail with contain identifier', async () => {
+        expect.assertions(1);
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
         request.desiredResourceState.resourceId = IDENTIFIER;
-        await expect(resource['invokeHandler'](session, request, Action.Create, {})).rejects.toThrow(exceptions.InvalidRequest);
+        try {
+            await resource['invokeHandler'](session, request, Action.Create, {});
+        } catch (e) {
+            expect(e).toEqual(expect.any(exceptions.InvalidRequest));
+        }
     });
 
     test('update operation successful', async () => {
@@ -107,15 +115,25 @@ describe('when calling handler', () => {
     });
 
     test('update operation fail not found', async () => {
+        expect.assertions(1);
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<ResourceModel>(resource['modelCls']);
         request.desiredResourceState.resourceId = undefined;
-        await expect(resource['invokeHandler'](session, request, Action.Update, {})).rejects.toThrow(exceptions.NotFound);
+        try {
+            await resource['invokeHandler'](session, request, Action.Update, {});
+        } catch (e) {
+            expect(e).toEqual(expect.any(exceptions.NotFound));
+        }
     });
 
     test('update operation fail not updatable', async () => {
+        expect.assertions(1);
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<ResourceModel>(resource['modelCls']);
         request.previousResourceState.resourceId = undefined;
-        await expect(resource['invokeHandler'](session, request, Action.Update, {})).rejects.toThrow(exceptions.NotUpdatable);
+        try {
+            await resource['invokeHandler'](session, request, Action.Update, {});
+        } catch (e) {
+            expect(e).toEqual(expect.any(exceptions.NotUpdatable));
+        }
     });
 
     test('delete operation successful', async () => {
@@ -130,29 +148,35 @@ describe('when calling handler', () => {
     });
 
     test('delete operation fail not found', async () => {
+        expect.assertions(4);
         const mockGet = iam.mock('getAccountPasswordPolicy').reject({
             ...new Error(),
             code: 'NoSuchEntity',
         });
         const spyRetrieve = jest.spyOn<any, any>(resource, 'retrievePasswordPolicy');
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<ResourceModel>(resource['modelCls']);
-        await resource['invokeHandler'](session, request, Action.Delete, {}).catch((e: exceptions.BaseHandlerException) => {
+        try {
+            await resource['invokeHandler'](session, request, Action.Delete, {});
+        } catch (e) {
             expect(e).toEqual(expect.any(exceptions.NotFound));
-        });
+        }
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
         expect(spyRetrieve).toHaveBeenCalledTimes(1);
-        expect(spyRetrieve).toHaveReturnedWith(Promise.reject(exceptions.NotFound));
+        expect(spyRetrieve).toHaveReturned();
     });
 
     test('delete operation fail generic', async () => {
+        expect.assertions(2);
         const mockDelete = iam.mock('deleteAccountPasswordPolicy').reject({
             ...new Error(),
             code: 'ServiceUnavailableException',
         });
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<ResourceModel>(resource['modelCls']);
-        await expect(resource['invokeHandler'](session, request, Action.Delete, {})).rejects.toMatchObject({
-            code: 'ServiceUnavailableException',
-        });
+        try {
+            await resource['invokeHandler'](session, request, Action.Delete, {});
+        } catch (e) {
+            expect(e).toMatchObject({ code: 'ServiceUnavailableException' });
+        }
         expect(mockDelete.mock).toHaveBeenCalledTimes(1);
     });
 
