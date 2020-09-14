@@ -1,10 +1,10 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "approvalRuleTemplateId": "123456789012",
-        "approvalRuleTemplateName": "test2",
-        "approvalRuleTemplateDescription": "test2",
-        "approvalRuleTemplateContent": {
+        "ApprovalRuleTemplateId": "123456789012",
+        "ApprovalRuleTemplateName": "test2",
+        "ApprovalRuleTemplateDescription": "test2",
+        "ApprovalRuleTemplateContent": {
             "DestinationReferences": "refs/heads/master",
             "Statements": [
                 {
@@ -17,10 +17,10 @@
         }
     },
     "previousResourceState": {
-        "approvalRuleTemplateId": "123456789012",
-        "approvalRuleTemplateName": "test",
-        "approvalRuleTemplateDescription": "test",
-        "approvalRuleTemplateContent": {
+        "ApprovalRuleTemplateId": "123456789012",
+        "ApprovalRuleTemplateName": "test",
+        "ApprovalRuleTemplateDescription": "test",
+        "ApprovalRuleTemplateContent": {
             "DestinationReferences": "refs/heads/master",
             "Statements": [
                 {

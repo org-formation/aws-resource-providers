@@ -1,8 +1,8 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "approvalRuleTemplateId": "123456789012",
-        "approvalRuleTemplateName": "test"
+        "ApprovalRuleTemplateId": "123456789012",
+        "ApprovalRuleTemplateName": "test"
     },
     "awsAccountId": "123456789012",
     "logicalResourceIdentifier": "MyResource"

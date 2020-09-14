@@ -19,8 +19,15 @@ class Resource extends BaseResource<ResourceModel> {
         const response = await service.createApprovalRuleTemplate(request).promise();
         console.info({ action, message: 'after invoke createApprovalRuleTemplate', response });
 
-        const result = ResourceModel.deserialize(response.approvalRuleTemplate);
+        const result = new ResourceModel();
+        result.approvalRuleTemplateId = response.approvalRuleTemplate.approvalRuleTemplateId;
+        result.approvalRuleTemplateName = response.approvalRuleTemplate.approvalRuleTemplateName;
+        result.approvalRuleTemplateDescription = response.approvalRuleTemplate.approvalRuleTemplateDescription;
         result.approvalRuleTemplateContent = desiredResourceState.approvalRuleTemplateContent;
+        result.creationDate = response.approvalRuleTemplate.creationDate.toUTCString();
+        result.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate.toUTCString();
+        result.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
+        result.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
 
         console.info({ action, message: 'done', result });
         return result;
@@ -32,7 +39,7 @@ class Resource extends BaseResource<ResourceModel> {
         const { desiredResourceState, previousResourceState } = args.request;
         const model = desiredResourceState;
 
-        if (model.approvalRuleTemplateContent !== previousResourceState.approvalRuleTemplateContent) {
+        if (model.approvalRuleTemplateContent.serialize() !== previousResourceState.approvalRuleTemplateContent.serialize()) {
             const request: CodeCommit.UpdateApprovalRuleTemplateContentInput = {
                 approvalRuleTemplateName: model.approvalRuleTemplateName,
                 existingRuleContentSha256: model.ruleContentSha256,
@@ -99,9 +106,15 @@ class Resource extends BaseResource<ResourceModel> {
             const response = await service.getApprovalRuleTemplate(request).promise();
             console.info({ action, message: 'after invoke getApprovalRuleTemplate', response });
 
-            const approvalRuleTemplate = response.approvalRuleTemplate;
-
-            const result = ResourceModel.deserialize(approvalRuleTemplate);
+            const result = new ResourceModel();
+            result.approvalRuleTemplateId = response.approvalRuleTemplate.approvalRuleTemplateId;
+            result.approvalRuleTemplateName = response.approvalRuleTemplate.approvalRuleTemplateName;
+            result.approvalRuleTemplateDescription = response.approvalRuleTemplate.approvalRuleTemplateDescription;
+            result.approvalRuleTemplateContent = desiredResourceState.approvalRuleTemplateContent;
+            result.creationDate = response.approvalRuleTemplate.creationDate.toUTCString();
+            result.lastModifiedDate = response.approvalRuleTemplate.lastModifiedDate.toUTCString();
+            result.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
+            result.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
 
             console.info({ action, message: 'done', result });
 

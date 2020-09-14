@@ -1,6 +1,6 @@
 {
     "typeName": "Community::CodeCommit::ApprovalRuleTemplate",
-    "description": "Detailed information about an approval rule template for CodeCommit",
+    "description": "Resource that allows for the creation of approval rule template for CodeCommit.",
     "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
         "Statement": {
@@ -49,38 +49,38 @@
         }
     },
     "properties": {
-        "approvalRuleTemplateId": {
+        "ApprovalRuleTemplateId": {
             "type": "string",
             "description": "The system-generated ID of the approval rule template."
         },
-        "approvalRuleTemplateName": {
+        "ApprovalRuleTemplateName": {
             "type": "string",
             "description": "The name of the approval rule template. Provide descriptive names, because this name is applied to the approval rules created automatically in associated repositories.",
             "minLength": 1,
             "maxLength": 100
         },
-        "approvalRuleTemplateDescription": {
+        "ApprovalRuleTemplateDescription": {
             "type": "string",
             "description": "The description of the approval rule template. Consider providing a description that explains what this template does and when it might be appropriate to associate it with repositories.",
             "minLength": 0,
             "maxLength": 1000
         },
-        "approvalRuleTemplateContent": {
+        "ApprovalRuleTemplateContent": {
             "$ref": "#/definitions/TemplateContent"
         },
-        "creationDate": {
+        "CreationDate": {
             "type": "string",
             "description": "The date the approval rule template was created, in timestamp format."
         },
-        "lastModifiedDate": {
+        "LastModifiedDate": {
             "type": "string",
             "description": "The date the approval rule template was most recently changed, in timestamp format."
         },
-        "lastModifiedUser": {
+        "LastModifiedUser": {
             "type": "string",
             "description": "The Amazon Resource Name (ARN) of the user who made the most recent changes to the approval rule template."
         },
-        "ruleContentSha256": {
+        "RuleContentSha256": {
             "type": "string",
             "description": "The SHA-256 hash signature for the content of the approval rule template."
         }
