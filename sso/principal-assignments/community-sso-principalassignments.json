@@ -1,0 +1,104 @@
+{
+    "typeName": "Community::SSO::PrincipalAssignments",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers",
+    "definitions": {
+        "Target": {
+            "type": "object",
+            "properties": {
+                "TargetType": {
+                    "type": "string",
+                    "enum": [
+                        "AWS_ACCOUNT",
+                        "AWS_OU"
+                    ]
+                },
+                "TargetIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "TargetType",
+                "Title"
+            ]
+        }
+    },
+    "properties": {
+        "InstanceArn": {
+            "type": "string"
+        },
+        "ResourceId": {
+            "type": "string"
+        },
+        "PermissionSets": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "PrincipalId": {
+            "type": "string"
+        },
+        "PrincipalType": {
+            "type": "string",
+            "enum": [
+                "GROUP",
+                "USER"
+            ]
+        },
+        "Targets": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Target"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "InstanceArn",
+        "PermissionSets",
+        "PrincipalId",
+        "PrincipalType",
+        "Targets"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "createOnlyProperties": [
+        "/properties/InstanceArn"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ssoadmin:createAccountAssignment"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ssoadmin:createAccountAssignment",
+                "ssoadmin:deleteAccountAssignment"
+            ]
+        },
+        "delete": {
+            "permissions": [,
+                "ssoadmin:deleteAccountAssignment"
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
