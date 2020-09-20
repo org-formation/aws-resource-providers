@@ -15,6 +15,8 @@ describe('when calling handler', () => {
     let ssoAdmin: AwsServiceMockBuilder<SSOAdmin>;
     let createAccountAssignmentMock: AwsFunctionMockBuilder<SSOAdmin>;
     let deleteAccountAssignmentMock: AwsFunctionMockBuilder<SSOAdmin>;
+    let describeAccountAssignmentDeletionStatusMock: AwsFunctionMockBuilder<SSOAdmin>;
+    let describeAccountAssignmentCreationStatusMock: AwsFunctionMockBuilder<SSOAdmin>;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
@@ -26,9 +28,10 @@ describe('when calling handler', () => {
 
     beforeEach(async () => {
         ssoAdmin = on(SSOAdmin, { snapshot: false });
-        createAccountAssignmentMock = ssoAdmin.mock('createAccountAssignment').resolve({});
-        deleteAccountAssignmentMock = ssoAdmin.mock('deleteAccountAssignment').resolve({});
-    
+        createAccountAssignmentMock = ssoAdmin.mock('createAccountAssignment').resolve({AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
+        deleteAccountAssignmentMock = ssoAdmin.mock('deleteAccountAssignment').resolve({AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
+        // describeAccountAssignmentDeletionStatusMock = ssoAdmin.mock('describeAccountAssignmentDeletionStatus').resolve({AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status : 'SUCCESS' }});
+        // describeAccountAssignmentCreationStatusMock = ssoAdmin.mock('describeAccountAssignmentCreationStatus').resolve({AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status : 'SUCCESS' }});
         const fn = () => ssoAdmin.instance as any; //aws-sdk version issue....
         session['client'] = fn;
     });
@@ -72,7 +75,7 @@ describe('when calling handler', () => {
         expect(deleteAccountAssignmentMock.mock).toHaveBeenCalledTimes(0);
         
         const resourceModel: ResourceModel = progress.resourceModel;
-        expect(resourceModel.resourceId).toBe('arn:community::123456789012:principal-assignments:GROUP:d7fefe8f-992c-4524-bd52-cd54164c1e96')
+        expect(resourceModel.resourceId).toContain('arn:community::123456789012:principal-assignments:GROUP:d7fefe8f-992c-4524-bd52-cd54164c1e96')
 
     });
 

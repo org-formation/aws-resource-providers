@@ -14,6 +14,8 @@ import { ResourceModel } from './models';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { SSOAdmin } from 'aws-sdk';
 import { CreateAccountAssignmentRequest, DeleteAccountAssignmentRequest } from 'aws-sdk/clients/ssoadmin';
+import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
+import { v4 as uuidv4 } from 'uuid';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
@@ -93,10 +95,60 @@ const compareCreateAndDelete = async (service: SSOAdmin, previousModel: Resource
             await enumerateComparables(desiredModel) 
     ]);;
 
+    LOGGER.info({method: 'compareCreateAndDelete', previousComparables, desiredCompareables});
+
+
+    const deleteAndWait = async (assignmentRequest: DeleteAccountAssignmentRequest): Promise<void> => {
+
+        LOGGER.info({method: 'before deleteAndWait', assignmentRequest});
+
+        const response = await service.deleteAccountAssignment(assignmentRequest).promise();
+        return;
+
+        let deletionStatus = response.AccountAssignmentDeletionStatus;
+        while(deletionStatus && deletionStatus.Status === 'IN_PROGRESS') {
+            await sleep(1000);
+            const describeStatusResponse = await service.describeAccountAssignmentDeletionStatus({AccountAssignmentDeletionRequestId: deletionStatus.RequestId, InstanceArn: assignmentRequest.InstanceArn}).promise();
+            deletionStatus = describeStatusResponse.AccountAssignmentDeletionStatus;
+        }
+
+        LOGGER.info({method: 'after deleteAndWait', assignmentRequest, deletionStatus});
+
+        if (deletionStatus.Status !== 'SUCCEEDED') {
+            throw new InternalFailure(`unable to delete account assignment for ${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
+        }
+        
+    }
+
+
+    const createAndWait = async (createAssignmentRequest: CreateAccountAssignmentRequest): Promise<void> => {
+        LOGGER.info({method: 'before createAndWait', createAssignmentRequest});
+
+        const response = await service.createAccountAssignment(createAssignmentRequest).promise();
+        return;
+        
+        let creationStatus = response.AccountAssignmentCreationStatus;
+        while(creationStatus && creationStatus.Status === 'IN_PROGRESS') {
+            await sleep(1000);
+            const describeStatusResponse = await service.describeAccountAssignmentCreationStatus({AccountAssignmentCreationRequestId: creationStatus.RequestId, InstanceArn: createAssignmentRequest.InstanceArn}).promise();
+            creationStatus = describeStatusResponse.AccountAssignmentCreationStatus;
+        }
+    
+        LOGGER.info({method: 'after createAndWait', createAssignmentRequest, creationStatus});
+
+        if (creationStatus.Status !== 'SUCCEEDED') {
+            throw new InternalFailure(`unable to delete account assignment for ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`);
+        }
+        
+    }
+
     const comparablesToDelete = previousComparables.filter(x=>!desiredCompareables.includes(x));
     const comparablesToCreate = desiredCompareables.filter(x=>!previousComparables.includes(x));
 
-    const promises: Promise<any>[] = [];
+    LOGGER.info({method: 'compareCreateAndDelete', comparablesToDelete, comparablesToCreate});
+
+    LOGGER.info({method: 'before deleting', comparablesToDelete});
+    let promises: Promise<any>[] = [];
     for(const deletable of comparablesToDelete) {
         const assignmentRequest: DeleteAccountAssignmentRequest = {
             ... splitComparable(deletable),
@@ -104,11 +156,15 @@ const compareCreateAndDelete = async (service: SSOAdmin, previousModel: Resource
             PrincipalId: desiredModel.principalId,
             PrincipalType: desiredModel.principalType
         };
-        const assignmentPromise = service.deleteAccountAssignment(assignmentRequest).promise();
+        const assignmentPromise = deleteAndWait(assignmentRequest);
         promises.push(assignmentPromise);
-        
     }
+    await Promise.all(promises);
+    promises = [];
+    LOGGER.info({method: 'after deleting', comparablesToDelete});
 
+    LOGGER.info({method: 'before creating', comparablesToCreate});
+    
     for(const creatable of comparablesToCreate) {
         const createAssignmentRequest: CreateAccountAssignmentRequest = {
             ... splitComparable(creatable),
@@ -116,9 +172,10 @@ const compareCreateAndDelete = async (service: SSOAdmin, previousModel: Resource
             PrincipalId: desiredModel.principalId,
             PrincipalType: desiredModel.principalType
         };
-        const assignmentPromise = service.createAccountAssignment(createAssignmentRequest).promise();
+        const assignmentPromise = createAndWait(createAssignmentRequest);
         promises.push(assignmentPromise);
     }
+    LOGGER.info({method: 'after creating', comparablesToCreate});
 
     await Promise.all(promises);
 
@@ -136,7 +193,7 @@ class Resource extends BaseResource<ResourceModel> {
         const model = args.request.desiredResourceState;
         const accountId = args.request.awsAccountId;
 
-        model.resourceId = `arn:community::${accountId}:principal-assignments:${model.principalType}:${model.principalId}`;
+        model.resourceId = `arn:community::${accountId}:principal-assignments:${model.principalType}:${model.principalId}/${uuidv4()}`;
         
         await compareCreateAndDelete(service, new ResourceModel(), model);
 
@@ -180,3 +237,7 @@ export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 export const entrypoint = resource.entrypoint;
 
 export const testEntrypoint = resource.testEntrypoint;
+
+const sleep = (time: number): Promise<void> => {
+    return new Promise(resolve => setTimeout(resolve, time));
+};

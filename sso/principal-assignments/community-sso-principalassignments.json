@@ -92,7 +92,7 @@
             ]
         },
         "delete": {
-            "permissions": [,
+            "permissions": [
                 "ssoadmin:deleteAccountAssignment"
             ]
         },
