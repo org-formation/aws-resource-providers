@@ -1,36 +1,44 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "ApprovalRuleTemplateId": "123456789012",
+        "ApprovalRuleTemplateId": "8f9be413-f9cc-49a1-b901-0a59a6f126c2",
         "ApprovalRuleTemplateName": "test2",
         "ApprovalRuleTemplateDescription": "test2",
         "ApprovalRuleTemplateContent": {
+            "Version": "2018-11-08",
             "DestinationReferences": "refs/heads/master",
             "Statements": [
                 {
+                    "Type": "Approvers",
                     "NumberOfApprovalsNeeded": 3,
                     "ApprovalPoolMembers": [
-                        "arn:aws:sts::123456789012:assumed-role/CodeCommitReview/*"
+                        "*"
                     ]
                 }
             ]
         }
     },
     "previousResourceState": {
-        "ApprovalRuleTemplateId": "123456789012",
+        "ApprovalRuleTemplateId": "8f9be413-f9cc-49a1-b901-0a59a6f126c2",
         "ApprovalRuleTemplateName": "test",
         "ApprovalRuleTemplateDescription": "test",
         "ApprovalRuleTemplateContent": {
+            "Version": "2018-11-08",
             "DestinationReferences": "refs/heads/master",
             "Statements": [
                 {
+                    "Type": "Approvers",
                     "NumberOfApprovalsNeeded": 2,
                     "ApprovalPoolMembers": [
-                        "arn:aws:sts::123456789012:assumed-role/CodeCommitReview/*"
+                        "*"
                     ]
                 }
             ]
-        }
+        },
+        "CreationDate": 1600235278.615,
+        "LastModifiedDate": 1600286396.571,
+        "LastModifiedUser": "arn:aws:iam::123456789012:user/user",
+        "RuleContentSha256": "1148441f60a26ed5a119f367f206202e5f3ecad9b85e9fa39721cb07eef64bfa"
     },
     "awsAccountId": "123456789012",
     "logicalResourceIdentifier": "MyResource"

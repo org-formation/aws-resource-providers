@@ -21,7 +21,7 @@
     },
     "dependencies": {
         "aws-resource-providers-common": "https://github.com/org-formation/aws-resource-providers/releases/download/common-0.2.0/aws-resource-providers-common-0.2.0.tgz",
-        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
+        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.3/cfn-rpdk-0.3.3.tgz",
         "class-transformer": "^0.3.1"
     },
     "devDependencies": {

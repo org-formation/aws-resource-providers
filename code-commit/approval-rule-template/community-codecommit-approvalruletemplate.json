@@ -11,19 +11,29 @@
                     "type": "string",
                     "enum": [
                         "Approvers"
-                    ]
+                    ],
+                    "default": "Approvers"
                 },
                 "NumberOfApprovalsNeeded": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "ApprovalPoolMembers": {
                     "type": "array",
                     "description": "If approval pool members are specified, only approvals from these members will count toward satisfying this rule. You can use wildcards to match multiple approvers with one value.",
                     "items": {
-                        "type": "string"
-                    }
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "minItems": 1
                 }
-            }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Type",
+                "NumberOfApprovalsNeeded",
+                "ApprovalPoolMembers"
+            ]
         },
         "TemplateContent": {
             "type": "object",
@@ -33,25 +43,35 @@
                     "type": "string",
                     "enum": [
                         "2018-11-08"
-                    ]
+                    ],
+                    "default": "2018-11-08"
                 },
                 "DestinationReferences": {
                     "type": "string",
-                    "description": "Use branch filters to only apply this template to a pull request if the destination branch name matches a name."
+                    "description": "Use branch filters to only apply this template to a pull request if the destination branch name matches a name.",
+                    "minLength": 1
                 },
                 "Statements": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Statement"
-                    }
+                    },
+                    "minItems": 1
                 }
-            }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Version",
+                "DestinationReferences",
+                "Statements"
+            ]
         }
     },
     "properties": {
         "ApprovalRuleTemplateId": {
             "type": "string",
-            "description": "The system-generated ID of the approval rule template."
+            "description": "The system-generated ID of the approval rule template.",
+            "minLength": 1
         },
         "ApprovalRuleTemplateName": {
             "type": "string",
@@ -62,27 +82,31 @@
         "ApprovalRuleTemplateDescription": {
             "type": "string",
             "description": "The description of the approval rule template. Consider providing a description that explains what this template does and when it might be appropriate to associate it with repositories.",
-            "minLength": 0,
+            "minLength": 1,
             "maxLength": 1000
         },
         "ApprovalRuleTemplateContent": {
             "$ref": "#/definitions/TemplateContent"
         },
         "CreationDate": {
-            "type": "string",
-            "description": "The date the approval rule template was created, in timestamp format."
+            "type": "number",
+            "description": "The date the approval rule template was created, in timestamp format.",
+            "minimum": 1
         },
         "LastModifiedDate": {
-            "type": "string",
-            "description": "The date the approval rule template was most recently changed, in timestamp format."
+            "type": "number",
+            "description": "The date the approval rule template was most recently changed, in timestamp format.",
+            "minimum": 1
         },
         "LastModifiedUser": {
             "type": "string",
-            "description": "The Amazon Resource Name (ARN) of the user who made the most recent changes to the approval rule template."
+            "description": "The Amazon Resource Name (ARN) of the user who made the most recent changes to the approval rule template.",
+            "minLength": 1
         },
         "RuleContentSha256": {
             "type": "string",
-            "description": "The SHA-256 hash signature for the content of the approval rule template."
+            "description": "The SHA-256 hash signature for the content of the approval rule template.",
+            "minLength": 1
         }
     },
     "additionalProperties": false,
@@ -118,7 +142,8 @@
         },
         "read": {
             "permissions": [
-                "codecommit:GetApprovalRuleTemplate"
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates"
             ]
         },
         "update": {
@@ -130,7 +155,9 @@
         },
         "delete": {
             "permissions": [
-                "codecommit:DeleteApprovalRuleTemplate"
+                "codecommit:DeleteApprovalRuleTemplate",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates"
             ]
         }
     }   

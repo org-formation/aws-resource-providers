@@ -46,21 +46,21 @@ export class ResourceModel extends BaseModel {
     @Expose({ name: 'CreationDate' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'creationDate', value, obj, []),
+            transformValue(Number, 'creationDate', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    creationDate?: Optional<string>;
+    creationDate?: Optional<number>;
     @Expose({ name: 'LastModifiedDate' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'lastModifiedDate', value, obj, []),
+            transformValue(Number, 'lastModifiedDate', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    lastModifiedDate?: Optional<string>;
+    lastModifiedDate?: Optional<number>;
     @Expose({ name: 'LastModifiedUser' })
     @Transform(
         (value: any, obj: any) =>

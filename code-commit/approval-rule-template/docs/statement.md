@@ -29,7 +29,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 #### Type
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
@@ -39,7 +39,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### NumberOfApprovalsNeeded
 
-_Required_: No
+_Required_: Yes
 
 _Type_: Integer
 
@@ -49,7 +49,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 If approval pool members are specified, only approvals from these members will count toward satisfying this rule. You can use wildcards to match multiple approvers with one value.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: List of String
 

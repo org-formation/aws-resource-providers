@@ -30,14 +30,20 @@ describe('when calling handler', () => {
         codecommit = on(CodeCommit, { snapshot: false });
         codecommit.mock('getApprovalRuleTemplate').resolve({
             approvalRuleTemplate: {
+                approvalRuleTemplateId: 'ecc5e2e3-9bf4-4589-8759-8e788983c1fb',
                 approvalRuleTemplateName: 'test',
+                approvalRuleTemplateContent: '',
             },
+        });
+        codecommit.mock('listApprovalRuleTemplates').resolve({
+            approvalRuleTemplateNames: ['test', 'test2'],
         });
         codecommit.mock('createApprovalRuleTemplate').resolve({
             approvalRuleTemplate: {
                 approvalRuleTemplateName: 'test',
                 approvalRuleTemplateId: IDENTIFIER,
                 approvalRuleTemplateDescription: 'test',
+                approvalRuleTemplateContent: '',
             },
         });
         codecommit.mock('updateApprovalRuleTemplateContent').resolve({ approvalRuleTemplate: {} });
@@ -94,8 +100,8 @@ describe('when calling handler', () => {
             status: OperationStatus.Success,
             message: '',
             callbackDelaySeconds: 0,
-            resourceModel: request.desiredResourceState,
         });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState.serialize());
     });
 
     test('all operations fail without session - code commit approval rule template', async () => {

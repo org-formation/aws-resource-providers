@@ -1,0 +1,28 @@
+{
+    "CREATE": {
+        "/ApprovalRuleTemplateContent/Version": "2018-11-08",
+        "/ApprovalRuleTemplateContent/DestinationReferences": "refs/heads/master",
+        "/ApprovalRuleTemplateContent/Statements": [
+            {
+                "Type": "Approvers",
+                "NumberOfApprovalsNeeded": 1,
+                "ApprovalPoolMembers": [
+                    "*"
+                ]
+            }
+        ]
+    },
+    "UPDATE": {
+        "/ApprovalRuleTemplateContent/Version": "2018-11-08",
+        "/ApprovalRuleTemplateContent/DestinationReferences": "refs/heads/master",
+        "/ApprovalRuleTemplateContent/Statements": [
+            {
+                "Type": "Approvers",
+                "NumberOfApprovalsNeeded": 2,
+                "ApprovalPoolMembers": [
+                    "*"
+                ]
+            }
+        ]
+    }
+}

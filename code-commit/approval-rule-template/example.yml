@@ -6,8 +6,10 @@ Resources:
       ApprovalRuleTemplateName: 'test'
       ApprovalRuleTemplateDescription: 'test'
       ApprovalRuleTemplateContent:
+        Version: '2018-11-08'
         DestinationReferences: 'refs/heads/master'
         Statements:
-          - NumberOfApprovalsNeeded: 2
+          - Type: 'Approvers'
+            NumberOfApprovalsNeeded: 2
             ApprovalPoolMembers:
-              - 'arn:aws:sts::123456789012:assumed-role/CodeCommitReview/*\'
+              - '*'

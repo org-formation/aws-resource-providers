@@ -29,7 +29,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 #### Version
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
@@ -41,15 +41,17 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 Use branch filters to only apply this template to a pull request if the destination branch name matches a name.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
+
+_Minimum_: <code>1</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### Statements
 
-_Required_: No
+_Required_: Yes
 
 _Type_: List of <a href="statement.md">Statement</a>
 
