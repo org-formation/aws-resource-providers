@@ -12,8 +12,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "Community::CodeCommit::ApprovalRuleTemplate",
     "Properties" : {
-        "<a href="#approvalruletemplatedescription" title="ApprovalRuleTemplateDescription">ApprovalRuleTemplateDescription</a>" : <i>String</i>,
-        "<a href="#approvalruletemplatecontent" title="ApprovalRuleTemplateContent">ApprovalRuleTemplateContent</a>" : <i><a href="templatecontent.md">TemplateContent</a></i>,
+        "<a href="#description" title="Description">Description</a>" : <i>String</i>,
+        "<a href="#content" title="Content">Content</a>" : <i><a href="templatecontent.md">TemplateContent</a></i>,
     }
 }
 </pre>
@@ -23,13 +23,13 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: Community::CodeCommit::ApprovalRuleTemplate
 Properties:
-    <a href="#approvalruletemplatedescription" title="ApprovalRuleTemplateDescription">ApprovalRuleTemplateDescription</a>: <i>String</i>
-    <a href="#approvalruletemplatecontent" title="ApprovalRuleTemplateContent">ApprovalRuleTemplateContent</a>: <i><a href="templatecontent.md">TemplateContent</a></i>
+    <a href="#description" title="Description">Description</a>: <i>String</i>
+    <a href="#content" title="Content">Content</a>: <i><a href="templatecontent.md">TemplateContent</a></i>
 </pre>
 
 ## Properties
 
-#### ApprovalRuleTemplateDescription
+#### Description
 
 The description of the approval rule template. Consider providing a description that explains what this template does and when it might be appropriate to associate it with repositories.
 
@@ -43,7 +43,7 @@ _Maximum_: <code>1000</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### ApprovalRuleTemplateContent
+#### Content
 
 The content of the approval rule template.
 
@@ -57,7 +57,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 ### Ref
 
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the ApprovalRuleTemplateId.
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Id.
 
 ### Fn::GetAtt
 
@@ -65,21 +65,21 @@ The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of
 
 For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
 
-#### ApprovalRuleTemplateId
+#### Id
 
 The system-generated ID of the approval rule template.
 
-#### ApprovalRuleTemplateName
+#### Name
 
 The name of the approval rule template. Provide descriptive names, because this name is applied to the approval rules created automatically in associated repositories.
 
 #### CreationDate
 
-The date the approval rule template was created, in timestamp format.
+The date the approval rule template was created, in POSIX time format.
 
 #### LastModifiedDate
 
-The date the approval rule template was most recently changed, in timestamp format.
+The date the approval rule template was most recently changed, in POSIX time format.
 
 #### LastModifiedUser
 

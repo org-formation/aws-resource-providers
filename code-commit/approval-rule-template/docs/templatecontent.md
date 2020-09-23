@@ -11,7 +11,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#version" title="Version">Version</a>" : <i>String</i>,
-    "<a href="#destinationreferences" title="DestinationReferences">DestinationReferences</a>" : <i>String</i>,
+    "<a href="#destinationreferences" title="DestinationReferences">DestinationReferences</a>" : <i>[ String, ... ]</i>,
     "<a href="#statements" title="Statements">Statements</a>" : <i>[ <a href="statement.md">Statement</a>, ... ]</i>
 }
 </pre>
@@ -20,7 +20,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 <a href="#version" title="Version">Version</a>: <i>String</i>
-<a href="#destinationreferences" title="DestinationReferences">DestinationReferences</a>: <i>String</i>
+<a href="#destinationreferences" title="DestinationReferences">DestinationReferences</a>: <i>
+      - String</i>
 <a href="#statements" title="Statements">Statements</a>: <i>
       - <a href="statement.md">Statement</a></i>
 </pre>
@@ -41,11 +42,9 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 Use branch filters to only apply this template to a pull request if the destination branch name matches a name.
 
-_Required_: Yes
+_Required_: No
 
-_Type_: String
-
-_Minimum_: <code>1</code>
+_Type_: List of String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

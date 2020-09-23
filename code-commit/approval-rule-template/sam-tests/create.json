@@ -1,18 +1,16 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "ApprovalRuleTemplateName": "test",
-        "ApprovalRuleTemplateDescription": "test",
-        "ApprovalRuleTemplateContent": {
+        "Name": "test",
+        "Description": "test",
+        "Content": {
             "Version": "2018-11-08",
-            "DestinationReferences": "refs/heads/master",
+            "DestinationReferences": [ "refs/heads/master" ],
             "Statements": [
                 {
                     "Type": "Approvers",
                     "NumberOfApprovalsNeeded": 2,
-                    "ApprovalPoolMembers": [
-                        "*"
-                    ]
+                    "ApprovalPoolMembers": [ "*" ]
                 }
             ]
         }

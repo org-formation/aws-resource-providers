@@ -1,43 +1,39 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "ApprovalRuleTemplateId": "8f9be413-f9cc-49a1-b901-0a59a6f126c2",
-        "ApprovalRuleTemplateName": "test2",
-        "ApprovalRuleTemplateDescription": "test2",
-        "ApprovalRuleTemplateContent": {
+        "Id": "8f9be413-f9cc-49a1-b901-0a59a6f126c2",
+        "Name": "test2",
+        "Description": "test2",
+        "Content": {
             "Version": "2018-11-08",
-            "DestinationReferences": "refs/heads/master",
+            "DestinationReferences": [ "refs/heads/master" ],
             "Statements": [
                 {
                     "Type": "Approvers",
                     "NumberOfApprovalsNeeded": 3,
-                    "ApprovalPoolMembers": [
-                        "*"
-                    ]
+                    "ApprovalPoolMembers": [ "*" ]
                 }
             ]
         }
     },
     "previousResourceState": {
-        "ApprovalRuleTemplateId": "8f9be413-f9cc-49a1-b901-0a59a6f126c2",
-        "ApprovalRuleTemplateName": "test",
-        "ApprovalRuleTemplateDescription": "test",
-        "ApprovalRuleTemplateContent": {
+        "Id": "8f9be413-f9cc-49a1-b901-0a59a6f126c2",
+        "Name": "test",
+        "Description": "test",
+        "Content": {
             "Version": "2018-11-08",
-            "DestinationReferences": "refs/heads/master",
+            "DestinationReferences": [ "refs/heads/master" ],
             "Statements": [
                 {
                     "Type": "Approvers",
                     "NumberOfApprovalsNeeded": 2,
-                    "ApprovalPoolMembers": [
-                        "*"
-                    ]
+                    "ApprovalPoolMembers": [ "*" ]
                 }
             ]
         },
         "CreationDate": 1600235278.615,
         "LastModifiedDate": 1600286396.571,
-        "LastModifiedUser": "arn:aws:iam::123456789012:user/user",
+        "LastModifiedUser": "arn:aws:iam::123456789012:user/username",
         "RuleContentSha256": "1148441f60a26ed5a119f367f206202e5f3ecad9b85e9fa39721cb07eef64bfa"
     },
     "awsAccountId": "123456789012",

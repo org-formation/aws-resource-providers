@@ -62,7 +62,7 @@ describe('when calling handler', () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Create, {});
         const model = request.desiredResourceState;
-        model.approvalRuleTemplateId = IDENTIFIER;
+        model.id = IDENTIFIER;
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',

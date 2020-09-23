@@ -23,6 +23,7 @@
                     "description": "If approval pool members are specified, only approvals from these members will count toward satisfying this rule. You can use wildcards to match multiple approvers with one value.",
                     "items": {
                         "type": "string",
+                        "description": "When you create an approval pool or add users to an approval pool, you can choose from two different options: Fully qualified ARN (starts with arn:) and IAM user name or assumed role (starts with CodeCommitApprovers:).",
                         "minLength": 1
                     },
                     "minItems": 1
@@ -47,9 +48,12 @@
                     "default": "2018-11-08"
                 },
                 "DestinationReferences": {
-                    "type": "string",
+                    "type": "array",
                     "description": "Use branch filters to only apply this template to a pull request if the destination branch name matches a name.",
-                    "minLength": 1
+                    "items": {
+                        "type": "string",
+                        "minLength": 1
+                    }
                 },
                 "Statements": {
                     "type": "array",
@@ -62,40 +66,39 @@
             "additionalProperties": false,
             "required": [
                 "Version",
-                "DestinationReferences",
                 "Statements"
             ]
         }
     },
     "properties": {
-        "ApprovalRuleTemplateId": {
+        "Id": {
             "type": "string",
             "description": "The system-generated ID of the approval rule template.",
             "minLength": 1
         },
-        "ApprovalRuleTemplateName": {
+        "Name": {
             "type": "string",
             "description": "The name of the approval rule template. Provide descriptive names, because this name is applied to the approval rules created automatically in associated repositories.",
             "minLength": 1,
             "maxLength": 100
         },
-        "ApprovalRuleTemplateDescription": {
+        "Description": {
             "type": "string",
             "description": "The description of the approval rule template. Consider providing a description that explains what this template does and when it might be appropriate to associate it with repositories.",
             "minLength": 1,
             "maxLength": 1000
         },
-        "ApprovalRuleTemplateContent": {
+        "Content": {
             "$ref": "#/definitions/TemplateContent"
         },
         "CreationDate": {
             "type": "number",
-            "description": "The date the approval rule template was created, in timestamp format.",
+            "description": "The date the approval rule template was created, in POSIX time format.",
             "minimum": 1
         },
         "LastModifiedDate": {
             "type": "number",
-            "description": "The date the approval rule template was most recently changed, in timestamp format.",
+            "description": "The date the approval rule template was most recently changed, in POSIX time format.",
             "minimum": 1
         },
         "LastModifiedUser": {
@@ -111,27 +114,27 @@
     },
     "additionalProperties": false,
     "required": [
-        "ApprovalRuleTemplateName",
-        "ApprovalRuleTemplateContent"
+        "Name",
+        "Content"
     ],
     "createOnlyProperties": [
-        "/properties/ApprovalRuleTemplateId",
+        "/properties/Id",
         "/properties/CreationDate"
     ],
     "readOnlyProperties": [
-        "/properties/ApprovalRuleTemplateId",
-        "/properties/ApprovalRuleTemplateName",
+        "/properties/Id",
+        "/properties/Name",
         "/properties/CreationDate",
         "/properties/LastModifiedDate",
         "/properties/LastModifiedUser",
         "/properties/RuleContentSha256"
     ],
     "primaryIdentifier": [
-        "/properties/ApprovalRuleTemplateId"
+        "/properties/Id"
     ],
     "additionalIdentifiers": [
         [
-            "/properties/ApprovalRuleTemplateName"
+            "/properties/Name"
         ]
     ],
     "handlers": {

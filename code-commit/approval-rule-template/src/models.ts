@@ -9,40 +9,40 @@ export class ResourceModel extends BaseModel {
     public static readonly TYPE_NAME: string = 'Community::CodeCommit::ApprovalRuleTemplate';
 
     @Exclude()
-    protected readonly IDENTIFIER_KEY_APPROVALRULETEMPLATEID: string = '/properties/ApprovalRuleTemplateId';
+    protected readonly IDENTIFIER_KEY_ID: string = '/properties/Id';
     @Exclude()
-    protected readonly IDENTIFIER_KEY_APPROVALRULETEMPLATENAME: string = '/properties/ApprovalRuleTemplateName';
+    protected readonly IDENTIFIER_KEY_NAME: string = '/properties/Name';
 
-    @Expose({ name: 'ApprovalRuleTemplateId' })
+    @Expose({ name: 'Id' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'approvalRuleTemplateId', value, obj, []),
+            transformValue(String, 'id', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    approvalRuleTemplateId?: Optional<string>;
-    @Expose({ name: 'ApprovalRuleTemplateName' })
+    id?: Optional<string>;
+    @Expose({ name: 'Name' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'approvalRuleTemplateName', value, obj, []),
+            transformValue(String, 'name', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    approvalRuleTemplateName?: Optional<string>;
-    @Expose({ name: 'ApprovalRuleTemplateDescription' })
+    name?: Optional<string>;
+    @Expose({ name: 'Description' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'approvalRuleTemplateDescription', value, obj, []),
+            transformValue(String, 'description', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    approvalRuleTemplateDescription?: Optional<string>;
-    @Expose({ name: 'ApprovalRuleTemplateContent' })
+    description?: Optional<string>;
+    @Expose({ name: 'Content' })
     @Type(() => TemplateContent)
-    approvalRuleTemplateContent?: Optional<TemplateContent>;
+    content?: Optional<TemplateContent>;
     @Expose({ name: 'CreationDate' })
     @Transform(
         (value: any, obj: any) =>
@@ -83,8 +83,8 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.approvalRuleTemplateId != null) {
-            identifier[this.IDENTIFIER_KEY_APPROVALRULETEMPLATEID] = this.approvalRuleTemplateId;
+        if (this.id != null) {
+            identifier[this.IDENTIFIER_KEY_ID] = this.id;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
@@ -94,18 +94,18 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getAdditionalIdentifiers(): Array<Dict> {
         const identifiers: Array<Dict> = new Array<Dict>();
-        if (this.getIdentifier_ApprovalRuleTemplateName() != null) {
-            identifiers.push(this.getIdentifier_ApprovalRuleTemplateName());
+        if (this.getIdentifier_Name() != null) {
+            identifiers.push(this.getIdentifier_Name());
         }
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
     }
 
     @Exclude()
-    public getIdentifier_ApprovalRuleTemplateName(): Dict {
+    public getIdentifier_Name(): Dict {
         const identifier: Dict = {};
-        if ((this as any).approvalRuleTemplateName != null) {
-            identifier[this.IDENTIFIER_KEY_APPROVALRULETEMPLATENAME] = (this as any).approvalRuleTemplateName;
+        if ((this as any).name != null) {
+            identifier[this.IDENTIFIER_KEY_NAME] = (this as any).name;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
@@ -129,12 +129,12 @@ export class TemplateContent extends BaseModel {
     @Expose({ name: 'DestinationReferences' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'destinationReferences', value, obj, []),
+            transformValue(String, 'destinationReferences', value, obj, [Array]),
         {
             toClassOnly: true,
         }
     )
-    destinationReferences?: Optional<string>;
+    destinationReferences?: Optional<Array<string>>;
     @Expose({ name: 'Statements' })
     @Type(() => Statement)
     statements?: Optional<Array<Statement>>;
