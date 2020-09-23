@@ -1,0 +1,15 @@
+{
+    "CREATE": {
+        "/ApprovalRuleTemplateName": "repo-rule",
+        "/RepositoryNames": [
+            "repo"
+        ]
+    },
+    "UPDATE": {
+        "/ApprovalRuleTemplateName": "repo-rule",
+        "/RepositoryNames": [
+            "repo",
+            "repo2"
+        ]
+    }
+}
