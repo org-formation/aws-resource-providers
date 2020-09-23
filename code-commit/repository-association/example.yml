@@ -3,11 +3,6 @@ Resources:
   ApprovalRuleTemplate:
     Type: 'Community::CodeCommit::RepositoryAssociation'
     Properties:
-      approvalRuleTemplateName: 'test'
-      approvalRuleTemplateDescription: 'test'
-      approvalRuleTemplateContent:
-        DestinationReferences: 'refs/heads/master'
-        Statements:
-          - NumberOfApprovalsNeeded: 2
-            ApprovalPoolMembers:
-              - 'arn:aws:sts::123456789012:assumed-role/CodeCommitReview/*\'
+      ApprovalRuleTemplateName: 'test'
+      RepositoryNames:
+          - 'repo'

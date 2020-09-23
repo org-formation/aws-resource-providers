@@ -23,8 +23,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "codecommit:AssociateApprovalRuleTemplateWithRepository"
                 - "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories"
                 - "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories"
+                - "codecommit:DisassociateApprovalRuleTemplateFromRepository"
                 - "codecommit:ListRepositoriesForApprovalRuleTemplate"
                 Resource: "*"
 Outputs:

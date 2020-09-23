@@ -1,13 +1,28 @@
-import { CodeCommit } from 'aws-sdk';
+import { AWSError, CodeCommit, Response } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 
+type CodeCommitBatchOutput = CodeCommit.BatchAssociateApprovalRuleTemplateWithRepositoriesOutput | CodeCommit.BatchDisassociateApprovalRuleTemplateFromRepositoriesOutput;
+type CodeCommitBatchResponse = CodeCommitBatchOutput & { $response?: Response<CodeCommitBatchOutput, AWSError> };
+
 class Resource extends BaseResource<ResourceModel> {
+    private async checkBatchResponse(response: CodeCommitBatchResponse): Promise<CodeCommitBatchResponse> {
+        if (response.errors.length) {
+            console.log(response.errors);
+            const err = new AWSError(response.errors[0].errorMessage);
+            err.requestId = response.$response.requestId;
+            err.code = response.errors[0].errorCode;
+            throw err;
+        }
+
+        return response;
+    }
+
     @handlerEvent(Action.Create)
     @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
-        const { awsAccountId, desiredResourceState } = args.request;
+        const { awsAccountId, clientRequestToken, desiredResourceState, region } = args.request;
         const model = desiredResourceState;
 
         const request: CodeCommit.BatchAssociateApprovalRuleTemplateWithRepositoriesInput = {
@@ -18,8 +33,8 @@ class Resource extends BaseResource<ResourceModel> {
         console.info({ action, message: 'after batchAssociateApprovalRuleTemplateWithRepositories', request });
         const response = await service.batchAssociateApprovalRuleTemplateWithRepositories(request).promise();
         console.info({ action, message: 'after invoke batchAssociateApprovalRuleTemplateWithRepositories', response });
-
-        model.arn = `arn:community:codecommit::${awsAccountId}:repository-association/${model.approvalRuleTemplateName}`;
+        await this.checkBatchResponse(response);
+        model.arn = `arn:community:codecommit:${region}:${awsAccountId}:repository-association/${clientRequestToken}`;
 
         console.info({ action, message: 'done', model });
         return model;
@@ -33,7 +48,7 @@ class Resource extends BaseResource<ResourceModel> {
 
         let added = desiredResourceState.repositoryNames;
         let deleted = previousResourceState.repositoryNames;
-        if (desiredResourceState.approvalRuleTemplateName == previousResourceState.approvalRuleTemplateName) {
+        if (desiredResourceState.approvalRuleTemplateName === previousResourceState.approvalRuleTemplateName) {
             added = desiredResourceState.repositoryNames.filter((element: string) => {
                 return !previousResourceState.repositoryNames.includes(element);
             });
@@ -46,18 +61,20 @@ class Resource extends BaseResource<ResourceModel> {
                 approvalRuleTemplateName: desiredResourceState.approvalRuleTemplateName,
                 repositoryNames: added,
             };
-            console.info({ action, message: 'after batchAssociateApprovalRuleTemplateWithRepositories', request });
+            console.info({ action, message: 'before batchAssociateApprovalRuleTemplateWithRepositories', request });
             const response = await service.batchAssociateApprovalRuleTemplateWithRepositories(request).promise();
             console.info({ action, message: 'after invoke batchAssociateApprovalRuleTemplateWithRepositories', response });
+            await this.checkBatchResponse(response);
         }
         if (deleted.length > 0) {
             const request: CodeCommit.BatchDisassociateApprovalRuleTemplateFromRepositoriesInput = {
                 approvalRuleTemplateName: previousResourceState.approvalRuleTemplateName,
                 repositoryNames: deleted,
             };
-            console.info({ action, message: 'after batchDisassociateApprovalRuleTemplateFromRepositories', request });
+            console.info({ action, message: 'before batchDisassociateApprovalRuleTemplateFromRepositories', request });
             const response = await service.batchDisassociateApprovalRuleTemplateFromRepositories(request).promise();
             console.info({ action, message: 'after invoke batchDisassociateApprovalRuleTemplateFromRepositories', response });
+            await this.checkBatchResponse(response);
         }
 
         return model;
@@ -72,9 +89,10 @@ class Resource extends BaseResource<ResourceModel> {
             repositoryNames: desiredResourceState.repositoryNames,
         };
 
-        console.info({ action, message: 'after invoke batchDisassociateApprovalRuleTemplateFromRepositories', request });
+        console.info({ action, message: 'before invoke batchDisassociateApprovalRuleTemplateFromRepositories', request });
         const response = await service.batchDisassociateApprovalRuleTemplateFromRepositories(request).promise();
         console.info({ action, message: 'after invoke batchDisassociateApprovalRuleTemplateFromRepositories', response });
+        await this.checkBatchResponse(response);
 
         console.info({ action, message: 'done' });
         return Promise.resolve(null);
@@ -83,13 +101,17 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Read)
     @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
-        const { desiredResourceState } = args.request;
+        const { desiredResourceState, logicalResourceIdentifier } = args.request;
+
+        if (!desiredResourceState.approvalRuleTemplateName) {
+            throw new exceptions.NotFound(ResourceModel.TYPE_NAME, logicalResourceIdentifier);
+        }
 
         const request: CodeCommit.ListRepositoriesForApprovalRuleTemplateInput = {
             approvalRuleTemplateName: desiredResourceState.approvalRuleTemplateName,
         };
 
-        console.info({ action, message: 'after invoke listRepositoriesForApprovalRuleTemplate', request });
+        console.info({ action, message: 'before invoke listRepositoriesForApprovalRuleTemplate', request });
         try {
             const response = await service.listRepositoriesForApprovalRuleTemplate(request).promise();
             console.info({ action, message: 'after invoke listRepositoriesForApprovalRuleTemplate', response });
@@ -103,7 +125,7 @@ class Resource extends BaseResource<ResourceModel> {
 
             return Promise.resolve(result);
         } catch (err) {
-            if (err && err.code === 'ApprovalRuleTemplateDoesNotExistException') {
+            if (err && (err.code === 'ApprovalRuleTemplateDoesNotExistException' || err.code === 'RepositoryDoesNotExistException')) {
                 throw new exceptions.NotFound(ResourceModel.TYPE_NAME, desiredResourceState.approvalRuleTemplateName);
             } else {
                 // Raise the original exception

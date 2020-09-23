@@ -1,9 +1,10 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "Arn": "arn:community:codecommit::123456789012:repository-association/test",
+        "Arn": "arn:community:codecommit:eu-central-1:123456789012:repository-association/4b90a7e4-b790-456b-a937-0cfdfa211dfe",
         "ApprovalRuleTemplateName": "test"
     },
     "awsAccountId": "123456789012",
+    "region": "eu-central-1",
     "logicalResourceIdentifier": "MyResource"
 }

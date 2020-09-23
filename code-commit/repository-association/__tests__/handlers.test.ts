@@ -39,7 +39,7 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test('create operation successful - code commit approval rule template', async () => {
+    test('create operation successful - code commit repository association', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Create, {});
         const model = request.desiredResourceState;
@@ -52,7 +52,7 @@ describe('when calling handler', () => {
         expect(progress.resourceModel.serialize()).toMatchObject(model.serialize());
     });
 
-    test('update operation successful - code commit approval rule template', async () => {
+    test('update operation successful - code commit repository association', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Update, {});
         expect(progress).toMatchObject({
@@ -63,7 +63,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('delete operation successful - code commit approval rule template', async () => {
+    test('delete operation successful - code commit repository association', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Delete, {});
         expect(progress).toMatchObject({
@@ -74,7 +74,7 @@ describe('when calling handler', () => {
         expect(progress.resourceModel).toBeNull();
     });
 
-    test('read operation successful - code commit approval rule template', async () => {
+    test('read operation successful - code commit repository association', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Read)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Read, {});
         expect(progress).toMatchObject({
@@ -85,7 +85,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('all operations fail without session - code commit approval rule template', async () => {
+    test('all operations fail without session - code commit repository association', async () => {
         const promises: any[] = [];
         fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
             const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);

@@ -30,7 +30,7 @@ Properties:
 
 #### RepositoryNames
 
-A list of repository names that are associated with the specified approval rule template.
+A list of repository names that will be associated with the specified approval rule template.
 
 _Required_: Yes
 
@@ -42,7 +42,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 ### Ref
 
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Arn.
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the ApprovalRuleTemplateName.
 
 ### Fn::GetAtt
 
@@ -52,9 +52,9 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 #### Arn
 
-The Amazon Resource Name (ARN) of the template repository association.
+The Amazon Resource Name (ARN) of the approval rule template repository association.
 
 #### ApprovalRuleTemplateName
 
-The name of the approval rule template for which you want to list repositories that are associated with that template.
+The name of the approval rule template for which you want to associate the repositories.
 

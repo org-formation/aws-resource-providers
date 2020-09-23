@@ -9,9 +9,9 @@ export class ResourceModel extends BaseModel {
     public static readonly TYPE_NAME: string = 'Community::CodeCommit::RepositoryAssociation';
 
     @Exclude()
-    protected readonly IDENTIFIER_KEY_ARN: string = '/properties/Arn';
-    @Exclude()
     protected readonly IDENTIFIER_KEY_APPROVALRULETEMPLATENAME: string = '/properties/ApprovalRuleTemplateName';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_ARN: string = '/properties/Arn';
 
     @Expose({ name: 'Arn' })
     @Transform(
@@ -44,8 +44,8 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.arn != null) {
-            identifier[this.IDENTIFIER_KEY_ARN] = this.arn;
+        if (this.approvalRuleTemplateName != null) {
+            identifier[this.IDENTIFIER_KEY_APPROVALRULETEMPLATENAME] = this.approvalRuleTemplateName;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
@@ -55,18 +55,18 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getAdditionalIdentifiers(): Array<Dict> {
         const identifiers: Array<Dict> = new Array<Dict>();
-        if (this.getIdentifier_ApprovalRuleTemplateName() != null) {
-            identifiers.push(this.getIdentifier_ApprovalRuleTemplateName());
+        if (this.getIdentifier_Arn() != null) {
+            identifiers.push(this.getIdentifier_Arn());
         }
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
     }
 
     @Exclude()
-    public getIdentifier_ApprovalRuleTemplateName(): Dict {
+    public getIdentifier_Arn(): Dict {
         const identifier: Dict = {};
-        if ((this as any).approvalRuleTemplateName != null) {
-            identifier[this.IDENTIFIER_KEY_APPROVALRULETEMPLATENAME] = (this as any).approvalRuleTemplateName;
+        if ((this as any).arn != null) {
+            identifier[this.IDENTIFIER_KEY_ARN] = (this as any).arn;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
