@@ -78,7 +78,8 @@
     "handlers": {
         "create": {
             "permissions": [
-                "ssoadmin:createAccountAssignment"
+                "sso:CreateAccountAssignment",
+                "sso:DescribeAccountAssignmentCreationStatus"
             ]
         },
         "read": {
@@ -87,13 +88,16 @@
         },
         "update": {
             "permissions": [
-                "ssoadmin:createAccountAssignment",
-                "ssoadmin:deleteAccountAssignment"
+                "sso:CreateAccountAssignment",
+                "sso:DescribeAccountAssignmentCreationStatus",
+                "sso:DeleteAccountAssignment",
+                "sso:DescribeAccountAssignmentDeletionStatus"
             ]
         },
         "delete": {
             "permissions": [
-                "ssoadmin:deleteAccountAssignment"
+                "sso:DeleteAccountAssignment",
+                "sso:DescribeAccountAssignmentDeletionStatus"
             ]
         },
         "list": {

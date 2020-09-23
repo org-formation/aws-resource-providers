@@ -1,4 +1,5 @@
-import { S3Control, SSOAdmin } from 'aws-sdk';
+
+import SSOAdmin = require('../ssoadmin/ssoadmin');
 import { on, AwsServiceMockBuilder, AwsFunctionMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
 import { Action, exceptions, OperationStatus, SessionProxy, UnmodeledRequest } from 'cfn-rpdk';
 import createFixture from '../sam-tests/create.json';
@@ -28,8 +29,8 @@ describe('when calling handler', () => {
 
     beforeEach(async () => {
         ssoAdmin = on(SSOAdmin, { snapshot: false });
-        createAccountAssignmentMock = ssoAdmin.mock('createAccountAssignment').resolve({AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
-        deleteAccountAssignmentMock = ssoAdmin.mock('deleteAccountAssignment').resolve({AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
+        // createAccountAssignmentMock = ssoAdmin.mock('createAccountAssignment').resolve({AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
+        // deleteAccountAssignmentMock = ssoAdmin.mock('deleteAccountAssignment').resolve({AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
         // describeAccountAssignmentDeletionStatusMock = ssoAdmin.mock('describeAccountAssignmentDeletionStatus').resolve({AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status : 'SUCCESS' }});
         // describeAccountAssignmentCreationStatusMock = ssoAdmin.mock('describeAccountAssignmentCreationStatus').resolve({AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status : 'SUCCESS' }});
         const fn = () => ssoAdmin.instance as any; //aws-sdk version issue....

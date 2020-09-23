@@ -3,7 +3,6 @@ import {
     BaseResource,
     exceptions,
     handlerEvent,
-    HandlerErrorCode,
     OperationStatus,
     Optional,
     ProgressEvent,
@@ -11,19 +10,16 @@ import {
     SessionProxy,
 } from 'cfn-rpdk';
 import { ResourceModel } from './models';
-import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { SSOAdmin } from 'aws-sdk';
-import { CreateAccountAssignmentRequest, DeleteAccountAssignmentRequest } from 'aws-sdk/clients/ssoadmin';
+import SSOAdmin = require('../ssoadmin/ssoadmin');
+import { CreateAccountAssignmentRequest, DeleteAccountAssignmentRequest } from '../ssoadmin/ssoadmin';
 import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
 import { v4 as uuidv4 } from 'uuid';
+
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
 interface CallbackContext extends Record<string, any> {}
-
-
-
 
 const enumeratePermissionSetArns = (model: ResourceModel): string[] => {
     if (model.permissionSets === undefined) {
@@ -35,6 +31,9 @@ const enumeratePermissionSetArns = (model: ResourceModel): string[] => {
 
     const createArnIfId = (arnOrId: string): string => {
         if (arnOrId.startsWith('arn')) {
+            if (arnOrId.indexOf('|arn') > -1) {
+                return arnOrId.substring(arnOrId.lastIndexOf('arn'));
+            }
             return arnOrId;
         }
         return `arn:aws:sso:::permissionSet/${instanceId}/${arnOrId}`;
@@ -85,7 +84,7 @@ const splitComparable = (comparable: string): AssignmentTarget => {
     return {
         TargetType: 'AWS_ACCOUNT',
         TargetId: parts[0],
-        PermissionSetArn: parts[1]
+        PermissionSetArn: parts[parts.length-1]
     };
 } 
 
@@ -101,21 +100,22 @@ const compareCreateAndDelete = async (service: SSOAdmin, previousModel: Resource
     const deleteAndWait = async (assignmentRequest: DeleteAccountAssignmentRequest): Promise<void> => {
 
         LOGGER.info({method: 'before deleteAndWait', assignmentRequest});
-
         const response = await service.deleteAccountAssignment(assignmentRequest).promise();
-        return;
+        LOGGER.info({method: 'delete assignment response', assignmentRequest, response});
 
         let deletionStatus = response.AccountAssignmentDeletionStatus;
         while(deletionStatus && deletionStatus.Status === 'IN_PROGRESS') {
-            await sleep(1000);
-            const describeStatusResponse = await service.describeAccountAssignmentDeletionStatus({AccountAssignmentDeletionRequestId: deletionStatus.RequestId, InstanceArn: assignmentRequest.InstanceArn}).promise();
+            await sleep(5000);
+            const describeDeleteAssignmentRequest = {AccountAssignmentDeletionRequestId: deletionStatus.RequestId, InstanceArn: assignmentRequest.InstanceArn};
+            LOGGER.info({method: 'before describe deletion status', assignmentRequest});
+            const describeStatusResponse = await service.describeAccountAssignmentDeletionStatus(describeDeleteAssignmentRequest).promise();
             deletionStatus = describeStatusResponse.AccountAssignmentDeletionStatus;
+            LOGGER.info({method: 'after describe deletion status', deletionStatus});
         }
 
         LOGGER.info({method: 'after deleteAndWait', assignmentRequest, deletionStatus});
-
         if (deletionStatus.Status !== 'SUCCEEDED') {
-            throw new InternalFailure(`unable to delete account assignment for ${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
+            throw new InternalFailure(`${deletionStatus.FailureReason}:${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
         }
         
     }
@@ -123,21 +123,22 @@ const compareCreateAndDelete = async (service: SSOAdmin, previousModel: Resource
 
     const createAndWait = async (createAssignmentRequest: CreateAccountAssignmentRequest): Promise<void> => {
         LOGGER.info({method: 'before createAndWait', createAssignmentRequest});
-
         const response = await service.createAccountAssignment(createAssignmentRequest).promise();
-        return;
+        LOGGER.info({method: 'create assignment response', createAssignmentRequest, response});
         
         let creationStatus = response.AccountAssignmentCreationStatus;
         while(creationStatus && creationStatus.Status === 'IN_PROGRESS') {
-            await sleep(1000);
-            const describeStatusResponse = await service.describeAccountAssignmentCreationStatus({AccountAssignmentCreationRequestId: creationStatus.RequestId, InstanceArn: createAssignmentRequest.InstanceArn}).promise();
+            await sleep(5000);
+            const describeCreateAssignmentRequest = {AccountAssignmentCreationRequestId: creationStatus.RequestId, InstanceArn: createAssignmentRequest.InstanceArn};
+            LOGGER.info({method: 'before describe creation status', createAssignmentRequest});
+            const describeStatusResponse = await service.describeAccountAssignmentCreationStatus(describeCreateAssignmentRequest).promise();
             creationStatus = describeStatusResponse.AccountAssignmentCreationStatus;
+            LOGGER.info({method: 'after describe creation status', creationStatus});
         }
     
         LOGGER.info({method: 'after createAndWait', createAssignmentRequest, creationStatus});
-
         if (creationStatus.Status !== 'SUCCEEDED') {
-            throw new InternalFailure(`unable to delete account assignment for ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`);
+            throw new InternalFailure(`${creationStatus.FailureReason}: ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`);
         }
         
     }
@@ -164,7 +165,6 @@ const compareCreateAndDelete = async (service: SSOAdmin, previousModel: Resource
     LOGGER.info({method: 'after deleting', comparablesToDelete});
 
     LOGGER.info({method: 'before creating', comparablesToCreate});
-    
     for(const creatable of comparablesToCreate) {
         const createAssignmentRequest: CreateAccountAssignmentRequest = {
             ... splitComparable(creatable),
@@ -182,54 +182,64 @@ const compareCreateAndDelete = async (service: SSOAdmin, previousModel: Resource
 }
 
 class Resource extends BaseResource<ResourceModel> {
-
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'SSOAdmin' })
-    public async create(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: SSOAdmin
-    ): Promise<ResourceModel> {
-        const model = args.request.desiredResourceState;
-        const accountId = args.request.awsAccountId;
+    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
+        const model: ResourceModel = request.desiredResourceState;
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+
+        LOGGER.info({ handler: 'create', request, callbackContext });
+        const accountId = request.awsAccountId;
 
         model.resourceId = `arn:community::${accountId}:principal-assignments:${model.principalType}:${model.principalId}/${uuidv4()}`;
         
-        await compareCreateAndDelete(service, new ResourceModel(), model);
+        if (session instanceof SessionProxy) {
+            const options = (session as any).options;
 
-        return model;
+            const service = new SSOAdmin(options);
+
+            await compareCreateAndDelete(service, new ResourceModel(), model);
+        }
+
+        progress.status = OperationStatus.Success;
+        return progress;
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'SSOAdmin' })
-    public async update(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: SSOAdmin
-    ): Promise<ResourceModel> {
-        const desired = args.request.desiredResourceState;
-        const previous = args.request.previousResourceState;
-        
-        await compareCreateAndDelete(service, previous, desired);
-        
-        return desired;   
+    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
+        const previous: ResourceModel = request.previousResourceState;
+        const model: ResourceModel = request.desiredResourceState;
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+
+        LOGGER.info({ handler: 'update', request, callbackContext });
+
+        if (session instanceof SessionProxy) {
+            const options = (session as any).options;
+
+            const service = new SSOAdmin(options);
+
+            await compareCreateAndDelete(service, previous, model);
+        }
+
+        return progress;
     }
+
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'SSOAdmin' })
-    public async delete(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: SSOAdmin
-    ): Promise<ResourceModel> {
-        const desired = new ResourceModel();
-        const previous = args.request.desiredResourceState;
+    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
+        const model: ResourceModel = request.desiredResourceState;
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
         
-        await compareCreateAndDelete(service, previous, desired);
-        
-        return desired;   
-    }
+        LOGGER.info({ handler: 'delete', request, callbackContext });
 
+        if (session instanceof SessionProxy) {
+            const options = (session as any).options;
+            const service = new SSOAdmin(options);
+
+            await compareCreateAndDelete(service, model, new ResourceModel({}));
+        }
+        progress.status = OperationStatus.Success;
+        return progress;
+    }
 }
 
 export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);

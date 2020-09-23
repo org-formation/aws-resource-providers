@@ -23,8 +23,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "ssoadmin:createAccountAssignment"
-                - "ssoadmin:deleteAccountAssignment"
+                - "sso:CreateAccountAssignment"
+                - "sso:DeleteAccountAssignment"
+                - "sso:DescribeAccountAssignmentCreationStatus"
+                - "sso:DescribeAccountAssignmentDeletionStatus"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
