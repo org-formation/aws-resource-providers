@@ -8,7 +8,7 @@ type CodeCommitBatchResponse = CodeCommitBatchOutput & { $response?: Response<Co
 
 class Resource extends BaseResource<ResourceModel> {
     private async checkBatchResponse(response: CodeCommitBatchResponse): Promise<CodeCommitBatchResponse> {
-        if (response.errors.length) {
+        if (response.errors?.length) {
             console.log(response.errors);
             const err = new AWSError(response.errors[0].errorMessage);
             err.requestId = response.$response.requestId;
