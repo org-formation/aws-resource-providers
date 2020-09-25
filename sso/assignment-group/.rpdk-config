@@ -1,5 +1,5 @@
 {
-    "typeName": "Community::SSO::PrincipalAssignments",
+    "typeName": "Community::SSO::AssignmentGroup",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",

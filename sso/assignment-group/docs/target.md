@@ -1,4 +1,4 @@
-# Community::SSO::PrincipalAssignments Target
+# Community::SSO::AssignmentGroup Target
 
 ## Syntax
 

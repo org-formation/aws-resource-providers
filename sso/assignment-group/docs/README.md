@@ -1,4 +1,4 @@
-# Community::SSO::PrincipalAssignments
+# Community::SSO::AssignmentGroup
 
 An example resource schema demonstrating some basic constructs and validation rules.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "Community::SSO::PrincipalAssignments",
+    "Type" : "Community::SSO::AssignmentGroup",
     "Properties" : {
         "<a href="#instancearn" title="InstanceArn">InstanceArn</a>" : <i>String</i>,
         "<a href="#permissionsets" title="PermissionSets">PermissionSets</a>" : <i>[ String, ... ]</i>,
@@ -24,7 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: Community::SSO::PrincipalAssignments
+Type: Community::SSO::AssignmentGroup
 Properties:
     <a href="#instancearn" title="InstanceArn">InstanceArn</a>: <i>String</i>
     <a href="#permissionsets" title="PermissionSets">PermissionSets</a>: <i>

@@ -1,5 +1,5 @@
 {
-    "typeName": "Community::SSO::PrincipalAssignments",
+    "typeName": "Community::SSO::AssignmentGroup",
     "description": "An example resource schema demonstrating some basic constructs and validation rules.",
     "sourceUrl": "https://github.com/org-formation/aws-resource-providers",
     "definitions": {

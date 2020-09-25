@@ -1,11 +1,11 @@
-// Community::SSO::PrincipalAssignments
+// Community::SSO::AssignmentGroup
 
 Congratulations on starting development! Next steps:
 
-1. Write the JSON schema describing your resource, [community-sso-principalassignments.json](./community-sso-principalassignments.json)
-2. Implement your resource handlers in [handlers.ts](./community-sso-principalassignments/handlers.ts)
+1. Write the JSON schema describing your resource, [community-sso-assignmentgroup.json](./community-sso-assignmentgroup.json)
+2. Implement your resource handlers in [handlers.ts](./community-sso-assignmentgroup/handlers.ts)
 
-> Don't modify [models.ts](./community-sso-principalassignments/models.ts) by hand, any modifications will be overwritten when the `generate` or `package` commands are run.
+> Don't modify [models.ts](./community-sso-assignmentgroup/models.ts) by hand, any modifications will be overwritten when the `generate` or `package` commands are run.
 
 Implement CloudFormation resource here. Each function must always return a ProgressEvent.
 
