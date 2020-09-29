@@ -1,0 +1,6 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  CloudFormation:
+    Type: 'Community::SecurityHub::Master'
+    Properties:
+      MasterAccountId: 102625093955
