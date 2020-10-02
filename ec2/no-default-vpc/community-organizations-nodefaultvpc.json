@@ -1,5 +1,5 @@
 {
-    "typeName": "Community::EC2::NoDefaultVPC",
+    "typeName": "Community::Organizations::NoDefaultVPC",
     "description": "Resource type that, when created, removed the Default VPC.",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
     "definitions": {

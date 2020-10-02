@@ -1,4 +1,4 @@
-# Community::EC2::NoDefaultVPC
+# Community::Organizations::NoDefaultVPC
 
 Resource type that, when created, removed the Default VPC.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "Community::EC2::NoDefaultVPC",
+    "Type" : "Community::Organizations::NoDefaultVPC",
     "Properties" : {
     }
 }
@@ -19,7 +19,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: Community::EC2::NoDefaultVPC
+Type: Community::Organizations::NoDefaultVPC
 Properties:
 </pre>
 

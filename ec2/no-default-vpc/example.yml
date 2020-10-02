@@ -2,6 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Resources:
   NoDefaultVpc:
-    Type: 'Community::EC2::NoDefaultVpc'
+    Type: 'Community::Organizations::NoDefaultVPC'
     Properties:
         Name: 'asd'

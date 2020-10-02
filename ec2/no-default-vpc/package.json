@@ -1,7 +1,7 @@
 {
-    "name": "community-ec2-nodefaultvpc",
+    "name": "community-organizations-nodefaultvpc",
     "version": "0.1.0",
-    "description": "AWS custom resource provider named Community::EC2::NoDefaultVPC.",
+    "description": "AWS custom resource provider named Community::Organizations::NoDefaultVPC.",
     "main": "dist/handlers.js",
     "files": [
         "dist"

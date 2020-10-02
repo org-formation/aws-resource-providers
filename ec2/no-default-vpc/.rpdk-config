@@ -1,5 +1,5 @@
 {
-    "typeName": "Community::EC2::NoDefaultVPC",
+    "typeName": "Community::Organizations::NoDefaultVPC",
     "language": "typescript",
     "runtime": "nodejs12.x",
     "entrypoint": "dist/handlers.entrypoint",
