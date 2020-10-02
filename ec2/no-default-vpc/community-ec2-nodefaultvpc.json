@@ -1,0 +1,54 @@
+{
+    "typeName": "Community::EC2::NoDefaultVPC",
+    "description": "Resource type that, when created, removed the Default VPC.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "ResourceId": {
+            "type":"string"
+        }
+    },
+    "additionalProperties": false, 
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ec2:DeleteVpc",
+                "ec2:DescribeAccountAttributes",
+                "ec2:describeInternetGateways",
+                "ec2:detachInternetGateway",
+                "ec2:deleteInternetGateway",
+                "ec2:describeRouteTables",
+                "ec2:deleteRouteTable",
+                "ec2:describeNetworkAcls",
+                "ec2:deleteNetworkAcl",
+                "ec2:describeSubnets",
+                "ec2:deleteSubnet",
+                "ec2:describeSecurityGroups",
+                "ec2:deleteSecurityGroup",
+                "ec2:describeNetworkInterfaces"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ec2:CreateDefaultVpc"
+            ]
+        }
+    }
+}
