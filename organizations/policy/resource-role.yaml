@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  This CloudFormation template creates a role assumed by CloudFormation
+  during CRUDL operations to mutate resources on behalf of the customer.
+
+Resources:
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      MaxSessionDuration: 8400
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: resources.cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: ResourceTypePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                - "organizations:AttachPolicy"
+                - "organizations:CreatePolicy"
+                - "organizations:DeletePolicy"
+                - "organizations:DescribeAccount"
+                - "organizations:DescribeCreateAccountStatus"
+                - "organizations:DescribeEffectivePolicy"
+                - "organizations:DescribeOrganization"
+                - "organizations:DescribeOrganizationalUnit"
+                - "organizations:DescribePolicy"
+                - "organizations:DetachPolicy"
+                - "organizations:DisableAWSServiceAccess"
+                - "organizations:DisablePolicyType"
+                - "organizations:EnableAWSServiceAccess"
+                - "organizations:EnablePolicyType"
+                - "organizations:ListAWSServiceAccessForOrganization"
+                - "organizations:ListCreateAccountStatus"
+                - "organizations:ListParents"
+                - "organizations:ListPoliciesForTarget"
+                - "organizations:ListRoots"
+                - "organizations:ListTargetsForPolicy"
+                - "organizations:TagResource"
+                - "organizations:UntagResource"
+                - "organizations:UpdatePolicy"
+                Resource: "*"
+Outputs:
+  ExecutionRoleArn:
+    Value:
+      Fn::GetAtt: ExecutionRole.Arn

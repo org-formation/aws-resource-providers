@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Example template for a global AI opt-out organizations management policy
+
+Parameters:
+  content:
+    Type: String
+    Description: Enter the JSON policy document
+  description:
+    Type: String
+    Description: Enter a description of the policy
+  policyName:
+    Type: String
+    Description: Enter the desired name of the policy
+  targetId:
+    Type: String
+    Description: Enter the target ID of the OU or Root to target, e.g. r-xxxx
+  policyType:
+    Type: String
+    AllowedValues:
+      - AISERVICES_OPT_OUT_POLICY
+      - BACKUP_POLICY
+      - SERVICE_CONTROL_POLICY
+      - TAG_POLICY
+    Description: Enter AISERVICES_OPT_OUT_POLICY, BACKUP_POLICY, SERVICE_CONTROL_POLICY, or TAG_POLICY.
+
+Resources:
+  OrganizationPolicy:
+    Type: Community::Organizations::Policy
+    Properties:
+      Content: !Sub '${content}'
+      Description: !Sub '${description}'
+      Name: !Sub '${policyName}'
+      PolicyType: !Sub '${policyType}'
+      TargetId: !Sub '${targetId}'

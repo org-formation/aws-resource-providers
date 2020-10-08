@@ -1,0 +1,94 @@
+{
+    "typeName": "Community::Organizations::Policy",
+    "description": "Resource that allows for the creation of an Organizations Policy attached to an OU.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "Content": {
+            "description": "The policy content.",
+            "type": "string"
+        },
+        "Description": {
+            "description": "The policy description.",
+            "type": "string"
+        },
+        "Name": {
+            "description": "The name of the policy.",
+            "type": "string"
+        },
+        "PolicyType": {
+            "type": "string",
+            "enum": [
+                "AISERVICES_OPT_OUT_POLICY",
+                "BACKUP_POLICY",
+                "SERVICE_CONTROL_POLICY",
+                "TAG_POLICY"
+            ]
+        },
+        "TargetId": {
+            "description": "The target ID to attach the policy to.",
+            "type": "string"
+        },
+        "ResourceId": {
+            "description": "AWS CloudFormation generates a unique identifier for the organizations policy resource.",
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Content",
+        "Description",
+        "Name",
+        "PolicyType",
+        "TargetId"
+    ],
+    "createOnlyProperties": [
+        "/properties/ResourceId",
+        "/properties/TargetId"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId",
+        "/properties/TargetId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "organizations:ListPoliciesForTarget",
+                "organizations:ListTargetsForPolicy",
+                "organizations:DescribeEffectivePolicy",
+                "organizations:DescribePolicy",
+                "organizations:ListRoots",
+                "organizations:ListAWSServiceAccessForOrganization",
+                "organizations:DescribeAccount",
+                "organizations:ListCreateAccountStatus",
+                "organizations:DescribeOrganizationalUnit",
+                "organizations:ListParents",
+                "organizations:DescribeCreateAccountStatus",
+                "organizations:AttachPolicy",
+                "organizations:CreatePolicy",
+                "organizations:EnableAWSServiceAccess",
+                "organizations:EnablePolicyType",
+                "organizations:DescribeOrganization",
+                "organizations:TagResource"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "organizations:UpdatePolicy",
+                "organizations:UntagResource"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "organizations:DetachPolicy",
+                "organizations:DeletePolicy",
+                "organizations:DisablePolicyType",
+                "organizations:DisableAWSServiceAccess"
+            ]
+        }
+    }
+}
