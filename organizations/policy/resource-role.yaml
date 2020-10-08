@@ -26,6 +26,7 @@ Resources:
                 - "organizations:AttachPolicy"
                 - "organizations:CreatePolicy"
                 - "organizations:DeletePolicy"
+                - "organizations:DescribePolicy"
                 - "organizations:DetachPolicy"
                 - "organizations:UpdatePolicy"
                 Resource: "*"

@@ -1,6 +1,6 @@
-import { Organizations } from 'aws-sdk';
+import { Organizations, S3Control } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
 
 import { ResourceModel } from './models';
 
@@ -79,7 +79,7 @@ class Resource extends BaseResource<ResourceModel> {
         debug: true,
     })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<null> {
-        const { desiredResourceState, logicalResourceIdentifier } = args.request;
+        const { desiredResourceState } = args.request;
 
         const model: ResourceModel = desiredResourceState;
         const policyId = model.resourceId;
@@ -104,6 +104,48 @@ class Resource extends BaseResource<ResourceModel> {
         console.info({ action, message: 'policy deleted', policyId: policyId });
 
         return Promise.resolve(null);
+    }
+
+    /**
+     * CloudFormation invokes this handler as part of a stack update operation when
+     * detailed information about the resource's current state is required.
+     */
+    @handlerEvent(Action.Read)
+    @commonAws({
+        serviceName: 'Organizations',
+        debug: true,
+    })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<ResourceModel> {
+        const { desiredResourceState } = args.request;
+        const model: ResourceModel = desiredResourceState;
+        const policyTargets = await this.listPolicyTargets(service, model.resourceId);
+        const policyIds = policyTargets.map((target) => target.TargetId);
+        model.targetIds = policyIds;
+        const policyDescription = await service
+            .describePolicy({
+                PolicyId: model.resourceId,
+            })
+            .promise();
+        const content = policyDescription.Policy.Content;
+        model.content = content;
+        model.description = policyDescription.Policy.PolicySummary.Description;
+        model.name = policyDescription.Policy.PolicySummary.Name;
+        return Promise.resolve(model);
+    }
+
+    public async listPolicyTargets(service: Organizations, policyId: string): Promise<Organizations.PolicyTargetSummary[]> {
+        const policyTargets: Organizations.PolicyTargetSummary[] = [];
+        let response: Organizations.ListTargetsForPolicyResponse = {};
+        do {
+            response = await service
+                .listTargetsForPolicy({
+                    PolicyId: policyId,
+                    NextToken: response.NextToken,
+                })
+                .promise();
+            policyTargets.push(...response.Targets);
+        } while (response.NextToken);
+        return Promise.resolve(policyTargets);
     }
 }
 

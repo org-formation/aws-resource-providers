@@ -74,6 +74,12 @@
                 "organizations:DetachPolicy",
                 "organizations:DeletePolicy"
             ]
+        },
+        "read": {
+            "permissions": [
+                "organizations:DescribePolicy",
+                "organizations:DescribePolicy"
+            ]
         }
     }
 }
