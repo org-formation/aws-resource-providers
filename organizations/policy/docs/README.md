@@ -16,7 +16,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#policytype" title="PolicyType">PolicyType</a>" : <i>String</i>,
-        "<a href="#targetid" title="TargetId">TargetId</a>" : <i>String</i>,
+        "<a href="#targetids" title="TargetIds">TargetIds</a>" : <i>[ String, ... ]</i>,
     }
 }
 </pre>
@@ -30,7 +30,8 @@ Properties:
     <a href="#description" title="Description">Description</a>: <i>String</i>
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#policytype" title="PolicyType">PolicyType</a>: <i>String</i>
-    <a href="#targetid" title="TargetId">TargetId</a>: <i>String</i>
+    <a href="#targetids" title="TargetIds">TargetIds</a>: <i>
+      - String</i>
 </pre>
 
 ## Properties
@@ -75,17 +76,21 @@ _Allowed Values_: <code>AISERVICES_OPT_OUT_POLICY</code> | <code>BACKUP_POLICY</
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### TargetId
+#### TargetIds
 
-The target ID to attach the policy to.
+The list of target IDs to attach the policy to.
 
 _Required_: Yes
 
-_Type_: String
+_Type_: List of String
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 ## Return Values
+
+### Ref
+
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the ResourceId.
 
 ### Fn::GetAtt
 

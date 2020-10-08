@@ -26,9 +26,13 @@
                 "TAG_POLICY"
             ]
         },
-        "TargetId": {
-            "description": "The target ID to attach the policy to.",
-            "type": "string"
+        "TargetIds": {
+            "description": "The list of target IDs to attach the policy to.",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
         },
         "ResourceId": {
             "description": "AWS CloudFormation generates a unique identifier for the organizations policy resource.",
@@ -41,53 +45,34 @@
         "Description",
         "Name",
         "PolicyType",
-        "TargetId"
+        "TargetIds"
     ],
     "createOnlyProperties": [
         "/properties/ResourceId",
-        "/properties/TargetId"
+        "/properties/TargetIds"
     ],
     "readOnlyProperties": [
         "/properties/ResourceId"
     ],
     "primaryIdentifier": [
-        "/properties/ResourceId",
-        "/properties/TargetId"
+        "/properties/ResourceId"
     ],
     "handlers": {
         "create": {
             "permissions": [
-                "organizations:ListPoliciesForTarget",
-                "organizations:ListTargetsForPolicy",
-                "organizations:DescribeEffectivePolicy",
-                "organizations:DescribePolicy",
-                "organizations:ListRoots",
-                "organizations:ListAWSServiceAccessForOrganization",
-                "organizations:DescribeAccount",
-                "organizations:ListCreateAccountStatus",
-                "organizations:DescribeOrganizationalUnit",
-                "organizations:ListParents",
-                "organizations:DescribeCreateAccountStatus",
                 "organizations:AttachPolicy",
-                "organizations:CreatePolicy",
-                "organizations:EnableAWSServiceAccess",
-                "organizations:EnablePolicyType",
-                "organizations:DescribeOrganization",
-                "organizations:TagResource"
+                "organizations:CreatePolicy"
             ]
         },
         "update": {
             "permissions": [
-                "organizations:UpdatePolicy",
-                "organizations:UntagResource"
+                "organizations:UpdatePolicy"
             ]
         },
         "delete": {
             "permissions": [
                 "organizations:DetachPolicy",
-                "organizations:DeletePolicy",
-                "organizations:DisablePolicyType",
-                "organizations:DisableAWSServiceAccess"
+                "organizations:DeletePolicy"
             ]
         }
     }

@@ -10,8 +10,6 @@ export class ResourceModel extends BaseModel {
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';
-    @Exclude()
-    protected readonly IDENTIFIER_KEY_TARGETID: string = '/properties/TargetId';
 
     @Expose({ name: 'Content' })
     @Transform(
@@ -49,15 +47,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     policyType?: Optional<string>;
-    @Expose({ name: 'TargetId' })
+    @Expose({ name: 'TargetIds' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'targetId', value, obj, []),
+            transformValue(String, 'targetIds', value, obj, [Array]),
         {
             toClassOnly: true,
         }
     )
-    targetId?: Optional<string>;
+    targetIds?: Optional<Array<string>>;
     @Expose({ name: 'ResourceId' })
     @Transform(
         (value: any, obj: any) =>
@@ -75,12 +73,8 @@ export class ResourceModel extends BaseModel {
             identifier[this.IDENTIFIER_KEY_RESOURCEID] = this.resourceId;
         }
 
-        if (this.targetId != null) {
-            identifier[this.IDENTIFIER_KEY_TARGETID] = this.targetId;
-        }
-
         // only return the identifier if it can be used, i.e. if all components are present
-        return Object.keys(identifier).length === 2 ? identifier : null;
+        return Object.keys(identifier).length === 1 ? identifier : null;
     }
 
     @Exclude()

@@ -1,6 +1,6 @@
 import { Organizations } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, Optional, CfnResponse, SessionProxy, ProgressEvent } from 'cfn-rpdk';
+import { Action, BaseResource, handlerEvent } from 'cfn-rpdk';
 
 import { ResourceModel } from './models';
 
@@ -28,13 +28,16 @@ class Resource extends BaseResource<ResourceModel> {
             .promise();
         model.resourceId = response.Policy.PolicySummary.Id;
         console.info({ action, message: 'policy creation', policyId: model.resourceId });
-        await service
-            .attachPolicy({
-                PolicyId: model.resourceId,
-                TargetId: model.targetId,
-            })
-            .promise();
-        console.info({ action, message: 'target ID attachment', targetId: model.targetId });
+        for (const targetId of model.targetIds) {
+            await service
+                .attachPolicy({
+                    PolicyId: model.resourceId,
+                    TargetId: targetId,
+                })
+                .promise();
+            console.info({ action, message: 'target ID attachment', targetId: targetId });
+        }
+
         return Promise.resolve(model);
     }
 
@@ -80,16 +83,18 @@ class Resource extends BaseResource<ResourceModel> {
 
         const model: ResourceModel = desiredResourceState;
         const policyId = model.resourceId;
-        const targetId = model.targetId;
-        try {
-            await service
-                .detachPolicy({
-                    PolicyId: policyId,
-                    TargetId: targetId,
-                })
-                .promise();
-            console.info({ action, message: 'policy detached', policyId: policyId, targetId: targetId });
-        } catch (err) {}
+
+        for (const targetId of model.targetIds) {
+            try {
+                await service
+                    .detachPolicy({
+                        PolicyId: policyId,
+                        TargetId: targetId,
+                    })
+                    .promise();
+                console.info({ action, message: 'policy detached', policyId: policyId, targetId: targetId });
+            } catch (err) {}
+        }
 
         await service
             .deletePolicy({

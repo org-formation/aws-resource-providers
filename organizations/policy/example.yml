@@ -11,9 +11,9 @@ Parameters:
   policyName:
     Type: String
     Description: Enter the desired name of the policy
-  targetId:
-    Type: String
-    Description: Enter the target ID of the OU or Root to target, e.g. r-xxxx
+  targetIds:
+    Type: CommaDelimitedList
+    Description: Comma-delimeted list of the target IDs of the OUs or Root to target, e.g. r-xxxx
   policyType:
     Type: String
     AllowedValues:
@@ -31,4 +31,4 @@ Resources:
       Description: !Sub '${description}'
       Name: !Sub '${policyName}'
       PolicyType: !Sub '${policyType}'
-      TargetId: !Sub '${targetId}'
+      TargetIds: !Ref targetIds
