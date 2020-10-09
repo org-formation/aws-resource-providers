@@ -3,42 +3,33 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   instanceArn: 
     Type: String
-    Default: arn:aws:sso:::instance/ssoins-7223c4d3679b1b6c
-
-  accountId: 
-    Type: String
-    Default: '615268041978'
+    Default: arn:aws:sso:::instance/ssoins-7223bb1f3d5cae54
 
   principalId: 
     Type: String
-    Default: 90677ebef5-c6ba3a0a-ab78-4ce8-9f63-f3ac62b96262
+    Default: 906761b815-8d376b7c-4306-4c61-9536-0076e38d9499
 
 Resources:
 
-  AdminPS:
+  TestPS:
     Type: AWS::SSO::PermissionSet
     Properties: 
-      Name: TestPS
+      Name: TestPSABC
       Description: Readonly Access
       InstanceArn: !Ref instanceArn
       ManagedPolicies: 
         - arn:aws:iam::aws:policy/ReadOnlyAccess
       SessionDuration: PT12H
 
-
   TestAssignmentGroup:
     Type: Community::SSO::AssignmentGroup
     Properties:
       InstanceArn: !Ref instanceArn
       PermissionSets:
-      - !Ref AdminPS
+      - !Ref TestPS
       PrincipalId: !Ref principalId
       PrincipalType: GROUP
       Targets:
       - TargetType: AWS_ACCOUNT
         TargetIds:
-        - !Ref accountId
         - '102625093955'
-        - '673026687213'
-        - '362239514602'
-        - '340381375986'

@@ -79,7 +79,10 @@
         "create": {
             "permissions": [
                 "sso:CreateAccountAssignment",
-                "sso:DescribeAccountAssignmentCreationStatus"
+                "sso:DescribeAccountAssignmentCreationStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider",
+                "iam:CreateRole"
             ]
         },
         "read": {
@@ -91,13 +94,18 @@
                 "sso:CreateAccountAssignment",
                 "sso:DescribeAccountAssignmentCreationStatus",
                 "sso:DeleteAccountAssignment",
-                "sso:DescribeAccountAssignmentDeletionStatus"
+                "sso:DescribeAccountAssignmentDeletionStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider",
+                "iam:CreateRole"
             ]
         },
         "delete": {
             "permissions": [
                 "sso:DeleteAccountAssignment",
-                "sso:DescribeAccountAssignmentDeletionStatus"
+                "sso:DescribeAccountAssignmentDeletionStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider"
             ]
         },
         "list": {

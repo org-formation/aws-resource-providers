@@ -26,7 +26,9 @@ interface LogContext {
     clientRequestToken: string;
 }
 
-interface CallbackContext extends Record<string, any> { }
+interface CallbackContext extends Record<string, any> { 
+
+}
 
 const enumeratePermissionSetArns = (model: ResourceModel): string[] => {
     if (model.permissionSets === undefined) {
@@ -120,29 +122,58 @@ const retryCreateOrDeleteOperation = async (operation: () => Promise<void>) => {
 
 const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogContext, previousModel: ResourceModel, desiredModel: ResourceModel) => {
 
-    LOGGER.info({ ...loggingContext, method: 'compareCreateAndDelete', previousModel, desiredModel });
-
     const [previousComparables, desiredCompareables] = await Promise.all([
         await enumerateComparables(previousModel),
         await enumerateComparables(desiredModel)
     ]);;
+    
 
     LOGGER.info({ ...loggingContext, method: 'compareCreateAndDelete', previousComparables, desiredCompareables });
+
+    const getHasAssignment = async(assignmentRequest: DeleteAccountAssignmentRequest | CreateAccountAssignmentRequest) : Promise<boolean | undefined> => {
+        if (assignmentRequest.TargetType !== 'AWS_ACCOUNT') {
+            return undefined;
+        }
+
+        let response: SSOAdmin.ListAccountAssignmentsResponse = {};
+        
+        do {
+            const request: SSOAdmin.ListAccountAssignmentsRequest = {
+                InstanceArn: assignmentRequest.InstanceArn,
+                AccountId: assignmentRequest.TargetId,
+                PermissionSetArn: assignmentRequest.PermissionSetArn,
+                NextToken: response.NextToken
+            };
+            response = await service.listAccountAssignments(request).promise();
+
+            if (response.AccountAssignments && response.AccountAssignments.find(x => x.PrincipalId === assignmentRequest.PrincipalId)) {
+                return true;
+            }
+        } while (response.NextToken)
+
+        return false;
+    }
 
     const deleteAndWait = async (assignmentRequest: DeleteAccountAssignmentRequest): Promise<void> => {
 
         LOGGER.info({ ...loggingContext, method: 'before deleteAndWait', assignmentRequest });
         const response = await service.deleteAccountAssignment(assignmentRequest).promise();
-        LOGGER.info({ ...loggingContext, method: 'delete assignment response', assignmentRequest, response });
+        //LOGGER.info({ ...loggingContext, method: 'delete assignment response', assignmentRequest, response });
+
+        const getHasAssignments = await getHasAssignment(assignmentRequest);
+        if (getHasAssignments === false) {
+            LOGGER.info({ ...loggingContext, message: 'no assignment found, skipping', method: 'deleteAndWait', assignmentRequest });
+            return;
+        }
 
         let deletionStatus = response.AccountAssignmentDeletionStatus;
         while (deletionStatus && deletionStatus.Status === 'IN_PROGRESS') {
             await sleep(2000);
             const describeDeleteAssignmentRequest = { AccountAssignmentDeletionRequestId: deletionStatus.RequestId, InstanceArn: assignmentRequest.InstanceArn };
-            LOGGER.info({ ...loggingContext, method: 'before describe deletion status', assignmentRequest });
+            //LOGGER.info({ ...loggingContext, method: 'before describe deletion status', assignmentRequest });
             const describeStatusResponse = await service.describeAccountAssignmentDeletionStatus(describeDeleteAssignmentRequest).promise();
             deletionStatus = describeStatusResponse.AccountAssignmentDeletionStatus;
-            LOGGER.info({ ...loggingContext, method: 'after describe deletion status', deletionStatus });
+            //LOGGER.info({ ...loggingContext, method: 'after describe deletion status', deletionStatus });
         }
 
         LOGGER.info({ ...loggingContext, method: 'after deleteAndWait', assignmentRequest, deletionStatus });
@@ -151,20 +182,23 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
         }
     }
 
-
     const createAndWait = async (createAssignmentRequest: CreateAccountAssignmentRequest): Promise<void> => {
         LOGGER.info({ ...loggingContext, method: 'before createAndWait', createAssignmentRequest });
+
         const response = await service.createAccountAssignment(createAssignmentRequest).promise();
-        LOGGER.info({ ...loggingContext, method: 'create assignment response', createAssignmentRequest, response });
+
+        const getHasAssignments = await getHasAssignment(createAssignmentRequest);
+        if (getHasAssignments === true) {
+            LOGGER.info({ ...loggingContext, message: 'assignment already made, skipping', method: 'createAndWait', createAssignmentRequest});
+            return;
+        }
 
         let creationStatus = response.AccountAssignmentCreationStatus;
         while (creationStatus && creationStatus.Status === 'IN_PROGRESS') {
             await sleep(2000);
             const describeCreateAssignmentRequest = { AccountAssignmentCreationRequestId: creationStatus.RequestId, InstanceArn: createAssignmentRequest.InstanceArn };
-            LOGGER.info({ ...loggingContext, method: 'before describe creation status', createAssignmentRequest });
             const describeStatusResponse = await service.describeAccountAssignmentCreationStatus(describeCreateAssignmentRequest).promise();
             creationStatus = describeStatusResponse.AccountAssignmentCreationStatus;
-            LOGGER.info({ ...loggingContext, method: 'after describe creation status', creationStatus });
         }
 
         LOGGER.info({ ...loggingContext, method: 'after createAndWait', createAssignmentRequest, creationStatus });
@@ -189,7 +223,6 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
         };
         await retryCreateOrDeleteOperation( async () => await deleteAndWait(assignmentRequest));
     }
-
     LOGGER.info({ ...loggingContext, method: 'after deleting', comparablesToDelete });
 
     LOGGER.info({ ...loggingContext, method: 'before creating', comparablesToCreate });
@@ -216,6 +249,7 @@ class Resource extends BaseResource<ResourceModel> {
 
         LOGGER.info({ ...loggingContext, request, callbackContext });
         try {
+            progress.status = OperationStatus.Success;
             const accountId = request.awsAccountId;
 
             model.resourceId = `arn:community::${accountId}:principal-assignments:${model.principalType}:${model.principalId}/${uuidv4()}`;
@@ -230,7 +264,6 @@ class Resource extends BaseResource<ResourceModel> {
                 throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
             }
 
-            progress.status = OperationStatus.Success;
         } catch (err) {
             console.info({ ...loggingContext, message: 'error', err });
             progress.status = OperationStatus.Failed;
