@@ -1,4 +1,4 @@
-import { Action, BaseModel, BaseResource, exceptions, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseModel, BaseResource, Constructor, exceptions, LoggerProxy, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import * as Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
@@ -10,6 +10,7 @@ export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Rec
     session: Optional<SessionProxy>;
     request: ResourceHandlerRequest<R>;
     callbackContext: T;
+    logger?: LoggerProxy;
 };
 
 export interface commonAwsOptions {
@@ -28,8 +29,8 @@ interface Session {
  *
  * @returns {MethodDecorator}
  */
-export function commonAws<T extends Record<string, any>, ResourceModel extends BaseModel>(options: commonAwsOptions): MethodDecorator {
-    return function (target: BaseResource<ResourceModel>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
+export function commonAws<T extends Record<string, any>, R extends BaseModel>(options: commonAwsOptions): MethodDecorator {
+    return function (target: BaseResource<R>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
         const { debug, serviceName } = options;
 
         if (descriptor === undefined) {
@@ -39,7 +40,7 @@ export function commonAws<T extends Record<string, any>, ResourceModel extends B
         const originalMethod = descriptor.value;
 
         // Wrapping the original method with new signature.
-        descriptor.value = async function (session: Optional<SessionProxy | Session>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: T): Promise<ProgressEvent> {
+        descriptor.value = async function (session: Optional<SessionProxy | Session>, request: ResourceHandlerRequest<R>, callbackContext: T, logger?: LoggerProxy): Promise<ProgressEvent<R, T>> {
             let action = options.action;
             if (!action) {
                 const events: HandlerEvents = Reflect.getMetadata('handlerEvents', target);
@@ -50,19 +51,24 @@ export function commonAws<T extends Record<string, any>, ResourceModel extends B
                 });
             }
 
-            const handlerArgs = { session, request, callbackContext };
+            const loggerProxy = logger || console;
 
-            const model: ResourceModel = request.desiredResourceState;
-            const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, T>>(model);
+            const handlerArgs = { session, request, callbackContext, logger };
+            const { desiredResourceState } = request;
 
-            if (debug) console.info({ action, request, callbackContext, env: process.env });
+            const ModelClass: Constructor<R> = Object.getPrototypeOf(desiredResourceState);
+
+            const model: R = new ModelClass(request.desiredResourceState);
+            const progress = ProgressEvent.progress<ProgressEvent<R, T>>(model);
+
+            if (debug) loggerProxy.log({ action, request, callbackContext, env: process.env });
 
             if (session && (session instanceof SessionProxy || session.client instanceof Function)) {
                 const service = session.client(serviceName as any);
 
-                if (debug) console.info({ action, message: 'before perform' });
-                const modified = await originalMethod.apply(this, [action, handlerArgs, service]);
-                if (debug) console.info({ action, message: 'after perform' });
+                if (debug) loggerProxy.log({ action, message: 'before perform' });
+                const modified = await originalMethod.apply(this, [action, handlerArgs, service, model]);
+                if (debug) loggerProxy.log({ action, message: 'after perform' });
 
                 if (modified !== undefined) {
                     if (Array.isArray(modified)) {
