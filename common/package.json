@@ -1,9 +1,12 @@
 {
     "name": "aws-resource-providers-common",
     "version": "0.2.1",
-    "description": "",
+    "description": "Common patterns and code that can be used when developing resource type providers for AWS CloudFormation.",
     "private": false,
     "main": "dist/index.js",
+    "publishConfig": {
+        "access": "public"
+    },
     "scripts": {
         "build": "npx tsc",
         "prepublishOnly": "npm run build",
@@ -12,8 +15,8 @@
     "files": [
         "dist/**/*"
     ],
-    "author": "",
-    "license": "ISC",
+    "author": "org-formation",
+    "license": "MIT",
     "dependencies": {
         "cfn-rpdk": "npm:@org-formation/cfn-rpdk@0.x"
     },

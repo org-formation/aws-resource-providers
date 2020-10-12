@@ -24,8 +24,7 @@ interface Session {
 }
 
 /**
- * Decorator for event handler with common behavior
- * to interact with AWS APIs.
+ * Decorator for event handler with common behavior to interact with AWS APIs.
  *
  * @returns {MethodDecorator}
  */
@@ -61,7 +60,7 @@ export function commonAws<T extends Record<string, any>, R extends BaseModel>(op
             const model: R = new ModelClass(request.desiredResourceState);
             const progress = ProgressEvent.progress<ProgressEvent<R, T>>(model);
 
-            if (debug) loggerProxy.log({ action, request, callbackContext, env: process.env });
+            if (debug) loggerProxy.log({ action, request, callbackContext });
 
             if (session && (session instanceof SessionProxy || session.client instanceof Function)) {
                 const service = session.client(serviceName as any);
