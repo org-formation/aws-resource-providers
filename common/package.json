@@ -1,21 +1,24 @@
 {
     "name": "aws-resource-providers-common",
-    "version": "0.2.0",
-    "description": "",
+    "version": "0.2.1",
+    "description": "Common patterns and code that can be used when developing resource type providers for AWS CloudFormation.",
     "private": false,
     "main": "dist/index.js",
+    "publishConfig": {
+        "access": "public"
+    },
     "scripts": {
         "build": "npx tsc",
         "prepublishOnly": "npm run build",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "npx jest --config ../jest.config.js --rootDir ."
     },
     "files": [
         "dist/**/*"
     ],
-    "author": "",
-    "license": "ISC",
+    "author": "org-formation",
+    "license": "MIT",
     "dependencies": {
-        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz"
+        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@0.x"
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
