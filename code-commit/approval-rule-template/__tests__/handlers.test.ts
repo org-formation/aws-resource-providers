@@ -1,24 +1,24 @@
 import { CodeCommit } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, OperationStatus, SessionProxy, UnmodeledRequest } from 'cfn-rpdk';
+import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
 import createFixture from '../sam-tests/create.json';
 import deleteFixture from '../sam-tests/delete.json';
 import readFixture from '../sam-tests/read.json';
 import updateFixture from '../sam-tests/update.json';
 import { resource } from '../src/handlers';
-import { ResourceModel } from '../src/models';
 
 const IDENTIFIER = '123456789012';
 
 jest.mock('aws-sdk');
 
 describe('when calling handler', () => {
-    let session: SessionProxy;
+    let testEntrypointPayload: any;
+    let spySession: jest.SpyInstance;
+    let spySessionClient: jest.SpyInstance;
     let codecommit: AwsServiceMockBuilder<CodeCommit>;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
-        session = new SessionProxy({});
         fixtureMap = new Map<Action, Record<string, any>>();
         fixtureMap.set(Action.Create, createFixture);
         fixtureMap.set(Action.Read, readFixture);
@@ -50,7 +50,14 @@ describe('when calling handler', () => {
         codecommit.mock('updateApprovalRuleTemplateDescription').resolve({ approvalRuleTemplate: {} });
         codecommit.mock('updateApprovalRuleTemplateName').resolve({ approvalRuleTemplate: {} });
         codecommit.mock('deleteApprovalRuleTemplate').resolve({});
-        session['client'] = () => codecommit.instance;
+        spySession = jest.spyOn(SessionProxy, 'getSession');
+        spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
+        spySessionClient.mockReturnValue(codecommit.instance);
+        testEntrypointPayload = {
+            credentials: { accessKeyId: '', secretAccessKey: '', sessionToken: '' },
+            region: 'us-east-1',
+            action: 'CREATE',
+        };
     });
 
     afterEach(() => {
@@ -59,32 +66,33 @@ describe('when calling handler', () => {
     });
 
     test('create operation successful - code commit approval rule template', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Create, {});
-        const model = request.desiredResourceState;
-        model.id = IDENTIFIER;
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
             callbackDelaySeconds: 0,
         });
-        expect(progress.resourceModel.serialize()).toMatchObject(model.serialize());
+        expect(progress.resourceModel.serialize()).toMatchObject({
+            ...request.desiredResourceState,
+            Id: IDENTIFIER,
+        });
     });
 
     test('update operation successful - code commit approval rule template', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Update, {});
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
             callbackDelaySeconds: 0,
-            resourceModel: request.desiredResourceState,
         });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
     test('delete operation successful - code commit approval rule template', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Delete, {});
+        const request = fixtureMap.get(Action.Delete);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
@@ -94,27 +102,22 @@ describe('when calling handler', () => {
     });
 
     test('read operation successful - code commit approval rule template', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Read)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Read, {});
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
         expect(progress).toMatchObject({
             status: OperationStatus.Success,
             message: '',
             callbackDelaySeconds: 0,
         });
-        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState.serialize());
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
     test('all operations fail without session - code commit approval rule template', async () => {
-        const promises: any[] = [];
-        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);
-            promises.push(
-                resource['invokeHandler'](null, request, action, {}).catch((e: exceptions.BaseHandlerException) => {
-                    expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
-                })
-            );
-        });
-        expect.assertions(promises.length);
-        await Promise.all(promises);
+        expect.assertions(fixtureMap.size);
+        spySession.mockReturnValue(null);
+        for (const [action, request] of fixtureMap) {
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, null);
+            expect(progress.errorCode).toBe(exceptions.InvalidCredentials.name);
+        }
     });
 });

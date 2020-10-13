@@ -1,6 +1,6 @@
 import { CodeCommit } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 import { ResourceModel, TemplateContent } from './models';
 
 class Resource extends BaseResource<ResourceModel> {
@@ -11,14 +11,14 @@ class Resource extends BaseResource<ResourceModel> {
         return null;
     }
 
-    private async getRuleTemplate(service: CodeCommit, approvalRuleTemplateName: string): Promise<ResourceModel> {
+    private async getRuleTemplate(service: CodeCommit, logger: Logger, approvalRuleTemplateName: string): Promise<ResourceModel> {
         const request: CodeCommit.GetApprovalRuleTemplateInput = {
             approvalRuleTemplateName,
         };
 
-        console.info({ message: 'before invoke getApprovalRuleTemplate', request });
+        logger.log({ message: 'before invoke getApprovalRuleTemplate', request });
         const response = await service.getApprovalRuleTemplate(request).promise();
-        console.info({ message: 'after invoke getApprovalRuleTemplate', response });
+        logger.log({ message: 'after invoke getApprovalRuleTemplate', response });
         const { approvalRuleTemplateId, approvalRuleTemplateContent } = response.approvalRuleTemplate;
 
         const model = new ResourceModel();
@@ -34,15 +34,15 @@ class Resource extends BaseResource<ResourceModel> {
         return Promise.resolve(model);
     }
 
-    private async listRuleTemplates(service: CodeCommit, filter?: Pick<ResourceModel, 'id' | 'name'>): Promise<ResourceModel[]> {
+    private async listRuleTemplates(service: CodeCommit, logger: Logger, filter?: Pick<ResourceModel, 'id' | 'name'>): Promise<ResourceModel[]> {
         let rules: ResourceModel[] = [];
         if (service) {
-            console.info({ message: 'before invoke listApprovalRuleTemplates' });
+            logger.log({ message: 'before invoke listApprovalRuleTemplates' });
             const response = await service.listApprovalRuleTemplates().promise();
-            console.info({ message: 'after invoke listApprovalRuleTemplates', response });
+            logger.log({ message: 'after invoke listApprovalRuleTemplates', response });
             rules = await Promise.all(
                 response.approvalRuleTemplateNames.map((approvalRuleTemplateName: string) => {
-                    return this.getRuleTemplate(service, approvalRuleTemplateName);
+                    return this.getRuleTemplate(service, logger, approvalRuleTemplateName);
                 })
             );
             if (filter) {
@@ -55,35 +55,35 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'CodeCommit', debug: true })
-    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
-        console.info(args.request);
-        const { desiredResourceState, logicalResourceIdentifier } = args.request;
+    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<ResourceModel> {
+        args.logger.log(args.request);
+        const { logicalResourceIdentifier } = args.request;
 
         const request: CodeCommit.CreateApprovalRuleTemplateInput = {
-            approvalRuleTemplateName: desiredResourceState.name,
-            approvalRuleTemplateDescription: desiredResourceState.description,
-            approvalRuleTemplateContent: desiredResourceState.content && JSON.stringify(desiredResourceState.content.serialize()),
+            approvalRuleTemplateName: model.name,
+            approvalRuleTemplateDescription: model.description,
+            approvalRuleTemplateContent: model.content && JSON.stringify(model.content.serialize()),
         };
 
-        console.info({ action, message: 'before createApprovalRuleTemplate', request });
+        args.logger.log({ action, message: 'before createApprovalRuleTemplate', request });
         try {
             const response = await service.createApprovalRuleTemplate(request).promise();
-            console.info({ action, message: 'after invoke createApprovalRuleTemplate', response });
+            args.logger.log({ action, message: 'after invoke createApprovalRuleTemplate', response });
             const { approvalRuleTemplateId, approvalRuleTemplateName } = response.approvalRuleTemplate;
 
-            const model = new ResourceModel();
-            model.id = approvalRuleTemplateId;
-            model.name = approvalRuleTemplateName;
-            model.description = response.approvalRuleTemplate.approvalRuleTemplateDescription;
-            model.content = desiredResourceState.content;
-            model.creationDate = Resource.convertToEpoch(response.approvalRuleTemplate.creationDate);
-            model.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
-            model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
-            model.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
+            const result = new ResourceModel();
+            result.id = approvalRuleTemplateId;
+            result.name = approvalRuleTemplateName;
+            result.description = response.approvalRuleTemplate.approvalRuleTemplateDescription;
+            result.content = model.content;
+            result.creationDate = Resource.convertToEpoch(response.approvalRuleTemplate.creationDate);
+            result.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
+            result.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
+            result.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
 
-            console.info({ action, message: 'done', model });
-            return Promise.resolve(model);
+            args.logger.log({ action, message: 'done', result });
+            return Promise.resolve(result);
         } catch (err) {
             console.log(err);
             if (err && err.code === 'ApprovalRuleTemplateNameAlreadyExistsException') {
@@ -96,10 +96,9 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'CodeCommit', debug: true })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
-        const { desiredResourceState, previousResourceState } = args.request;
-        const model = desiredResourceState;
+    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<ResourceModel> {
+        const { previousResourceState } = args.request;
         const serializedContent = model.content && model.content.serialize();
         if (serializedContent !== previousResourceState.content.serialize()) {
             const request: CodeCommit.UpdateApprovalRuleTemplateContentInput = {
@@ -107,9 +106,9 @@ class Resource extends BaseResource<ResourceModel> {
                 // existingRuleContentSha256: previousResourceState.ruleContentSha256, # Removing because this will only succeed if content has been modified by CFN
                 newRuleContent: JSON.stringify(serializedContent),
             };
-            console.info({ action, message: 'before updateApprovalRuleTemplateContent', request });
+            args.logger.log({ action, message: 'before updateApprovalRuleTemplateContent', request });
             const response = await service.updateApprovalRuleTemplateContent(request).promise();
-            console.info({ action, message: 'after invoke updateApprovalRuleTemplateContent', response });
+            args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateContent', response });
 
             model.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
             model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
@@ -121,9 +120,9 @@ class Resource extends BaseResource<ResourceModel> {
                 approvalRuleTemplateName: previousResourceState.name,
                 approvalRuleTemplateDescription: model.description,
             };
-            console.info({ action, message: 'before updateApprovalRuleTemplateDescription', request });
+            args.logger.log({ action, message: 'before updateApprovalRuleTemplateDescription', request });
             const response = await service.updateApprovalRuleTemplateDescription(request).promise();
-            console.info({ action, message: 'after invoke updateApprovalRuleTemplateDescription', response });
+            args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateDescription', response });
 
             model.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
             model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
@@ -134,9 +133,9 @@ class Resource extends BaseResource<ResourceModel> {
                 oldApprovalRuleTemplateName: previousResourceState.name,
                 newApprovalRuleTemplateName: model.name,
             };
-            console.info({ action, message: 'before invoke updateApprovalRuleTemplateName', request });
+            args.logger.log({ action, message: 'before invoke updateApprovalRuleTemplateName', request });
             const response = await service.updateApprovalRuleTemplateName(request).promise();
-            console.info({ action, message: 'after invoke updateApprovalRuleTemplateName', response });
+            args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateName', response });
 
             model.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
             model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
@@ -146,20 +145,18 @@ class Resource extends BaseResource<ResourceModel> {
             model.creationDate = previousResourceState.creationDate;
         }
 
-        console.info({ action, message: 'done', model });
+        args.logger.log({ action, message: 'done', model });
         return Promise.resolve(model);
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'CodeCommit', debug: true })
-    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<null> {
-        const { desiredResourceState } = args.request;
-
-        let approvalRuleTemplateName = desiredResourceState.name;
+    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<null> {
+        let approvalRuleTemplateName = model.name;
 
         if (!approvalRuleTemplateName) {
-            const rules = await this.listRuleTemplates(service, {
-                id: desiredResourceState.id,
+            const rules = await this.listRuleTemplates(service, args.logger, {
+                id: model.id,
             });
             approvalRuleTemplateName = rules[0].name;
         }
@@ -168,33 +165,33 @@ class Resource extends BaseResource<ResourceModel> {
             approvalRuleTemplateName,
         };
 
-        console.info({ action, message: 'before invoke deleteApprovalRuleTemplate', request });
+        args.logger.log({ action, message: 'before invoke deleteApprovalRuleTemplate', request });
         const response = await service.deleteApprovalRuleTemplate(request).promise();
-        console.info({ action, message: 'after invoke deleteApprovalRuleTemplate', response });
+        args.logger.log({ action, message: 'after invoke deleteApprovalRuleTemplate', response });
 
-        console.info({ action, message: 'done' });
+        args.logger.log({ action, message: 'done' });
 
         return Promise.resolve(null);
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({ serviceName: 'CodeCommit', debug: true })
-    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit): Promise<ResourceModel> {
-        const { desiredResourceState, logicalResourceIdentifier } = args.request;
-        const { name, id } = desiredResourceState;
+    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<ResourceModel> {
+        const { logicalResourceIdentifier } = args.request;
+        const { name, id } = model;
 
         if (!name && !id) {
             throw new exceptions.NotFound(ResourceModel.TYPE_NAME, logicalResourceIdentifier);
         }
         try {
-            const rules = await this.listRuleTemplates(service, {
+            const rules = await this.listRuleTemplates(service, args.logger, {
                 id,
                 name,
             });
-            const model = rules[0];
-            console.info({ action, message: 'done', model });
+            const result = rules[0];
+            args.logger.log({ action, message: 'done', result });
 
-            return Promise.resolve(model);
+            return Promise.resolve(result);
         } catch (err) {
             if (err && err.code === 'ApprovalRuleTemplateDoesNotExistException') {
                 throw new exceptions.NotFound(ResourceModel.TYPE_NAME, id || logicalResourceIdentifier);

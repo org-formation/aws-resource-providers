@@ -4,7 +4,7 @@ Resources:
     Type: 'Community::CodeCommit::ApprovalRuleTemplate'
     Properties:
       Name: 'test'
-      Description: : 'test'
+      Description: 'test'
       Content:
         Version: '2018-11-08'
         DestinationReferences:

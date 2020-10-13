@@ -5,4 +5,4 @@ Resources:
     Properties:
       ApprovalRuleTemplateName: 'test'
       RepositoryNames:
-          - 'repo'
+        - 'repo'
