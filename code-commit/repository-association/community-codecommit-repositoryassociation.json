@@ -33,26 +33,25 @@
         "RepositoryNames"
     ],
     "createOnlyProperties": [
-        "/properties/Arn",
         "/properties/ApprovalRuleTemplateName"
     ],
     "readOnlyProperties": [
-        "/properties/Arn",
-        "/properties/ApprovalRuleTemplateName"
+        "/properties/Arn"
     ],
     "primaryIdentifier": [
-        "/properties/ApprovalRuleTemplateName"
+        "/properties/Arn"
     ],
     "additionalIdentifiers": [
         [
-            "/properties/Arn"
+            "/properties/ApprovalRuleTemplateName"
         ]
     ],
     "handlers": {
         "create": {
             "permissions": [
                 "codecommit:AssociateApprovalRuleTemplateWithRepository",
-                "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories"
+                "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories",
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
             ]
         },
         "read": {
@@ -65,13 +64,15 @@
                 "codecommit:AssociateApprovalRuleTemplateWithRepository",
                 "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories",
                 "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories",
-                "codecommit:DisassociateApprovalRuleTemplateFromRepository"
+                "codecommit:DisassociateApprovalRuleTemplateFromRepository",
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
             ]
         },
         "delete": {
             "permissions": [
                 "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories",
-                "codecommit:DisassociateApprovalRuleTemplateFromRepository"
+                "codecommit:DisassociateApprovalRuleTemplateFromRepository",
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
             ]
         }
     }   

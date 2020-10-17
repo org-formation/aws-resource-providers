@@ -9,6 +9,6 @@
     },
     "previousResourceState": null,
     "awsAccountId": "123456789012",
-    "region": "eu-central-1",
+    "region": "us-east-1",
     "logicalResourceIdentifier": "MyResource"
 }

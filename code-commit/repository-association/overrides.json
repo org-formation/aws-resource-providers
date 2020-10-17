@@ -6,10 +6,9 @@
         ]
     },
     "UPDATE": {
-        "/ApprovalRuleTemplateName": "repo-rule",
         "/RepositoryNames": [
-            "repo",
-            "repo2"
+            "repo2",
+            "repo"
         ]
     }
 }

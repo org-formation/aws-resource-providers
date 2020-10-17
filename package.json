@@ -4,7 +4,7 @@
     "description": "A community driven repository where you can find AWS Resource Type Providers for different purposes.",
     "private": true,
     "scripts": {
-        "bootstrap": "npm ci --optional && npx lerna bootstrap",
+        "bootstrap": "npm ci --optional && npx lerna bootstrap --hoist",
         "reset": "npm run cleanup && npx rimraf -rf **/node_modules && npm run bootstrap",
         "cleanup": "npx lerna run cleanup --stream --parallel",
         "build": "npx lerna run build",
@@ -31,7 +31,7 @@
     },
     "homepage": "https://github.com/git@github.com:org-formation/aws-resource-providers#readme",
     "dependencies": {
-        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
+        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.4.0",
         "class-transformer": "^0.3.1"
     },
     "devDependencies": {

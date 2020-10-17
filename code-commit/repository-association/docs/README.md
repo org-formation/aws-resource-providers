@@ -12,6 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "Community::CodeCommit::RepositoryAssociation",
     "Properties" : {
+        "<a href="#approvalruletemplatename" title="ApprovalRuleTemplateName">ApprovalRuleTemplateName</a>" : <i>String</i>,
         "<a href="#repositorynames" title="RepositoryNames">RepositoryNames</a>" : <i>[ String, ... ]</i>
     }
 }
@@ -22,11 +23,26 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: Community::CodeCommit::RepositoryAssociation
 Properties:
+    <a href="#approvalruletemplatename" title="ApprovalRuleTemplateName">ApprovalRuleTemplateName</a>: <i>String</i>
     <a href="#repositorynames" title="RepositoryNames">RepositoryNames</a>: <i>
       - String</i>
 </pre>
 
 ## Properties
+
+#### ApprovalRuleTemplateName
+
+The name of the approval rule template for which you want to associate the repositories.
+
+_Required_: Yes
+
+_Type_: String
+
+_Minimum_: <code>1</code>
+
+_Maximum_: <code>100</code>
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 #### RepositoryNames
 
@@ -42,7 +58,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 ### Ref
 
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the ApprovalRuleTemplateName.
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Arn.
 
 ### Fn::GetAtt
 
@@ -53,8 +69,4 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### Arn
 
 The Amazon Resource Name (ARN) of the approval rule template repository association.
-
-#### ApprovalRuleTemplateName
-
-The name of the approval rule template for which you want to associate the repositories.
 
