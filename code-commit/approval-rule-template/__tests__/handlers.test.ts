@@ -68,11 +68,7 @@ describe('when calling handler', () => {
     test('create operation successful - code commit approval rule template', async () => {
         const request = fixtureMap.get(Action.Create);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-        });
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject({
             ...request.desiredResourceState,
             Id: IDENTIFIER,
@@ -81,34 +77,31 @@ describe('when calling handler', () => {
 
     test('update operation successful - code commit approval rule template', async () => {
         const request = fixtureMap.get(Action.Update);
-        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
+        codecommit.mock('getApprovalRuleTemplate').resolve({
+            approvalRuleTemplate: {
+                approvalRuleTemplateId: '8f9be413-f9cc-49a1-b901-0a59a6f126c2',
+                approvalRuleTemplateName: 'test2',
+                approvalRuleTemplateDescription: 'test2',
+                approvalRuleTemplateContent:
+                    '{"Version": "2018-11-08","DestinationReferences": ["refs/heads/master"],"Statements": [{"Type": "Approvers","NumberOfApprovalsNeeded": 3,"ApprovalPoolMembers": ["*"]}]}',
+            },
         });
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
     test('delete operation successful - code commit approval rule template', async () => {
         const request = fixtureMap.get(Action.Delete);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-        });
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel).toBeNull();
     });
 
     test('read operation successful - code commit approval rule template', async () => {
         const request = fixtureMap.get(Action.Read);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-        });
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 

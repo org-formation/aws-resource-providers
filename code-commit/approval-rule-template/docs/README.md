@@ -12,6 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "Community::CodeCommit::ApprovalRuleTemplate",
     "Properties" : {
+        "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#content" title="Content">Content</a>" : <i><a href="templatecontent.md">TemplateContent</a></i>,
     }
@@ -23,11 +24,26 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: Community::CodeCommit::ApprovalRuleTemplate
 Properties:
+    <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#description" title="Description">Description</a>: <i>String</i>
     <a href="#content" title="Content">Content</a>: <i><a href="templatecontent.md">TemplateContent</a></i>
 </pre>
 
 ## Properties
+
+#### Name
+
+The name of the approval rule template. Provide descriptive names, because this name is applied to the approval rules created automatically in associated repositories.
+
+_Required_: Yes
+
+_Type_: String
+
+_Minimum_: <code>1</code>
+
+_Maximum_: <code>100</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### Description
 
@@ -36,8 +52,6 @@ The description of the approval rule template. Consider providing a description 
 _Required_: No
 
 _Type_: String
-
-_Minimum_: <code>1</code>
 
 _Maximum_: <code>1000</code>
 
@@ -57,7 +71,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 ### Ref
 
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Id.
+When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Arn.
 
 ### Fn::GetAtt
 
@@ -65,13 +79,13 @@ The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of
 
 For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
 
+#### Arn
+
+The Amazon Resource Name (ARN) of the approval rule template.
+
 #### Id
 
 The system-generated ID of the approval rule template.
-
-#### Name
-
-The name of the approval rule template. Provide descriptive names, because this name is applied to the approval rules created automatically in associated repositories.
 
 #### CreationDate
 

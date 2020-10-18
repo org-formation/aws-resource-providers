@@ -69,6 +69,21 @@ describe('when calling handler', () => {
         });
     });
 
+    test('create operation fail not found - code commit repository association', async () => {
+        expect.assertions(4);
+        const mockGet = codecommit.mock('listRepositoriesForApprovalRuleTemplate').reject({
+            ...new Error(),
+            code: 'ApprovalRuleTemplateDoesNotExistException',
+        });
+        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRepositories');
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveReturned();
+    });
+
     test('update operation successful - code commit repository association', async () => {
         const request = fixtureMap.get(Action.Update);
         codecommit.mock('batchAssociateApprovalRuleTemplateWithRepositories').resolve({

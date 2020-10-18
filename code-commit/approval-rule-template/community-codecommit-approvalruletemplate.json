@@ -71,6 +71,13 @@
         }
     },
     "properties": {
+        "Arn": {
+            "type": "string",
+            "description": "The Amazon Resource Name (ARN) of the approval rule template.",
+            "minLength": 25,
+            "maxLength": 256,
+            "pattern": "^arn:community:codecommit:[A-Za-z0-9-]{1,64}:[0-9]{12}:approval-rule-template/.+$"
+        },
         "Id": {
             "type": "string",
             "description": "The system-generated ID of the approval rule template.",
@@ -85,7 +92,7 @@
         "Description": {
             "type": "string",
             "description": "The description of the approval rule template. Consider providing a description that explains what this template does and when it might be appropriate to associate it with repositories.",
-            "minLength": 1,
+            "minLength": 0,
             "maxLength": 1000
         },
         "Content": {
@@ -117,22 +124,21 @@
         "Name",
         "Content"
     ],
-    "createOnlyProperties": [
-        "/properties/Id",
-        "/properties/CreationDate"
-    ],
     "readOnlyProperties": [
+        "/properties/Arn",
         "/properties/Id",
-        "/properties/Name",
         "/properties/CreationDate",
         "/properties/LastModifiedDate",
         "/properties/LastModifiedUser",
         "/properties/RuleContentSha256"
     ],
     "primaryIdentifier": [
-        "/properties/Id"
+        "/properties/Arn"
     ],
     "additionalIdentifiers": [
+        [
+            "/properties/Id"
+        ],
         [
             "/properties/Name"
         ]
@@ -151,6 +157,7 @@
         },
         "update": {
             "permissions": [
+                "codecommit:GetApprovalRuleTemplate",
                 "codecommit:UpdateApprovalRuleTemplateContent",
                 "codecommit:UpdateApprovalRuleTemplateDescription",
                 "codecommit:UpdateApprovalRuleTemplateName"

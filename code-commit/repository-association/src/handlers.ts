@@ -7,9 +7,9 @@ type CodeCommitBatchOutput = CodeCommit.BatchAssociateApprovalRuleTemplateWithRe
 type CodeCommitBatchResponse = CodeCommitBatchOutput & { $response?: Response<CodeCommitBatchOutput, AWSError> };
 
 class Resource extends BaseResource<ResourceModel> {
-    static extractName(arn: string): string {
+    static extractResourceId(arn: string): string {
         if (arn.length) {
-            return arn.split('/')[-1];
+            return arn.split('/').pop();
         }
         return arn;
     }
@@ -36,8 +36,8 @@ class Resource extends BaseResource<ResourceModel> {
 
             return Promise.resolve(result);
         } catch (err) {
-            if (err && err.code === 'ApprovalRuleTemplateDoesNotExistException') {
-                throw new exceptions.NotFound(this.typeName, model.approvalRuleTemplateName);
+            if (err?.code === 'ApprovalRuleTemplateDoesNotExistException') {
+                throw new exceptions.NotFound('ApprovalRuleTemplate', model.approvalRuleTemplateName);
             } else {
                 // Raise the original exception
                 throw err;
@@ -67,11 +67,18 @@ class Resource extends BaseResource<ResourceModel> {
         }
 
         await this.listRepositories(service, args.logger, model)
-            .catch((err: Error) => args.logger.log(err))
+            .catch((err: exceptions.BaseHandlerException) => {
+                if (err instanceof exceptions.NotFound) {
+                    throw err;
+                }
+                args.logger.log(err);
+                return Promise.resolve(null);
+            })
             .then((result: ResourceModel) => {
-                if (result.repositoryNames?.length) {
+                if (result?.repositoryNames?.length) {
                     throw new exceptions.AlreadyExists(this.typeName, model.approvalRuleTemplateName || logicalResourceIdentifier);
                 }
+                return Promise.resolve(null);
             });
 
         const request: CodeCommit.BatchAssociateApprovalRuleTemplateWithRepositoriesInput = {
@@ -151,7 +158,7 @@ class Resource extends BaseResource<ResourceModel> {
             arn = Resource.formatArn(region, awsAccountId, approvalRuleTemplateName);
         }
         if (!approvalRuleTemplateName) {
-            approvalRuleTemplateName = Resource.extractName(arn);
+            approvalRuleTemplateName = Resource.extractResourceId(arn);
         }
         const result = await this.listRepositories(service, args.logger, model);
         if (!result.repositoryNames?.length) {
@@ -183,7 +190,7 @@ class Resource extends BaseResource<ResourceModel> {
             arn = Resource.formatArn(region, awsAccountId, approvalRuleTemplateName);
         }
         if (!approvalRuleTemplateName) {
-            approvalRuleTemplateName = Resource.extractName(arn);
+            approvalRuleTemplateName = Resource.extractResourceId(arn);
         }
         const result = await this.listRepositories(service, args.logger, model);
         if (!result.repositoryNames?.length) {

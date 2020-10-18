@@ -7,7 +7,9 @@
         "Arn": {
             "type": "string",
             "description": "The Amazon Resource Name (ARN) of the approval rule template repository association.",
-            "minLength": 26
+            "minLength": 25,
+            "maxLength": 256,
+            "pattern": "^arn:community:codecommit:[A-Za-z0-9-]{1,64}:[0-9]{12}:repository-association/.+$"
         },
         "ApprovalRuleTemplateName": {
             "type": "string",

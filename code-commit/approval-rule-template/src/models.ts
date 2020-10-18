@@ -9,10 +9,21 @@ export class ResourceModel extends BaseModel {
     public static readonly TYPE_NAME: string = 'Community::CodeCommit::ApprovalRuleTemplate';
 
     @Exclude()
+    protected readonly IDENTIFIER_KEY_ARN: string = '/properties/Arn';
+    @Exclude()
     protected readonly IDENTIFIER_KEY_ID: string = '/properties/Id';
     @Exclude()
     protected readonly IDENTIFIER_KEY_NAME: string = '/properties/Name';
 
+    @Expose({ name: 'Arn' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'arn', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    arn?: Optional<string>;
     @Expose({ name: 'Id' })
     @Transform(
         (value: any, obj: any) =>
@@ -83,8 +94,8 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.id != null) {
-            identifier[this.IDENTIFIER_KEY_ID] = this.id;
+        if (this.arn != null) {
+            identifier[this.IDENTIFIER_KEY_ARN] = this.arn;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present
@@ -94,11 +105,25 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getAdditionalIdentifiers(): Array<Dict> {
         const identifiers: Array<Dict> = new Array<Dict>();
+        if (this.getIdentifier_Id() != null) {
+            identifiers.push(this.getIdentifier_Id());
+        }
         if (this.getIdentifier_Name() != null) {
             identifiers.push(this.getIdentifier_Name());
         }
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
+    }
+
+    @Exclude()
+    public getIdentifier_Id(): Dict {
+        const identifier: Dict = {};
+        if ((this as any).id != null) {
+            identifier[this.IDENTIFIER_KEY_ID] = (this as any).id;
+        }
+
+        // only return the identifier if it can be used, i.e. if all components are present
+        return Object.keys(identifier).length === 1 ? identifier : null;
     }
 
     @Exclude()

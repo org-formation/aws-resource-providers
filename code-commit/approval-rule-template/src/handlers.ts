@@ -11,6 +11,20 @@ class Resource extends BaseResource<ResourceModel> {
         return null;
     }
 
+    static extractResourceId(arn: string): string {
+        if (arn.length) {
+            return arn.split('/').pop();
+        }
+        return arn;
+    }
+
+    static formatArn(region: string, awsAccountId: string, resourceId: string): string {
+        if (region && awsAccountId && resourceId) {
+            return `arn:community:codecommit:${region}:${awsAccountId}:approval-rule-template/${resourceId}`;
+        }
+        return null;
+    }
+
     private async getRuleTemplate(service: CodeCommit, logger: Logger, approvalRuleTemplateName: string): Promise<ResourceModel> {
         const request: CodeCommit.GetApprovalRuleTemplateInput = {
             approvalRuleTemplateName,
@@ -55,10 +69,15 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<ResourceModel> {
-        args.logger.log(args.request);
-        const { logicalResourceIdentifier } = args.request;
+        const { awsAccountId, logicalResourceIdentifier, region } = args.request;
+
+        if (model.arn) {
+            throw new exceptions.InvalidRequest('Read only property [Arn] cannot be provided by the user.');
+        } else if (model.id) {
+            throw new exceptions.InvalidRequest('Read only property [Id] cannot be provided by the user.');
+        }
 
         const request: CodeCommit.CreateApprovalRuleTemplateInput = {
             approvalRuleTemplateName: model.name,
@@ -66,13 +85,14 @@ class Resource extends BaseResource<ResourceModel> {
             approvalRuleTemplateContent: model.content && JSON.stringify(model.content.serialize()),
         };
 
-        args.logger.log({ action, message: 'before createApprovalRuleTemplate', request });
         try {
+            args.logger.log({ action, message: 'before createApprovalRuleTemplate', request });
             const response = await service.createApprovalRuleTemplate(request).promise();
             args.logger.log({ action, message: 'after invoke createApprovalRuleTemplate', response });
             const { approvalRuleTemplateId, approvalRuleTemplateName } = response.approvalRuleTemplate;
 
             const result = new ResourceModel();
+            result.arn = Resource.formatArn(region, awsAccountId, approvalRuleTemplateId);
             result.id = approvalRuleTemplateId;
             result.name = approvalRuleTemplateName;
             result.description = response.approvalRuleTemplate.approvalRuleTemplateDescription;
@@ -86,8 +106,8 @@ class Resource extends BaseResource<ResourceModel> {
             return Promise.resolve(result);
         } catch (err) {
             console.log(err);
-            if (err && err.code === 'ApprovalRuleTemplateNameAlreadyExistsException') {
-                throw new exceptions.AlreadyExists(ResourceModel.TYPE_NAME, logicalResourceIdentifier);
+            if (err?.code === 'ApprovalRuleTemplateNameAlreadyExistsException') {
+                throw new exceptions.AlreadyExists(this.typeName, logicalResourceIdentifier);
             } else {
                 // Raise the original exception
                 throw err;
@@ -96,73 +116,92 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<ResourceModel> {
-        const { previousResourceState } = args.request;
-        const serializedContent = model.content && model.content.serialize();
-        if (serializedContent !== previousResourceState.content.serialize()) {
-            const request: CodeCommit.UpdateApprovalRuleTemplateContentInput = {
-                approvalRuleTemplateName: previousResourceState.name,
-                // existingRuleContentSha256: previousResourceState.ruleContentSha256, # Removing because this will only succeed if content has been modified by CFN
-                newRuleContent: JSON.stringify(serializedContent),
-            };
-            args.logger.log({ action, message: 'before updateApprovalRuleTemplateContent', request });
-            const response = await service.updateApprovalRuleTemplateContent(request).promise();
-            args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateContent', response });
-
-            model.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
-            model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
-            model.ruleContentSha256 = response.approvalRuleTemplate.ruleContentSha256;
+        const { awsAccountId, logicalResourceIdentifier, previousResourceState, region } = args.request;
+        const { arn, id } = previousResourceState;
+        if (!model.arn && !model.id) {
+            throw new exceptions.NotFound(this.typeName, logicalResourceIdentifier);
+        } else if (model.arn !== arn) {
+            args.logger.log(this.typeName, `[NEW ${model.arn}] [${logicalResourceIdentifier}]`, `does not match identifier from saved resource [OLD ${arn}].`);
+            throw new exceptions.NotUpdatable('Read only property [Arn] cannot be updated.');
+        } else if (model.id !== id) {
+            args.logger.log(this.typeName, `[NEW ${model.id}] [${logicalResourceIdentifier}]`, `does not match identifier from saved resource [OLD ${id}].`);
+            throw new exceptions.NotUpdatable('Read only property [Id] cannot be updated.');
         }
+        try {
+            const serializedContent = model.content && model.content.serialize();
+            if (serializedContent !== previousResourceState.content.serialize()) {
+                const request: CodeCommit.UpdateApprovalRuleTemplateContentInput = {
+                    approvalRuleTemplateName: previousResourceState.name,
+                    // existingRuleContentSha256: previousResourceState.ruleContentSha256, # Removing because this will only succeed if content has been modified by CFN
+                    newRuleContent: JSON.stringify(serializedContent),
+                };
+                args.logger.log({ action, message: 'before updateApprovalRuleTemplateContent', request });
+                const response = await service.updateApprovalRuleTemplateContent(request).promise();
+                args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateContent', response });
+            }
 
-        if (model.description !== previousResourceState.description) {
-            const request: CodeCommit.UpdateApprovalRuleTemplateDescriptionInput = {
-                approvalRuleTemplateName: previousResourceState.name,
-                approvalRuleTemplateDescription: model.description,
-            };
-            args.logger.log({ action, message: 'before updateApprovalRuleTemplateDescription', request });
-            const response = await service.updateApprovalRuleTemplateDescription(request).promise();
-            args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateDescription', response });
+            if (model.description !== previousResourceState.description) {
+                const request: CodeCommit.UpdateApprovalRuleTemplateDescriptionInput = {
+                    approvalRuleTemplateName: previousResourceState.name,
+                    approvalRuleTemplateDescription: model.description,
+                };
+                args.logger.log({ action, message: 'before updateApprovalRuleTemplateDescription', request });
+                const response = await service.updateApprovalRuleTemplateDescription(request).promise();
+                args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateDescription', response });
+            }
 
-            model.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
-            model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
+            if (model.name !== previousResourceState.name) {
+                const request: CodeCommit.UpdateApprovalRuleTemplateNameInput = {
+                    oldApprovalRuleTemplateName: previousResourceState.name,
+                    newApprovalRuleTemplateName: model.name,
+                };
+                args.logger.log({ action, message: 'before invoke updateApprovalRuleTemplateName', request });
+                const response = await service.updateApprovalRuleTemplateName(request).promise();
+                args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateName', response });
+            }
+
+            model = await this.getRuleTemplate(service, args.logger, model.name);
+            model.arn = Resource.formatArn(region, awsAccountId, model.id);
+
+            args.logger.log({ action, message: 'done', model });
+            return Promise.resolve(model);
+        } catch (err) {
+            if (err?.code === 'ApprovalRuleTemplateDoesNotExistException') {
+                throw new exceptions.NotFound(this.typeName, id || logicalResourceIdentifier);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
         }
-
-        if (model.name !== previousResourceState.name) {
-            const request: CodeCommit.UpdateApprovalRuleTemplateNameInput = {
-                oldApprovalRuleTemplateName: previousResourceState.name,
-                newApprovalRuleTemplateName: model.name,
-            };
-            args.logger.log({ action, message: 'before invoke updateApprovalRuleTemplateName', request });
-            const response = await service.updateApprovalRuleTemplateName(request).promise();
-            args.logger.log({ action, message: 'after invoke updateApprovalRuleTemplateName', response });
-
-            model.lastModifiedDate = Resource.convertToEpoch(response.approvalRuleTemplate.lastModifiedDate);
-            model.lastModifiedUser = response.approvalRuleTemplate.lastModifiedUser;
-        }
-
-        if (!model.creationDate) {
-            model.creationDate = previousResourceState.creationDate;
-        }
-
-        args.logger.log({ action, message: 'done', model });
-        return Promise.resolve(model);
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<null> {
-        let approvalRuleTemplateName = model.name;
-
-        if (!approvalRuleTemplateName) {
-            const rules = await this.listRuleTemplates(service, args.logger, {
-                id: model.id,
-            });
-            approvalRuleTemplateName = rules[0].name;
+        const { awsAccountId, logicalResourceIdentifier, region } = args.request;
+        let { arn, id, name } = model;
+        if (!arn && !id && !name) {
+            throw new exceptions.NotFound(this.typeName, logicalResourceIdentifier);
         }
+        if (!arn) {
+            arn = Resource.formatArn(region, awsAccountId, id);
+        }
+        if (!id) {
+            id = Resource.extractResourceId(arn);
+        }
+        const rules = await this.listRuleTemplates(service, args.logger, {
+            id,
+            name,
+        });
+        if (!rules.length) {
+            throw new exceptions.NotFound(this.typeName, id || logicalResourceIdentifier);
+        }
+        name = rules[0].name;
 
         const request: CodeCommit.DeleteApprovalRuleTemplateInput = {
-            approvalRuleTemplateName,
+            approvalRuleTemplateName: name,
         };
 
         args.logger.log({ action, message: 'before invoke deleteApprovalRuleTemplate', request });
@@ -175,26 +214,33 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({ serviceName: 'CodeCommit', debug: false })
+    @commonAws({ serviceName: 'CodeCommit', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: CodeCommit, model: ResourceModel): Promise<ResourceModel> {
-        const { logicalResourceIdentifier } = args.request;
-        const { name, id } = model;
-
-        if (!name && !id) {
-            throw new exceptions.NotFound(ResourceModel.TYPE_NAME, logicalResourceIdentifier);
+        const { awsAccountId, logicalResourceIdentifier, region } = args.request;
+        let { arn, id } = model;
+        const name = model.name;
+        if (!arn && !id && !name) {
+            throw new exceptions.NotFound(this.typeName, logicalResourceIdentifier);
+        }
+        if (!arn) {
+            arn = Resource.formatArn(region, awsAccountId, id);
+        }
+        if (!id) {
+            id = Resource.extractResourceId(arn);
         }
         try {
-            const rules = await this.listRuleTemplates(service, args.logger, {
-                id,
-                name,
-            });
+            const rules = await this.listRuleTemplates(service, args.logger, { id, name });
+            if (!rules.length) {
+                throw new exceptions.NotFound(this.typeName, id || logicalResourceIdentifier);
+            }
             const result = rules[0];
+            result.arn = Resource.formatArn(region, awsAccountId, result.id);
             args.logger.log({ action, message: 'done', result });
 
             return Promise.resolve(result);
         } catch (err) {
-            if (err && err.code === 'ApprovalRuleTemplateDoesNotExistException') {
-                throw new exceptions.NotFound(ResourceModel.TYPE_NAME, id || logicalResourceIdentifier);
+            if (err?.code === 'ApprovalRuleTemplateDoesNotExistException') {
+                throw new exceptions.NotFound(this.typeName, id || logicalResourceIdentifier);
             } else {
                 // Raise the original exception
                 throw err;
