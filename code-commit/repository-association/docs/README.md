@@ -12,6 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "Community::CodeCommit::RepositoryAssociation",
     "Properties" : {
+        "<a href="#approvalruletemplatearn" title="ApprovalRuleTemplateArn">ApprovalRuleTemplateArn</a>" : <i>String</i>,
         "<a href="#approvalruletemplatename" title="ApprovalRuleTemplateName">ApprovalRuleTemplateName</a>" : <i>String</i>,
         "<a href="#repositorynames" title="RepositoryNames">RepositoryNames</a>" : <i>[ String, ... ]</i>
     }
@@ -23,6 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: Community::CodeCommit::RepositoryAssociation
 Properties:
+    <a href="#approvalruletemplatearn" title="ApprovalRuleTemplateArn">ApprovalRuleTemplateArn</a>: <i>String</i>
     <a href="#approvalruletemplatename" title="ApprovalRuleTemplateName">ApprovalRuleTemplateName</a>: <i>String</i>
     <a href="#repositorynames" title="RepositoryNames">RepositoryNames</a>: <i>
       - String</i>
@@ -30,9 +32,23 @@ Properties:
 
 ## Properties
 
+#### ApprovalRuleTemplateArn
+
+The Amazon Resource Name (ARN) or ID of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateName is set.
+
+_Required_: Yes
+
+_Type_: String
+
+_Minimum_: <code>1</code>
+
+_Maximum_: <code>256</code>
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
 #### ApprovalRuleTemplateName
 
-The name of the approval rule template for which you want to associate the repositories.
+The name of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateArn is set.
 
 _Required_: Yes
 
@@ -68,5 +84,5 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 #### Arn
 
-The Amazon Resource Name (ARN) of the approval rule template repository association.
+The Amazon Resource Name (ARN) of the repository association.
 

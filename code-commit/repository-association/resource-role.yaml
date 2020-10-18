@@ -27,6 +27,8 @@ Resources:
                 - "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories"
                 - "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories"
                 - "codecommit:DisassociateApprovalRuleTemplateFromRepository"
+                - "codecommit:GetApprovalRuleTemplate"
+                - "codecommit:ListApprovalRuleTemplates"
                 - "codecommit:ListRepositoriesForApprovalRuleTemplate"
                 Resource: "*"
 Outputs:

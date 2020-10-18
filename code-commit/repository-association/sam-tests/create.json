@@ -1,7 +1,7 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "ApprovalRuleTemplateName": "test",
+        "ApprovalRuleTemplateArn": "arn:community:codecommit:us-east-1:123456789012:approval-rule-template/ecc5e2e3-9bf4-4589-8759-8e788983c1fb",
         "RepositoryNames": [
             "repo1",
             "repo2"

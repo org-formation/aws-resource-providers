@@ -1,7 +1,8 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "Arn": "arn:community:codecommit:us-east-1:123456789012:repository-association/test",
+        "Arn": "arn:community:codecommit:us-east-1:123456789012:repository-association/ecc5e2e3-9bf4-4589-8759-8e788983c1fb",
+        "ApprovalRuleTemplateArn": "arn:community:codecommit:us-east-1:123456789012:approval-rule-template/ecc5e2e3-9bf4-4589-8759-8e788983c1fb",
         "ApprovalRuleTemplateName": "test",
         "RepositoryNames": [
             "repo1",
@@ -9,7 +10,8 @@
         ]
     },
     "previousResourceState": {
-        "Arn": "arn:community:codecommit:us-east-1:123456789012:repository-association/test",
+        "Arn": "arn:community:codecommit:us-east-1:123456789012:repository-association/ecc5e2e3-9bf4-4589-8759-8e788983c1fb",
+        "ApprovalRuleTemplateArn": "arn:community:codecommit:us-east-1:123456789012:approval-rule-template/ecc5e2e3-9bf4-4589-8759-8e788983c1fb",
         "ApprovalRuleTemplateName": "test",
         "RepositoryNames": [
             "repo1",

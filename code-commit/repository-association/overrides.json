@@ -1,5 +1,6 @@
 {
     "CREATE": {
+        "/ApprovalRuleTemplateArn": null,
         "/ApprovalRuleTemplateName": "repo-rule",
         "/RepositoryNames": [
             "repo"

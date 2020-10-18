@@ -10,8 +10,6 @@ export class ResourceModel extends BaseModel {
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_ARN: string = '/properties/Arn';
-    @Exclude()
-    protected readonly IDENTIFIER_KEY_APPROVALRULETEMPLATENAME: string = '/properties/ApprovalRuleTemplateName';
 
     @Expose({ name: 'Arn' })
     @Transform(
@@ -22,6 +20,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     arn?: Optional<string>;
+    @Expose({ name: 'ApprovalRuleTemplateArn' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'approvalRuleTemplateArn', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    approvalRuleTemplateArn?: Optional<string>;
     @Expose({ name: 'ApprovalRuleTemplateName' })
     @Transform(
         (value: any, obj: any) =>
@@ -55,22 +62,8 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     public getAdditionalIdentifiers(): Array<Dict> {
         const identifiers: Array<Dict> = new Array<Dict>();
-        if (this.getIdentifier_ApprovalRuleTemplateName() != null) {
-            identifiers.push(this.getIdentifier_ApprovalRuleTemplateName());
-        }
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
-    }
-
-    @Exclude()
-    public getIdentifier_ApprovalRuleTemplateName(): Dict {
-        const identifier: Dict = {};
-        if ((this as any).approvalRuleTemplateName != null) {
-            identifier[this.IDENTIFIER_KEY_APPROVALRULETEMPLATENAME] = (this as any).approvalRuleTemplateName;
-        }
-
-        // only return the identifier if it can be used, i.e. if all components are present
-        return Object.keys(identifier).length === 1 ? identifier : null;
     }
 }
 

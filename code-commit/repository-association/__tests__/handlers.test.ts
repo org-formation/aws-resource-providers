@@ -7,7 +7,7 @@ import readFixture from '../sam-tests/read.json';
 import updateFixture from '../sam-tests/update.json';
 import { resource } from '../src/handlers';
 
-const IDENTIFIER = 'arn:community:codecommit:us-east-1:123456789012:repository-association/test';
+const IDENTIFIER = 'arn:community:codecommit:us-east-1:123456789012:repository-association/ecc5e2e3-9bf4-4589-8759-8e788983c1fb';
 
 jest.mock('aws-sdk');
 
@@ -38,6 +38,16 @@ describe('when calling handler', () => {
         });
         codecommit.mock('listRepositoriesForApprovalRuleTemplate').resolve({
             repositoryNames: ['repo1', 'repo2'],
+        });
+        codecommit.mock('getApprovalRuleTemplate').resolve({
+            approvalRuleTemplate: {
+                approvalRuleTemplateId: 'ecc5e2e3-9bf4-4589-8759-8e788983c1fb',
+                approvalRuleTemplateName: 'test',
+                approvalRuleTemplateContent: '',
+            },
+        });
+        codecommit.mock('listApprovalRuleTemplates').resolve({
+            approvalRuleTemplateNames: ['test', 'test2'],
         });
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
@@ -75,7 +85,7 @@ describe('when calling handler', () => {
             ...new Error(),
             code: 'ApprovalRuleTemplateDoesNotExistException',
         });
-        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRepositories');
+        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRepositoryAssociations');
         const request = fixtureMap.get(Action.Create);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
@@ -108,7 +118,7 @@ describe('when calling handler', () => {
             ...new Error(),
             code: 'ApprovalRuleTemplateDoesNotExistException',
         });
-        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRepositories');
+        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRepositoryAssociations');
         const request = fixtureMap.get(Action.Delete);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });

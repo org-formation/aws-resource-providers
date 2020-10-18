@@ -81,7 +81,8 @@
         "Id": {
             "type": "string",
             "description": "The system-generated ID of the approval rule template.",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 256
         },
         "Name": {
             "type": "string",

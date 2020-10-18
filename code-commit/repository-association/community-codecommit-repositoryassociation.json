@@ -6,14 +6,20 @@
     "properties": {
         "Arn": {
             "type": "string",
-            "description": "The Amazon Resource Name (ARN) of the approval rule template repository association.",
+            "description": "The Amazon Resource Name (ARN) of the repository association.",
             "minLength": 25,
             "maxLength": 256,
             "pattern": "^arn:community:codecommit:[A-Za-z0-9-]{1,64}:[0-9]{12}:repository-association/.+$"
         },
+        "ApprovalRuleTemplateArn": {
+            "type": "string",
+            "description": "The Amazon Resource Name (ARN) or ID of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateName is set.",
+            "minLength": 1,
+            "maxLength": 256
+        },
         "ApprovalRuleTemplateName": {
             "type": "string",
-            "description": "The name of the approval rule template for which you want to associate the repositories.",
+            "description": "The name of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateArn is set.",
             "minLength": 1,
             "maxLength": 100
         },
@@ -30,11 +36,22 @@
         }
     },
     "additionalProperties": false,
-    "required": [
-        "ApprovalRuleTemplateName",
-        "RepositoryNames"
+    "oneOf": [
+        {
+            "required": [
+                "ApprovalRuleTemplateArn",
+                "RepositoryNames"
+            ]
+        },
+        {
+            "required": [
+                "ApprovalRuleTemplateName",
+                "RepositoryNames"
+            ]
+        }
     ],
     "createOnlyProperties": [
+        "/properties/ApprovalRuleTemplateArn",
         "/properties/ApprovalRuleTemplateName"
     ],
     "readOnlyProperties": [
@@ -43,21 +60,20 @@
     "primaryIdentifier": [
         "/properties/Arn"
     ],
-    "additionalIdentifiers": [
-        [
-            "/properties/ApprovalRuleTemplateName"
-        ]
-    ],
     "handlers": {
         "create": {
             "permissions": [
                 "codecommit:AssociateApprovalRuleTemplateWithRepository",
                 "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
                 "codecommit:ListRepositoriesForApprovalRuleTemplate"
             ]
         },
         "read": {
             "permissions": [
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
                 "codecommit:ListRepositoriesForApprovalRuleTemplate"
             ]
         },
@@ -67,6 +83,8 @@
                 "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories",
                 "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories",
                 "codecommit:DisassociateApprovalRuleTemplateFromRepository",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
                 "codecommit:ListRepositoriesForApprovalRuleTemplate"
             ]
         },
@@ -74,6 +92,8 @@
             "permissions": [
                 "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories",
                 "codecommit:DisassociateApprovalRuleTemplateFromRepository",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
                 "codecommit:ListRepositoriesForApprovalRuleTemplate"
             ]
         }
