@@ -1,9 +1,0 @@
-{
-    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
-    "desiredResourceState": {
-        "Id": "123456789012",
-        "Name": "test"
-    },
-    "awsAccountId": "123456789012",
-    "logicalResourceIdentifier": "MyResource"
-}
