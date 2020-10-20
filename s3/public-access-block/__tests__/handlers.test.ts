@@ -43,20 +43,20 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test('create operation successful', async () => {
+    test('create operation successful - s3 public access block', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Create, {});
-        const model = request.desiredResourceState;
-        model.resourceId = IDENTIFIER;
+        const model = request.desiredResourceState.serialize();
+        model.ResourceId = IDENTIFIER;
         expect(progress.serialize()).toMatchObject({
             status: OperationStatus.Success,
             message: '',
             callbackDelaySeconds: 0,
-            resourceModel: model.serialize(),
+            resourceModel: model,
         });
     });
 
-    test('update operation successful', async () => {
+    test('update operation successful - s3 public access block', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Update, {});
         expect(progress).toMatchObject({
@@ -67,7 +67,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('delete operation successful', async () => {
+    test('delete operation successful - s3 public access block', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Delete, {});
         expect(progress).toMatchObject({
@@ -78,7 +78,7 @@ describe('when calling handler', () => {
         expect(progress.resourceModel).toBeNull();
     });
 
-    test('read operation successful', async () => {
+    test('read operation successful - s3 public access block', async () => {
         const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Read)).toModeled<ResourceModel>(resource['modelCls']);
         const progress = await resource['invokeHandler'](session, request, Action.Read, {});
         expect(progress).toMatchObject({
@@ -89,7 +89,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('all operations fail without session', async () => {
+    test('all operations fail without session - s3 public access block', async () => {
         const promises: any[] = [];
         fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
             const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);

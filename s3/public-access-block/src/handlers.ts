@@ -1,22 +1,22 @@
 import { S3Control } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {
-    private async upsertAccountPublicAccessBlock(action: Action, service: S3Control, model: ResourceModel, accountId: string): Promise<ResourceModel> {
+    private async upsertAccountPublicAccessBlock(action: Action, service: S3Control, logger: Logger, model: ResourceModel, accountId: string): Promise<ResourceModel> {
         const request: S3Control.PutPublicAccessBlockRequest = {
             AccountId: accountId,
             PublicAccessBlockConfiguration: model.serialize(),
         };
 
-        console.info({
+        logger.log({
             action,
             message: 'before invoke putPublicAccessBlock',
             request,
         });
         const response = await service.putPublicAccessBlock(request).promise();
-        console.info({
+        logger.log({
             action,
             message: 'after invoke putPublicAccessBlock',
             response,
@@ -25,55 +25,55 @@ class Resource extends BaseResource<ResourceModel> {
         const result = new ResourceModel(model);
         result.resourceId = accountId;
 
-        console.info({ action, message: 'done', result });
+        logger.log({ action, message: 'done', result });
         return result;
     }
 
     @handlerEvent(Action.Create)
     @commonAws({
         serviceName: 'S3Control',
-        debug: true,
+        debug: false,
     })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<ResourceModel> {
         const model = args.request.desiredResourceState;
         const accountId = args.request.awsAccountId;
-        return this.upsertAccountPublicAccessBlock(action, service, model, accountId);
+        return this.upsertAccountPublicAccessBlock(action, service, args.logger, model, accountId);
     }
 
     @handlerEvent(Action.Update)
     @commonAws({
         serviceName: 'S3Control',
-        debug: true,
+        debug: false,
     })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<ResourceModel> {
         const model = args.request.desiredResourceState;
         const accountId = args.request.awsAccountId;
-        return this.upsertAccountPublicAccessBlock(action, service, model, accountId);
+        return this.upsertAccountPublicAccessBlock(action, service, args.logger, model, accountId);
     }
 
     @handlerEvent(Action.Delete)
     @commonAws({
         serviceName: 'S3Control',
-        debug: true,
+        debug: false,
     })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<null> {
         const request: S3Control.DeletePublicAccessBlockRequest = {
             AccountId: args.request.awsAccountId,
         };
 
-        console.info({
+        args.logger.log({
             action,
             message: 'before invoke deletePublicAccessBlock',
             request,
         });
         const response = await service.deletePublicAccessBlock(request).promise();
-        console.info({
+        args.logger.log({
             action,
             message: 'after invoke deletePublicAccessBlock',
             response,
         });
 
-        console.info({ action, message: 'done' });
+        args.logger.log({ action, message: 'done' });
 
         return Promise.resolve(null);
     }
@@ -81,7 +81,7 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Read)
     @commonAws({
         serviceName: 'S3Control',
-        debug: true,
+        debug: false,
     })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<ResourceModel> {
         const accountId = args.request.awsAccountId;
@@ -90,14 +90,14 @@ class Resource extends BaseResource<ResourceModel> {
             AccountId: accountId,
         };
 
-        console.info({
+        args.logger.log({
             action,
             message: 'before invoke getPublicAccessBlock',
             request,
         });
         try {
             const response = await service.getPublicAccessBlock(request).promise();
-            console.info({
+            args.logger.log({
                 action,
                 message: 'after invoke getPublicAccessBlock',
                 response,
@@ -108,7 +108,7 @@ class Resource extends BaseResource<ResourceModel> {
             const result = ResourceModel.deserialize(publicAccessBlock);
             result.resourceId = accountId;
 
-            console.info({ action, message: 'done', result });
+            args.logger.log({ action, message: 'done', result });
 
             return Promise.resolve(result);
         } catch (err) {
