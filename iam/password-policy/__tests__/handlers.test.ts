@@ -37,7 +37,7 @@ describe('when calling handler', () => {
         fixtureMap.set(Action.List, listFixture);
     });
 
-    beforeEach(async () => {
+    beforeEach(() => {
         iam = on(IAM, { snapshot: false });
         iam.mock('getAccountPasswordPolicy').resolve({
             PasswordPolicy: {
