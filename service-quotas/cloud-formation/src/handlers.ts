@@ -1,11 +1,11 @@
 import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk';
-import * as Quotas from 'community-resource-providers-common/lib/service-quotas';
+import { QuotaID, UpsertQuotas } from 'aws-resource-providers-common';
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-const quotaCodeForPropertyName: Record<string, Quotas.QuotaID> = {
+const quotaCodeForPropertyName: Record<string, QuotaID> = {
     stacks: { QuotaCode: 'L-0485CB21', ServiceCode: 'cloudformation' },
     resourceTypes: { QuotaCode: 'L-9DE8E4FB', ServiceCode: 'cloudformation' },
     versionsPerResourceType: { QuotaCode: 'L-EA1018E8', ServiceCode: 'cloudformation' },
@@ -41,7 +41,7 @@ class Resource extends BaseResource<ResourceModel> {
 
         if (session instanceof SessionProxy) {
             const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-            await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
+            await UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
         } else {
             throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
@@ -68,7 +68,7 @@ class Resource extends BaseResource<ResourceModel> {
 
         if (session instanceof SessionProxy) {
             const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-            await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
+            await UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
         } else {
             throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }

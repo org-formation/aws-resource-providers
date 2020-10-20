@@ -3,15 +3,12 @@ import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { ResourceModel } from './models';
 import { EC2 } from 'aws-sdk';
 
-// Use this logger to forward log messages to CloudWatch Logs.
-//const LOGGER = console;
-
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
     @commonAws({ serviceName: 'EC2', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: EC2): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
+        const model = new ResourceModel(desiredResourceState);
 
         model.resourceId = 'region-defaults'; // there can only be one
 
@@ -37,8 +34,8 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'EC2', debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: EC2): Promise<ResourceModel> {
         const { desiredResourceState, previousResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
-        const prevModel: ResourceModel = previousResourceState;
+        const model = new ResourceModel(desiredResourceState);
+        const prevModel = new ResourceModel(previousResourceState);
 
         if (model.enableEbsEncryptionByDefault !== prevModel.enableEbsEncryptionByDefault) {
             if (model.enableEbsEncryptionByDefault === true) {
@@ -66,7 +63,7 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'EC2', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: EC2): Promise<null> {
         const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
+        const model = new ResourceModel(desiredResourceState);
 
         if (model.enableEbsEncryptionByDefault === true) {
             await service.disableEbsEncryptionByDefault().promise();
@@ -82,7 +79,7 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'EC2', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>): Promise<ResourceModel> {
         const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
+        const model = new ResourceModel(desiredResourceState);
         return Promise.resolve(model);
     }
 }
