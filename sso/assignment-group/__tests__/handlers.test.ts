@@ -1,6 +1,6 @@
 
-import SSOAdmin = require('../ssoadmin/ssoadmin');
 import { on, AwsServiceMockBuilder, AwsFunctionMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
+import { SSOAdmin } from 'aws-sdk';
 import { Action, exceptions, OperationStatus, SessionProxy, UnmodeledRequest } from 'cfn-rpdk';
 import createFixture from '../sam-tests/create.json';
 import deleteFixture from '../sam-tests/delete.json';
@@ -68,13 +68,13 @@ describe('when calling handler', () => {
             Action.Create,
             {}
         );
-        
+
         expect(progress.status).toBe(OperationStatus.Success);
         expect(progress.resourceModel).toBeDefined();
 
         expect(createAccountAssignmentMock.mock).toHaveBeenCalledTimes(6);
         expect(deleteAccountAssignmentMock.mock).toHaveBeenCalledTimes(0);
-        
+
         const resourceModel: ResourceModel = progress.resourceModel;
         expect(resourceModel.resourceId).toContain('arn:community::123456789012:principal-assignments:GROUP:d7fefe8f-992c-4524-bd52-cd54164c1e96')
 
@@ -91,7 +91,7 @@ describe('when calling handler', () => {
             Action.Update,
             {}
         );
-        
+
         expect(progress.status).toBe(OperationStatus.Success);
         expect(progress.resourceModel).toBeDefined();
 

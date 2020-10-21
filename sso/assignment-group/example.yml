@@ -1,23 +1,23 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  instanceArn: 
+  instanceArn:
     Type: String
-    Default: arn:aws:sso:::instance/ssoins-7223bb1f3d5cae54
+    Default: arn:aws:sso:::instance/ssoins-6804a82852974434
 
-  principalId: 
+  principalId:
     Type: String
-    Default: 906761b815-8d376b7c-4306-4c61-9536-0076e38d9499
+    Default: 9367051a0e-e6a95943-5ba2-456b-8917-2d831b25a348
 
 Resources:
 
   TestPS:
     Type: AWS::SSO::PermissionSet
-    Properties: 
+    Properties:
       Name: TestPSABC
       Description: Readonly Access
       InstanceArn: !Ref instanceArn
-      ManagedPolicies: 
+      ManagedPolicies:
         - arn:aws:iam::aws:policy/ReadOnlyAccess
       SessionDuration: PT12H
 
