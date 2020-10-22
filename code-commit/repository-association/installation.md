@@ -4,16 +4,16 @@
 ``` bash
 # first install the execution role
 aws cloudformation create-stack \
-  --template-url https://community-resource-provider-catalog.s3.amazonaws.com/community-codecommit-approvalruletemplate-resource-role-0.1.0.yml \
-  --stack-name community-codecommit-approvalruletemplate-resource-role \
+  --template-url https://community-resource-provider-catalog.s3.amazonaws.com/community-codecommit-repositoryassociation-resource-role-0.1.0.yml \
+  --stack-name community-codecommit-repositoryassociation-resource-role \
   --capabilities CAPABILITY_IAM
 
 aws cloudformation wait stack-create-complete \
-  --stack-name community-codecommit-approvalruletemplate-resource-role
+  --stack-name community-codecommit-repositoryassociation-resource-role
 
 # get the value of the ExecutionRoleArn Output
 aws cloudformation describe-stacks \
-  --stack-name community-codecommit-approvalruletemplate-resource-role
+  --stack-name community-codecommit-repositoryassociation-resource-role
 
 # register the cloudformation type
 aws cloudformation register-type \
