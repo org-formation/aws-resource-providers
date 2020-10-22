@@ -93,7 +93,7 @@
         "Description": {
             "type": "string",
             "description": "The description of the approval rule template. Consider providing a description that explains what this template does and when it might be appropriate to associate it with repositories.",
-            "minLength": 0,
+            "minLength": 1,
             "maxLength": 1000
         },
         "Content": {
