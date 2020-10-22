@@ -4,13 +4,14 @@
     "description": "A community driven repository where you can find AWS Resource Type Providers for different purposes.",
     "private": true,
     "scripts": {
-        "bootstrap": "npm ci --optional && npx lerna bootstrap",
+        "bootstrap": "npm ci --optional && npx lerna exec npm ci",
         "reset": "npm run cleanup && npx rimraf -rf **/node_modules && npm run bootstrap",
         "cleanup": "npx lerna run cleanup --stream --parallel",
         "build": "npx lerna run build",
         "lint": "npx eslint --ext .ts,.js .",
         "lint:fix": "npx eslint --fix --ext .ts,.js .",
         "test": "npx jest --runInBand --no-cache",
+        "test:silent": "jest --runInBand --reporters jest-silent-reporter",
         "test:debug": "npx --node-arg=--inspect jest --runInBand",
         "test:integration": "npx lerna run test:integration -- -vv",
         "validate": "npx lerna run validate -- -vv"
@@ -21,16 +22,16 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/git@github.com:org-formation/aws-resource-providers.git"
+        "url": "git+https://github.com/org-formation/aws-resource-providers.git"
     },
     "author": "org-formation",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/git@github.com:org-formation/aws-resource-providers/issues"
+        "url": "https://github.com/org-formation/aws-resource-providers/issues"
     },
-    "homepage": "https://github.com/git@github.com:org-formation/aws-resource-providers#readme",
+    "homepage": "https://github.com/org-formation/aws-resource-providers#readme",
     "dependencies": {
-        "cfn-rpdk": "https://github.com/eduardomourar/cloudformation-cli-typescript-plugin/releases/download/v0.3.2/cfn-rpdk-0.3.2.tgz",
+        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.4.0",
         "class-transformer": "^0.3.1"
     },
     "devDependencies": {
@@ -40,7 +41,7 @@
         "@types/node": "^12.0.0",
         "@typescript-eslint/eslint-plugin": "^4.0.1",
         "@typescript-eslint/parser": "^4.0.1",
-        "aws-sdk": "~2.631.0",
+        "aws-sdk": "~2.712.0",
         "eslint": "^7.7.0",
         "eslint-config-prettier": "^6.11.0",
         "eslint-import-resolver-node": "^0.3.4",
@@ -49,6 +50,7 @@
         "eslint-plugin-prefer-arrow": "^1.2.2",
         "eslint-plugin-prettier": "^3.1.4",
         "jest": "^26.4.2",
+        "jest-silent-reporter": "^0.2.1",
         "lerna": "^3.22.1",
         "npm-run-all": "^4.1.5",
         "prettier": "^2.1.1",
