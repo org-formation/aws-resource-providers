@@ -17,7 +17,8 @@ A community driven repository where you can find AWS Resource Type Providers for
 | Community::EC2::EbsEncryptionDefaults | Region level EBS encryption defaults: encryption enabled/disabled and KmsKeyId | in progress | [installation](ec2/ebs-encryption-defaults/installation.md) <br/> [docs](ec2/ebs-encryption-defaults/docs/README.md) <br/> [example](ec2/ebs-encryption-defaults/example.yml) |
 | Community::S3::PublicAccessBlock | Account level public access block (applies to all buckets within account) | in progress |  [installation](s3/public-access-block/installation.md) <br/> [docs](s3/public-access-block/docs/README.md) <br/> [example](s3/public-access-block/example.yml) |
 | Community::CloudFormation::Delay | Resource that waits for a specified time period. | in progress | [installation](cloud-formation/delay/installation.md) <br/> [docs](cloud-formation/delay/docs/README.md) <br/> [example](cloud-formation/delay/example.yml) |
-
+| Community::CodeCommit::ApprovalRuleTemplate | Resource that allows for the creation of approval rule template for CodeCommit. | in progress | [installation](code-commit/approval-rule-template/installation.md) <br/> [docs](code-commit/approval-rule-template/docs/README.md) <br/> [example](code-commit/approval-rule-template/example.yml) |
+| Community::CodeCommit::RepositoryAssociation | Resource that allows for the association of a particular approval rule template to CodeCommit repositories. | in progress | [installation](code-commit/repository-association/installation.md) <br/> [docs](code-commit/repository-association/docs/README.md) <br/> [example](code-commit/repository-association/example.yml) |
 
 Development
 -----------

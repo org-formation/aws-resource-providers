@@ -1,9 +1,6 @@
 import { Action, BaseResource, exceptions, handlerEvent, LoggerProxy, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 
-// Use this logger to forward log messages to CloudWatch Logs.
-const LOGGER = console;
-
 export interface CallbackContext extends Record<string, any> {
     Remaining?: number;
 }

@@ -1,6 +1,6 @@
 import * as Aws from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, BaseModel, BaseResource, BaseResourceHandlerRequest, exceptions, handlerEvent, LoggerProxy, OperationStatus, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseModel, BaseResource, BaseResourceHandlerRequest, exceptions, handlerEvent, OperationStatus, SessionProxy } from 'cfn-rpdk';
 import { Exclude, Expose } from 'class-transformer';
 import { commonAws, HandlerArgs } from '../src/common-decorator';
 
@@ -37,6 +37,7 @@ describe('when calling handler', () => {
         @handlerEvent(Action.List)
         @commonAws({ serviceName: 'S3' })
         public async list(action: Action, args: HandlerArgs<MockModel>, service: Aws.S3, model: MockModel): Promise<MockModel[]> {
+            args.logger.log({ action, model });
             return modelList;
         }
     }

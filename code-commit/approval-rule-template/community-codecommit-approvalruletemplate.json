@@ -1,0 +1,175 @@
+{
+    "typeName": "Community::CodeCommit::ApprovalRuleTemplate",
+    "description": "Resource that allows for the creation of approval rule template for CodeCommit.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {
+        "Statement": {
+            "type": "object",
+            "description": "The statement of the approval rule template content.",
+            "properties": {
+                "Type": {
+                    "type": "string",
+                    "enum": [
+                        "Approvers"
+                    ],
+                    "default": "Approvers"
+                },
+                "NumberOfApprovalsNeeded": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "ApprovalPoolMembers": {
+                    "type": "array",
+                    "description": "If approval pool members are specified, only approvals from these members will count toward satisfying this rule. You can use wildcards to match multiple approvers with one value.",
+                    "items": {
+                        "type": "string",
+                        "description": "When you create an approval pool or add users to an approval pool, you can choose from two different options: Fully qualified ARN (starts with arn:) and IAM user name or assumed role (starts with CodeCommitApprovers:).",
+                        "minLength": 1
+                    },
+                    "minItems": 1
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Type",
+                "NumberOfApprovalsNeeded",
+                "ApprovalPoolMembers"
+            ]
+        },
+        "TemplateContent": {
+            "type": "object",
+            "description": "The content of the approval rule template.",
+            "properties": {
+                "Version": {
+                    "type": "string",
+                    "enum": [
+                        "2018-11-08"
+                    ],
+                    "default": "2018-11-08"
+                },
+                "DestinationReferences": {
+                    "type": "array",
+                    "description": "Use branch filters to only apply this template to a pull request if the destination branch name matches a name.",
+                    "items": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "Statements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Statement"
+                    },
+                    "minItems": 1
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "Version",
+                "Statements"
+            ]
+        }
+    },
+    "properties": {
+        "Arn": {
+            "type": "string",
+            "description": "The Amazon Resource Name (ARN) of the approval rule template.",
+            "minLength": 25,
+            "maxLength": 256,
+            "pattern": "^arn:community:codecommit:[A-Za-z0-9-]{1,64}:[0-9]{12}:approval-rule-template/.+$"
+        },
+        "Id": {
+            "type": "string",
+            "description": "The system-generated ID of the approval rule template.",
+            "minLength": 1,
+            "maxLength": 256
+        },
+        "Name": {
+            "type": "string",
+            "description": "The name of the approval rule template. Provide descriptive names, because this name is applied to the approval rules created automatically in associated repositories.",
+            "minLength": 1,
+            "maxLength": 100
+        },
+        "Description": {
+            "type": "string",
+            "description": "The description of the approval rule template. Consider providing a description that explains what this template does and when it might be appropriate to associate it with repositories.",
+            "minLength": 1,
+            "maxLength": 1000
+        },
+        "Content": {
+            "$ref": "#/definitions/TemplateContent"
+        },
+        "CreationDate": {
+            "type": "number",
+            "description": "The date the approval rule template was created, in POSIX time format.",
+            "minimum": 1
+        },
+        "LastModifiedDate": {
+            "type": "number",
+            "description": "The date the approval rule template was most recently changed, in POSIX time format.",
+            "minimum": 1
+        },
+        "LastModifiedUser": {
+            "type": "string",
+            "description": "The Amazon Resource Name (ARN) of the user who made the most recent changes to the approval rule template.",
+            "minLength": 1
+        },
+        "RuleContentSha256": {
+            "type": "string",
+            "description": "The SHA-256 hash signature for the content of the approval rule template.",
+            "minLength": 1
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Name",
+        "Content"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn",
+        "/properties/Id",
+        "/properties/CreationDate",
+        "/properties/LastModifiedDate",
+        "/properties/LastModifiedUser",
+        "/properties/RuleContentSha256"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "additionalIdentifiers": [
+        [
+            "/properties/Id"
+        ],
+        [
+            "/properties/Name"
+        ]
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "codecommit:CreateApprovalRuleTemplate"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:UpdateApprovalRuleTemplateContent",
+                "codecommit:UpdateApprovalRuleTemplateDescription",
+                "codecommit:UpdateApprovalRuleTemplateName"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "codecommit:DeleteApprovalRuleTemplate",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates"
+            ]
+        }
+    }   
+}

@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  ApprovalRuleTemplate:
+    Type: 'Community::CodeCommit::RepositoryAssociation'
+    Properties:
+      ApprovalRuleTemplateName: 'test'
+      RepositoryNames:
+        - 'repo'
