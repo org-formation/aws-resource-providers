@@ -1,10 +1,10 @@
 import { CodeCommit } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
 import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
-import createFixture from '../sam-tests/create.json';
-import deleteFixture from '../sam-tests/delete.json';
-import readFixture from '../sam-tests/read.json';
-import updateFixture from '../sam-tests/update.json';
+import createFixture from './data/create-success.json';
+import deleteFixture from './data/delete-success.json';
+import readFixture from './data/read-success.json';
+import updateFixture from './data/update-success.json';
 import { resource } from '../src/handlers';
 
 const IDENTIFIER = '123456789012';
@@ -75,6 +75,18 @@ describe('when calling handler', () => {
         });
     });
 
+    test('create operation fail already exists - code commit approval rule template', async () => {
+        expect.assertions(2);
+        const mockCreate = codecommit.mock('createApprovalRuleTemplate').reject({
+            ...new Error(),
+            code: 'ApprovalRuleTemplateNameAlreadyExistsException',
+        });
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.AlreadyExists.name });
+        expect(mockCreate.mock).toHaveBeenCalledTimes(1);
+    });
+
     test('update operation successful - code commit approval rule template', async () => {
         const request = fixtureMap.get(Action.Update);
         codecommit.mock('getApprovalRuleTemplate').resolve({
@@ -98,11 +110,41 @@ describe('when calling handler', () => {
         expect(progress.resourceModel).toBeNull();
     });
 
+    test('delete operation fail not found - code commit approval rule template', async () => {
+        expect.assertions(4);
+        const mockGet = codecommit.mock('listApprovalRuleTemplates').reject({
+            ...new Error(),
+            code: 'ApprovalRuleTemplateDoesNotExistException',
+        });
+        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRuleTemplates');
+        const request = fixtureMap.get(Action.Delete);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveReturned();
+    });
+
     test('read operation successful - code commit approval rule template', async () => {
         const request = fixtureMap.get(Action.Read);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+    });
+
+    test('read operation  fail not found - code commit approval rule template', async () => {
+        expect.assertions(4);
+        const mockGet = codecommit.mock('listApprovalRuleTemplates').reject({
+            ...new Error(),
+            code: 'ApprovalRuleTemplateDoesNotExistException',
+        });
+        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRuleTemplates');
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveReturned();
     });
 
     test('all operations fail without session - code commit approval rule template', async () => {

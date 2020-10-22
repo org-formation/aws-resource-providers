@@ -1,4 +1,4 @@
-import { CodeCommit } from 'aws-sdk';
+import { AWSError, CodeCommit } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 import { ResourceModel, TemplateContent } from './models';
@@ -191,9 +191,13 @@ class Resource extends BaseResource<ResourceModel> {
         if (!id) {
             id = Resource.extractResourceId(arn);
         }
-        const rules = await this.listRuleTemplates(service, args.logger, {
-            id,
-            name,
+        const rules = await this.listRuleTemplates(service, args.logger, { id, name }).catch((err: AWSError) => {
+            if (err?.code === 'ApprovalRuleTemplateDoesNotExistException') {
+                throw new exceptions.NotFound(this.typeName, id || logicalResourceIdentifier);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
         });
         if (!rules.length) {
             throw new exceptions.NotFound(this.typeName, id || logicalResourceIdentifier);

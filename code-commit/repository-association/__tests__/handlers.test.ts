@@ -1,10 +1,10 @@
 import { CodeCommit } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
 import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
-import createFixture from '../sam-tests/create.json';
-import deleteFixture from '../sam-tests/delete.json';
-import readFixture from '../sam-tests/read.json';
-import updateFixture from '../sam-tests/update.json';
+import createFixture from './data/create-success.json';
+import deleteFixture from './data/delete-success.json';
+import readFixture from './data/read-success.json';
+import updateFixture from './data/update-success.json';
 import { resource } from '../src/handlers';
 
 const IDENTIFIER = 'arn:community:codecommit:us-east-1:123456789012:repository-association/ecc5e2e3-9bf4-4589-8759-8e788983c1fb';
@@ -151,6 +151,18 @@ describe('when calling handler', () => {
             ...request.desiredResourceState,
             RepositoryNames: ['repo1', 'repo2'],
         });
+    });
+
+    test('read operation  fail not found - code commit repository association', async () => {
+        expect.assertions(4);
+        const mockGet = codecommit.mock('listRepositoriesForApprovalRuleTemplate').resolve({ repositoryNames: [] });
+        const spyRetrieve = jest.spyOn<any, any>(resource, 'listRepositoryAssociations');
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveBeenCalledTimes(1);
+        expect(spyRetrieve).toHaveReturned();
     });
 
     test('all operations fail without session - code commit repository association', async () => {
