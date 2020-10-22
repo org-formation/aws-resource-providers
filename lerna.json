@@ -3,5 +3,5 @@
     "**/*"
   ],
   "version": "independent",
-  "npmClientArgs": ["--no-optional"]
+  "npmClientArgs": ["--no-optional", "--production=false"]
 }

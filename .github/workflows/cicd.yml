@@ -36,7 +36,7 @@ jobs:
       - name: Install Dependencies Node.js
         id: install_nodejs
         run: |
-          npm ci --optional && npx lerna bootstrap --ci && npm run build
+          npm run bootstrap -- --ci && npm run build
       - name: Run Automated Testing
         id: automated_testing
         run: |
