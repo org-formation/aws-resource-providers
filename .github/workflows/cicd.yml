@@ -30,13 +30,13 @@ jobs:
         run: |
           mkdir "$LOG_PATH"
           pip install --upgrade pip aws-sam-cli git+https://github.com/eduardomourar/cloudformation-cli-typescript-plugin.git#egg=cloudformation-cli-typescript-plugin
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: 12
       - name: Install Dependencies Node.js
         id: install_nodejs
         run: |
-          npm ci --optional && npx lerna bootstrap --ci && npm run build
+          npm run bootstrap -- --ci && npm run build
       - name: Run Automated Testing
         id: automated_testing
         run: |

@@ -33,10 +33,10 @@ class Resource extends BaseResource<ResourceModel> {
      */
     @handlerEvent(Action.Create)
     public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
+        const model = new ResourceModel(request.desiredResourceState);
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
-        LOGGER.info({ handler: 'create', request, callbackContext, env: process.env });
+        LOGGER.info({ handler: 'create', request, callbackContext });
         model.resourceId = 'cloudformation-quotas'; // there can only be one
 
         if (session instanceof SessionProxy) {
@@ -60,11 +60,12 @@ class Resource extends BaseResource<ResourceModel> {
      */
     @handlerEvent(Action.Update)
     public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        const desired: ResourceModel = request.desiredResourceState;
-        const previous: ResourceModel = request.previousResourceState;
+        const desired = new ResourceModel(request.desiredResourceState);
+        const previous = new ResourceModel(request.previousResourceState);
+
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(desired);
 
-        LOGGER.info({ handler: 'update', request, callbackContext, env: process.env });
+        LOGGER.info({ handler: 'update', request, callbackContext });
 
         if (session instanceof SessionProxy) {
             const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
@@ -109,7 +110,7 @@ class Resource extends BaseResource<ResourceModel> {
      */
     @handlerEvent(Action.Read)
     public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
+        const model = new ResourceModel(request.desiredResourceState);
         // TODO: put code here
         const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
         if (session instanceof SessionProxy) {
