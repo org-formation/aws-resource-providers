@@ -22,40 +22,28 @@ class Resource extends BaseResource<ResourceModel> {
             response,
         });
 
-        const result = new ResourceModel(model);
-        result.resourceId = accountId;
+        model.resourceId = accountId;
 
-        logger.log({ action, message: 'done', result });
-        return result;
+        logger.log({ action, message: 'done', model });
+        return model;
     }
 
     @handlerEvent(Action.Create)
-    @commonAws({
-        serviceName: 'S3Control',
-        debug: false,
-    })
-    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<ResourceModel> {
-        const model = args.request.desiredResourceState;
+    @commonAws({ serviceName: 'S3Control', debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control, model: ResourceModel): Promise<ResourceModel> {
         const accountId = args.request.awsAccountId;
         return this.upsertAccountPublicAccessBlock(action, service, args.logger, model, accountId);
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({
-        serviceName: 'S3Control',
-        debug: false,
-    })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<ResourceModel> {
-        const model = args.request.desiredResourceState;
+    @commonAws({ serviceName: 'S3Control', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control, model: ResourceModel): Promise<ResourceModel> {
         const accountId = args.request.awsAccountId;
         return this.upsertAccountPublicAccessBlock(action, service, args.logger, model, accountId);
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({
-        serviceName: 'S3Control',
-        debug: false,
-    })
+    @commonAws({ serviceName: 'S3Control', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<null> {
         const request: S3Control.DeletePublicAccessBlockRequest = {
             AccountId: args.request.awsAccountId,
@@ -79,10 +67,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({
-        serviceName: 'S3Control',
-        debug: false,
-    })
+    @commonAws({ serviceName: 'S3Control', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control): Promise<ResourceModel> {
         const accountId = args.request.awsAccountId;
 

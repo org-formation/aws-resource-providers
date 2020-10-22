@@ -1,6 +1,6 @@
 import { EC2 } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, SessionProxy } from 'cfn-rpdk';
+import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
 import createFixture from './data/create-success.json';
 import deleteFixture from './data/delete-success.json';
 import readFixture from './data/read-success.json';
@@ -26,6 +26,10 @@ describe('when calling handler', () => {
 
     beforeEach(async () => {
         ec2 = on(EC2, { snapshot: false });
+        ec2.mock('enableEbsEncryptionByDefault').resolve({});
+        ec2.mock('disableEbsEncryptionByDefault').resolve({});
+        ec2.mock('modifyEbsDefaultKmsKeyId').resolve({});
+        ec2.mock('resetEbsDefaultKmsKeyId').resolve({});
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
         spySessionClient.mockReturnValue(ec2.instance);
@@ -39,6 +43,34 @@ describe('when calling handler', () => {
     afterEach(() => {
         jest.clearAllMocks();
         jest.restoreAllMocks();
+    });
+
+    test('create operation successful - ec2 ebs encryption defaults', async () => {
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+    });
+
+    test('update operation successful - ec2 ebs encryption defaults', async () => {
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+    });
+
+    test('delete operation successful - ec2 ebs encryption defaults', async () => {
+        const request = fixtureMap.get(Action.Delete);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeNull();
+    });
+
+    test('read operation successful - ec2 ebs encryption defaults', async () => {
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
     test('all operations fail without session - ec2 ebs encryption defaults', async () => {
