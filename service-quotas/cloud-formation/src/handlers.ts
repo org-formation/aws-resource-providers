@@ -1,11 +1,11 @@
 import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk';
-import * as Quotas from 'community-resource-providers-common/lib/service-quotas';
+import { QuotaID, UpsertQuotas } from 'aws-resource-providers-common';
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-const quotaCodeForPropertyName: Record<string, Quotas.QuotaID> = {
+const quotaCodeForPropertyName: Record<string, QuotaID> = {
     stacks: { QuotaCode: 'L-0485CB21', ServiceCode: 'cloudformation' },
     resourceTypes: { QuotaCode: 'L-9DE8E4FB', ServiceCode: 'cloudformation' },
     versionsPerResourceType: { QuotaCode: 'L-EA1018E8', ServiceCode: 'cloudformation' },
@@ -33,15 +33,15 @@ class Resource extends BaseResource<ResourceModel> {
      */
     @handlerEvent(Action.Create)
     public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
+        const model = new ResourceModel(request.desiredResourceState);
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
 
-        LOGGER.info({ handler: 'create', request, callbackContext, env: process.env });
+        LOGGER.info({ handler: 'create', request, callbackContext });
         model.resourceId = 'cloudformation-quotas'; // there can only be one
 
         if (session instanceof SessionProxy) {
             const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-            await Quotas.UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
+            await UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
         } else {
             throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
@@ -60,15 +60,16 @@ class Resource extends BaseResource<ResourceModel> {
      */
     @handlerEvent(Action.Update)
     public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        const desired: ResourceModel = request.desiredResourceState;
-        const previous: ResourceModel = request.previousResourceState;
+        const desired = new ResourceModel(request.desiredResourceState);
+        const previous = new ResourceModel(request.previousResourceState);
+
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(desired);
 
-        LOGGER.info({ handler: 'update', request, callbackContext, env: process.env });
+        LOGGER.info({ handler: 'update', request, callbackContext });
 
         if (session instanceof SessionProxy) {
             const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-            await Quotas.UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
+            await UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
         } else {
             throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
         }
@@ -109,7 +110,7 @@ class Resource extends BaseResource<ResourceModel> {
      */
     @handlerEvent(Action.Read)
     public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
+        const model = new ResourceModel(request.desiredResourceState);
         // TODO: put code here
         const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
         if (session instanceof SessionProxy) {

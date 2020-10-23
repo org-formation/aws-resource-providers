@@ -20,9 +20,6 @@
     },
     "additionalProperties": false,
     "required": [],
-    "createOnlyProperties": [
-        "/properties/ResourceId"
-    ],
     "readOnlyProperties": [
         "/properties/ResourceId"
     ],
@@ -44,9 +41,6 @@
         "delete": {
             "permissions": [],
             "timeoutInMinutes": 720
-        },
-        "list": {
-            "permissions": []
         }
     }
 }
