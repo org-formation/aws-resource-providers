@@ -6,18 +6,28 @@
     },
     "properties": {
         "Content": {
-            "description": "The policy content.",
-            "type": "string"
+            "description": "The policy text content to add to the new policy. The text that you supply must adhere to the rules of the policy type you specify in the Type parameter.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000000,
+            "pattern": "[\\s\\S]+"
         },
         "Description": {
-            "description": "The policy description.",
-            "type": "string"
+            "description": "An optional description to assign to the policy.",
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 512,
+            "pattern": "[\\s\\S]*"
         },
         "Name": {
-            "description": "The name of the policy.",
-            "type": "string"
+            "description": "The friendly name to assign to the policy.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "[\\s\\S]+"
         },
         "PolicyType": {
+            "description": "The type of policy to create.",
             "type": "string",
             "enum": [
                 "AISERVICES_OPT_OUT_POLICY",
@@ -29,14 +39,20 @@
         "TargetIds": {
             "description": "The list of target IDs to attach the policy to.",
             "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 6,
+                "maxLength": 100,
+                "pattern": "^(r-[0-9a-z]{4,32})|(\\d{12})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$"
             },
             "minItems": 1,
             "type": "array"
         },
         "ResourceId": {
-            "description": "AWS CloudFormation generates a unique identifier for the organizations policy resource.",
-            "type": "string"
+            "description": "The unique identifier (ID) of the policy.",
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 130,
+            "pattern": "^p-[0-9a-zA-Z_]{8,128}$"
         }
     },
     "additionalProperties": false,
@@ -48,7 +64,6 @@
         "TargetIds"
     ],
     "createOnlyProperties": [
-        "/properties/ResourceId",
         "/properties/TargetIds"
     ],
     "readOnlyProperties": [
@@ -78,7 +93,7 @@
         "read": {
             "permissions": [
                 "organizations:DescribePolicy",
-                "organizations:DescribePolicy"
+                "organizations:ListTargetsForPolicy"
             ]
         }
     }

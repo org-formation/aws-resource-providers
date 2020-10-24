@@ -28,6 +28,7 @@ Resources:
                 - "organizations:DeletePolicy"
                 - "organizations:DescribePolicy"
                 - "organizations:DetachPolicy"
+                - "organizations:ListTargetsForPolicy"
                 - "organizations:UpdatePolicy"
                 Resource: "*"
 Outputs:
