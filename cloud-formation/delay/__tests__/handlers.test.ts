@@ -90,17 +90,4 @@ describe('when calling handler', () => {
             expect(progress.status).toBeDefined();
         }
     });
-
-    test('all operations successful without session', async () => {
-        const promises: any[] = [];
-        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<
-                ResourceModel
-            >(resource['modelCls']);
-            expect(request).toBeDefined();
-            promises.push(resource['invokeHandler'](null, request, action, {}));
-        });
-        expect.assertions(promises.length);
-        await Promise.all(promises);
-    });
 });
