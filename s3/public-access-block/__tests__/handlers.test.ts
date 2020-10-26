@@ -9,8 +9,6 @@ import { resource } from '../src/handlers';
 
 const IDENTIFIER = '123456789012';
 
-const IDENTIFIER = '123456789012';
-
 jest.mock('aws-sdk');
 
 describe('when calling handler', () => {

@@ -1,35 +1,23 @@
 import { ServiceQuotas } from 'aws-sdk';
-import {
-    on,
-    AwsServiceMockBuilder,
-    AwsFunctionMockBuilder,
-} from '@jurijzahn8019/aws-promise-jest-mock';
-import {
-    Action,
-    exceptions,
-    SessionProxy,
-    UnmodeledRequest,
-    OperationStatus,
-} from 'cfn-rpdk';
-import createFixture from '../sam-tests/create.json';
-import readFixture from '../sam-tests/read.json';
-import deleteFixture from '../sam-tests/delete.json';
-import updateDecreaseBucketsFixture from '../sam-tests/update-decrease-buckets.json';
-import updateFixture from '../sam-tests/update.json';
+import { on, AwsServiceMockBuilder, AwsFunctionMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
+import { Action, exceptions, SessionProxy, OperationStatus } from 'cfn-rpdk';
+import createFixture from './data/create-success.json';
+import readFixture from './data/read-success.json';
+import deleteFixture from './data/delete-success.json';
+import updateDecreaseBucketsFixture from './data/update-fail-decrease-buckets.json';
+import updateFixture from './data/update-success.json';
 import { resource } from '../src/handlers';
 import { ResourceModel } from '../src/models';
-import {
-    ListRequestedServiceQuotaChangeHistoryByQuotaResponse,
-    GetServiceQuotaResponse,
-    GetAWSDefaultServiceQuotaResponse,
-} from 'aws-sdk/clients/servicequotas';
+import { ListRequestedServiceQuotaChangeHistoryByQuotaResponse, GetServiceQuotaResponse, GetAWSDefaultServiceQuotaResponse } from 'aws-sdk/clients/servicequotas';
 
 jest.mock('aws-sdk');
 
 const IDENTIFIER = '123456789012';
 
 describe('when calling handler', () => {
-    let session: SessionProxy;
+    let testEntrypointPayload: any;
+    let spySession: jest.SpyInstance;
+    let spySessionClient: jest.SpyInstance;
     let serviceQuotas: AwsServiceMockBuilder<ServiceQuotas>;
     let listRequestedServiceQuotaChangeHistoryByQuotaMock: AwsFunctionMockBuilder<ServiceQuotas>;
     let getServiceQuotaMock: AwsFunctionMockBuilder<ServiceQuotas>;
@@ -38,27 +26,27 @@ describe('when calling handler', () => {
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
-        session = new SessionProxy({});
         fixtureMap = new Map<Action, Record<string, any>>();
         fixtureMap.set(Action.Create, createFixture);
         fixtureMap.set(Action.Read, readFixture);
         fixtureMap.set(Action.Update, updateFixture);
-        //fixtureMap.set(Action.Delete, deleteFixture);
+        fixtureMap.set(Action.Delete, deleteFixture);
     });
 
     beforeEach(async () => {
         serviceQuotas = on(ServiceQuotas, { snapshot: false });
-        listRequestedServiceQuotaChangeHistoryByQuotaMock = serviceQuotas
-            .mock('listRequestedServiceQuotaChangeHistoryByQuota')
-            .resolve({});
+        listRequestedServiceQuotaChangeHistoryByQuotaMock = serviceQuotas.mock('listRequestedServiceQuotaChangeHistoryByQuota').resolve({});
         getServiceQuotaMock = serviceQuotas.mock('getServiceQuota').resolve({});
-        requestServiceQuotaIncreaseMock = serviceQuotas
-            .mock('requestServiceQuotaIncrease')
-            .resolve({});
-        getAWSDefaultServiceQuota = serviceQuotas
-            .mock('getAWSDefaultServiceQuota')
-            .resolve({});
-        session['client'] = () => serviceQuotas.instance;
+        requestServiceQuotaIncreaseMock = serviceQuotas.mock('requestServiceQuotaIncrease').resolve({});
+        getAWSDefaultServiceQuota = serviceQuotas.mock('getAWSDefaultServiceQuota').resolve({});
+        spySession = jest.spyOn(SessionProxy, 'getSession');
+        spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
+        spySessionClient.mockReturnValue(serviceQuotas.instance);
+        testEntrypointPayload = {
+            credentials: { accessKeyId: '', secretAccessKey: '', sessionToken: '' },
+            region: 'us-east-1',
+            action: 'CREATE',
+        };
     });
 
     afterEach(() => {
@@ -66,45 +54,14 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test('service quotas s3 all operations fail without session', async () => {
-        const promises: any[] = [];
-        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);
-            promises.push(
-                resource['invokeHandler'](null, request, action, {}).catch((e: exceptions.BaseHandlerException) => {
-                    expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
-                })
-            );
-        });
-        expect.assertions(promises.length);
-        await Promise.all(promises);
-    });
+    test('create operation successful - service quotas s3', async () => {
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject({ ...request.desiredResourceState, ResourceId: IDENTIFIER });
 
-    test('service quotas s3 create operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(
-            fixtureMap.get(Action.Create)
-        ).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](
-            session,
-            request,
-            Action.Create,
-            {}
-        );
-        const model = request.desiredResourceState;
-        model.resourceId = IDENTIFIER;
-        expect(progress.serialize()).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModel: model.serialize(),
-        });
-
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
-            1
-        );
-        expect(
-            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
-        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
         expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
             QuotaCode: 'L-DC2B2D3D',
@@ -118,29 +75,14 @@ describe('when calling handler', () => {
         });
     });
 
-    test('service quotas s3 update operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(
-            fixtureMap.get(Action.Update)
-        ).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](
-            session,
-            request,
-            Action.Update,
-            {}
-        );
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModel: request.desiredResourceState,
-        });
+    test('update operation successful - service quotas s3', async () => {
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
 
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
-            1
-        );
-        expect(
-            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
-        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
         expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
             QuotaCode: 'L-DC2B2D3D',
@@ -154,54 +96,38 @@ describe('when calling handler', () => {
         });
     });
 
-    test('service quotas s3 update decrease bucket limit fails', async () => {
-        const updateDecreaseBuckets = updateDecreaseBucketsFixture;
-        const request = UnmodeledRequest.fromUnmodeled(updateDecreaseBuckets).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
+    test('update decrease bucket limit fails - service quotas s3', async () => {
+        const request = updateDecreaseBucketsFixture;
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({
+            status: OperationStatus.Failed,
+            message: expect.stringMatching(/Decrease of limit failed because desired value 90 is lower than previous value 100/),
+            errorCode: exceptions.InternalFailure.name,
+        });
 
-        expect(async () => {
-            await resource['invokeHandler'](session, request, Action.Update, {});
-        }).rejects.toThrowError(
-            /Decrease of limit failed because desired value 90 is lower than previous value 100/
-        );
-
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
-            0
-        );
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(0);
         expect(getServiceQuotaMock.mock).toBeCalledTimes(0);
         expect(requestServiceQuotaIncreaseMock.mock).toBeCalledTimes(0);
     });
 
-    test('service quotas s3 read operation successful (from change history)', async () => {
+    test('read operation successful (from change history) - service quotas s3', async () => {
         const history: ListRequestedServiceQuotaChangeHistoryByQuotaResponse = {
             RequestedQuotas: [{ Status: 'CASE_OPENED', DesiredValue: 123 }],
         };
         listRequestedServiceQuotaChangeHistoryByQuotaMock.resolve(history as any);
 
-        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
-
-        const response = await resource['invokeHandler'](
-            session,
-            request,
-            Action.Read,
-            {}
-        );
-        const resourceModel = response.resourceModel as ResourceModel;
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        const resourceModel = progress.resourceModel as ResourceModel;
         expect(resourceModel.buckets).toBe(123);
 
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
-            1
-        );
-        expect(
-            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
-        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
         expect(getServiceQuotaMock.mock).toBeCalledTimes(0);
     });
 
-    test('service quotas s3 read operation successful (from service quota)', async () => {
+    test('read operation successful (from service quota) - service quotas s3', async () => {
         const error = {
             code: 'NoSuchResourceException',
             message: 'not found',
@@ -212,25 +138,14 @@ describe('when calling handler', () => {
         listRequestedServiceQuotaChangeHistoryByQuotaMock.reject(error);
         getServiceQuotaMock.resolve(getQuotaResponse as any);
 
-        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
-
-        const response = await resource['invokeHandler'](
-            session,
-            request,
-            Action.Read,
-            {}
-        );
-        const resourceModel = response.resourceModel as ResourceModel;
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        const resourceModel = progress.resourceModel as ResourceModel;
         expect(resourceModel.buckets).toBe(124);
 
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
-            1
-        );
-        expect(
-            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
-        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
         expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
             QuotaCode: 'L-DC2B2D3D',
@@ -238,7 +153,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('service quotas s3 read operation successful (from aws default)', async () => {
+    test('read operation successful (from aws default) - service quotas s3', async () => {
         const error = {
             code: 'NoSuchResourceException',
             message: 'not found',
@@ -252,25 +167,14 @@ describe('when calling handler', () => {
         getServiceQuotaMock.reject(error);
         getAWSDefaultServiceQuota.resolve(getQuotaResponse as any);
 
-        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<
-            ResourceModel
-        >(resource['modelCls']);
-
-        const response = await resource['invokeHandler'](
-            session,
-            request,
-            Action.Read,
-            {}
-        );
-        const resourceModel = response.resourceModel as ResourceModel;
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        const resourceModel = progress.resourceModel as ResourceModel;
         expect(resourceModel.buckets).toBe(125);
 
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(
-            1
-        );
-        expect(
-            listRequestedServiceQuotaChangeHistoryByQuotaMock.mock
-        ).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
         expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
             QuotaCode: 'L-DC2B2D3D',
@@ -281,5 +185,14 @@ describe('when calling handler', () => {
             QuotaCode: 'L-DC2B2D3D',
             ServiceCode: 's3',
         });
+    });
+
+    test('all operations fail without session - service quotas s3', async () => {
+        expect.assertions(fixtureMap.size);
+        spySession.mockReturnValue(null);
+        for (const [action, request] of fixtureMap) {
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, null);
+            expect(progress.errorCode).toBe(exceptions.InvalidCredentials.name);
+        }
     });
 });
