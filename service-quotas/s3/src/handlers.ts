@@ -1,12 +1,7 @@
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk';
-import {
-    commonAws,
-    UpsertQuotas,
-    QuotaID,
-    HandlerArgs,
-} from 'aws-resource-providers-common';
+import { commonAws, UpsertQuotas, QuotaID, HandlerArgs } from 'aws-resource-providers-common';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
@@ -17,75 +12,38 @@ const quotaCodeForPropertyName: Record<string, QuotaID> = {
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'ServiceQuotas' })
-    public async create(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: ServiceQuotas
-    ): Promise<ResourceModel> {
-        const model = args.request.desiredResourceState;
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<ResourceModel> {
         const accountId = args.request.awsAccountId;
         model.resourceId = accountId;
 
-        await UpsertQuotas(
-            service,
-            new ResourceModel(),
-            model,
-            quotaCodeForPropertyName,
-            LOGGER
-        );
+        await UpsertQuotas(service, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
 
-        return model;
+        return Promise.resolve(model);
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'ServiceQuotas' })
-    public async update(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: ServiceQuotas
-    ): Promise<ResourceModel> {
-        const model = args.request.desiredResourceState;
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<ResourceModel> {
         const previousModel = args.request.previousResourceState;
 
-        await UpsertQuotas(
-            service,
-            previousModel,
-            model,
-            quotaCodeForPropertyName,
-            LOGGER
-        );
+        await UpsertQuotas(service, previousModel, model, quotaCodeForPropertyName, LOGGER);
 
-        return model;
+        return Promise.resolve(model);
     }
 
     @handlerEvent(Action.Delete)
-    public async delete(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: ServiceQuotas
-    ): Promise<ResourceModel> {
-        const model = args.request.desiredResourceState;
-        LOGGER.info({ method: 'delete (no-op)', model });
-        return model;
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<null> {
+        args.logger.log({ method: 'delete (no-op)', model });
+        return Promise.resolve(null);
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({ serviceName: 'ServiceQuotas' })
-    public async read(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: ServiceQuotas
-    ): Promise<ResourceModel> {
-        const model = args.request.desiredResourceState;
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<ResourceModel> {
         const identifier = args.request.logicalResourceIdentifier || model.resourceId!;
-        const updatedModel = await this.updateModelWithValuesFromQuotas(
-            service,
-            identifier,
-            model,
-            quotaCodeForPropertyName,
-            LOGGER
-        );
+        const updatedModel = await this.updateModelWithValuesFromQuotas(service, identifier, model, quotaCodeForPropertyName, args.logger);
         return updatedModel;
     }
 
@@ -94,7 +52,7 @@ class Resource extends BaseResource<ResourceModel> {
         identifier: string,
         model: ResourceModel,
         quotaCodeForPropertyName: Record<string, QuotaID>,
-        logger: Console
+        logger: Logger
     ): Promise<ResourceModel> {
         const obj = model as any;
         for (const [propertyName, quota] of Object.entries(quotaCodeForPropertyName)) {
@@ -111,24 +69,16 @@ class Resource extends BaseResource<ResourceModel> {
         return model;
     }
 
-    private async getQuotaValue(
-        service: ServiceQuotas,
-        quota: QuotaID,
-        logger: Console
-    ): Promise<number> {
-        logger.info({ method: 'getting quota value', quota });
-        logger.info({ method: 'before get history', quota });
+    private async getQuotaValue(service: ServiceQuotas, quota: QuotaID, logger: Logger): Promise<number> {
+        logger.log({ method: 'getting quota value', quota });
+        logger.log({ method: 'before get history', quota });
 
         try {
-            const history = await service
-                .listRequestedServiceQuotaChangeHistoryByQuota(quota)
-                .promise();
-            logger.info({ method: 'after get history', quota, history });
+            const history = await service.listRequestedServiceQuotaChangeHistoryByQuota(quota).promise();
+            logger.log({ method: 'after get history', quota, history });
 
             if (history.RequestedQuotas && history.RequestedQuotas.length > 0) {
-                const lastRequest = history.RequestedQuotas.find(
-                    (x) => x.Status === 'CASE_OPENED' || x.Status === 'PENDING'
-                );
+                const lastRequest = history.RequestedQuotas.find((x) => x.Status === 'CASE_OPENED' || x.Status === 'PENDING');
                 return lastRequest.DesiredValue;
             }
         } catch (err) {
@@ -141,9 +91,9 @@ class Resource extends BaseResource<ResourceModel> {
         }
 
         try {
-            logger.info({ method: 'before get quota', quota });
+            logger.log({ method: 'before get quota', quota });
             const quotaResponse = await service.getServiceQuota(quota).promise();
-            logger.info({ method: 'after get quota', quota, quotaResponse });
+            logger.log({ method: 'after get quota', quota, quotaResponse });
 
             if (quotaResponse.Quota && quotaResponse.Quota.Value !== undefined) {
                 return quotaResponse.Quota.Value;

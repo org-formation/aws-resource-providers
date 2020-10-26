@@ -1,0 +1,101 @@
+{
+    "typeName": "Community::CodeCommit::RepositoryAssociation",
+    "description": "Resource that allows for the association of a particular approval rule template to CodeCommit repositories.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {},
+    "properties": {
+        "Arn": {
+            "type": "string",
+            "description": "The Amazon Resource Name (ARN) of the repository association.",
+            "minLength": 25,
+            "maxLength": 256,
+            "pattern": "^arn:community:codecommit:[A-Za-z0-9-]{1,64}:[0-9]{12}:repository-association/.+$"
+        },
+        "ApprovalRuleTemplateArn": {
+            "type": "string",
+            "description": "The Amazon Resource Name (ARN) or ID of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateName is set.",
+            "minLength": 1,
+            "maxLength": 256
+        },
+        "ApprovalRuleTemplateName": {
+            "type": "string",
+            "description": "The name of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateArn is set.",
+            "minLength": 1,
+            "maxLength": 100
+        },
+        "RepositoryNames": {
+            "type": "array",
+            "description": "A list of repository names that will be associated with the specified approval rule template.",
+            "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "pattern": "[\\w\\.-]+"
+            },
+            "minItems": 1
+        }
+    },
+    "additionalProperties": false,
+    "oneOf": [
+        {
+            "required": [
+                "ApprovalRuleTemplateArn",
+                "RepositoryNames"
+            ]
+        },
+        {
+            "required": [
+                "ApprovalRuleTemplateName",
+                "RepositoryNames"
+            ]
+        }
+    ],
+    "createOnlyProperties": [
+        "/properties/ApprovalRuleTemplateArn",
+        "/properties/ApprovalRuleTemplateName"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "codecommit:AssociateApprovalRuleTemplateWithRepository",
+                "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "codecommit:AssociateApprovalRuleTemplateWithRepository",
+                "codecommit:BatchAssociateApprovalRuleTemplateWithRepositories",
+                "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories",
+                "codecommit:DisassociateApprovalRuleTemplateFromRepository",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories",
+                "codecommit:DisassociateApprovalRuleTemplateFromRepository",
+                "codecommit:GetApprovalRuleTemplate",
+                "codecommit:ListApprovalRuleTemplates",
+                "codecommit:ListRepositoriesForApprovalRuleTemplate"
+            ]
+        }
+    }   
+}

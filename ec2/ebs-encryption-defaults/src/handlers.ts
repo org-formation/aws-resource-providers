@@ -3,29 +3,13 @@ import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { ResourceModel } from './models';
 import { EC2 } from 'aws-sdk';
 
-// Use this logger to forward log messages to CloudWatch Logs.
-const LOGGER = console;
-
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
-    public async create(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: EC2
-    ): Promise<ResourceModel> {
-        const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
-
+    @commonAws({ serviceName: 'EC2', debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
         model.resourceId = 'region-defaults'; // there can only be one
 
-        if (
-            model.defaultEbsEncryptionKeyId !== undefined ||
-            model.enableEbsEncryptionByDefault !== undefined
-        ) {
+        if (model.defaultEbsEncryptionKeyId !== undefined || model.enableEbsEncryptionByDefault !== undefined) {
             if (model.enableEbsEncryptionByDefault === true) {
                 await service.enableEbsEncryptionByDefault().promise();
             } else if (model.enableEbsEncryptionByDefault === false) {
@@ -44,23 +28,11 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
-    public async update(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: EC2
-    ): Promise<ResourceModel> {
-        const { desiredResourceState, previousResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
-        const prevModel: ResourceModel = previousResourceState;
+    @commonAws({ serviceName: 'EC2', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
+        const prevModel = new ResourceModel(args.request.previousResourceState);
 
-        if (
-            model.enableEbsEncryptionByDefault !==
-            prevModel.enableEbsEncryptionByDefault
-        ) {
+        if (model.enableEbsEncryptionByDefault !== prevModel.enableEbsEncryptionByDefault) {
             if (model.enableEbsEncryptionByDefault === true) {
                 await service.enableEbsEncryptionByDefault().promise();
             } else {
@@ -83,18 +55,8 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
-    public async delete(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: EC2
-    ): Promise<null> {
-        const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
-
+    @commonAws({ serviceName: 'EC2', debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<null> {
         if (model.enableEbsEncryptionByDefault === true) {
             await service.disableEbsEncryptionByDefault().promise();
         }
@@ -106,17 +68,8 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({
-        serviceName: 'EC2',
-        debug: true,
-    })
-    public async read(
-        action: Action,
-        args: HandlerArgs<ResourceModel>,
-        service: EC2
-    ): Promise<ResourceModel> {
-        const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
+    @commonAws({ serviceName: 'EC2', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
         return Promise.resolve(model);
     }
 }

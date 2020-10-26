@@ -34,6 +34,9 @@ module.exports = {
 
         '@typescript-eslint/no-empty-function': ['warn'],
 
+        //todo: re-evaluate whether turning explicit any off.
+        '@typescript-eslint/no-explicit-any': ['off'],
+
         // Require all imported dependencies are actually declared in package.json
         'import/no-extraneous-dependencies': ['error'],
         'import/no-unresolved': ['error'],
