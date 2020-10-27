@@ -1,12 +1,12 @@
 {
     "typeName": "Community::Organizations::NoDefaultVPC",
-    "description": "Resource type that, when created, removed the Default VPC.",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "description": "Resource type that, when created, will remove the Default VPC.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
     },
     "properties": {
         "ResourceId": {
-            "type":"string"
+            "type": "string"
         }
     },
     "additionalProperties": false, 
@@ -38,10 +38,6 @@
             ]
         },
         "read": {
-            "permissions": [
-            ]
-        },
-        "update": {
             "permissions": [
             ]
         },

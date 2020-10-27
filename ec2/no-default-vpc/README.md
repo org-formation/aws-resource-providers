@@ -1,4 +1,4 @@
-// Community::Organizations::NoDefaultVPC
+# Community::Organizations::NoDefaultVPC
 
 Congratulations on starting development! Next steps:
 
