@@ -1,32 +1,20 @@
-import {
-    Action,
-    BaseResource,
-    exceptions,
-    handlerEvent,
-    OperationStatus,
-    Optional,
-    ProgressEvent,
-    ResourceHandlerRequest,
-    SessionProxy,
-    LoggerProxy
-} from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy, Logger } from 'cfn-rpdk';
 import { ResourceModel } from './models';
-import { SSOAdmin } from 'aws-sdk'
+import { SSOAdmin } from 'aws-sdk';
 import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
 import { v4 as uuidv4 } from 'uuid';
 import { DeleteAccountAssignmentRequest, CreateAccountAssignmentRequest } from 'aws-sdk/clients/ssoadmin';
+import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 
 const versionCode = '1';
 
 interface LogContext {
-    handler: 'Create' | 'Update' | 'Delete',
+    handler: string;
     versionCode: string;
     clientRequestToken: string;
 }
 
-interface CallbackContext extends Record<string, any> {
-
-}
+type CallbackContext = Record<string, any>;
 
 const enumeratePermissionSetArns = (model: ResourceModel): string[] => {
     if (model.permissionSets === undefined) {
@@ -46,18 +34,18 @@ const enumeratePermissionSetArns = (model: ResourceModel): string[] => {
         return `arn:aws:sso:::permissionSet/${instanceId}/${arnOrId}`;
     };
 
-    return model.permissionSets.map(x => createArnIfId(x));
-}
+    return model.permissionSets.map((x) => createArnIfId(x));
+};
 
 const enumerateAccountIds = async (model: ResourceModel): Promise<string[]> => {
     if (model.targets === undefined) {
         return [];
     }
     const result: string[] = [];
-    const accountIdTargets = model.targets.filter(x => x.targetType === 'AWS_ACCOUNT');
-    const ouIdTargets = model.targets.filter(x => x.targetType === 'AWS_OU');
+    const accountIdTargets = model.targets.filter((x) => x.targetType === 'AWS_ACCOUNT');
+    const ouIdTargets = model.targets.filter((x) => x.targetType === 'AWS_OU');
 
-    const flattenedAccountIds = accountIdTargets.map(x => x.targetIds).reduce((x, y) => y.concat(x), []);
+    const flattenedAccountIds = accountIdTargets.map((x) => x.targetIds).reduce((x, y) => y.concat(x), []);
     result.push(...flattenedAccountIds);
 
     if (ouIdTargets.length > 0) {
@@ -65,7 +53,7 @@ const enumerateAccountIds = async (model: ResourceModel): Promise<string[]> => {
     }
 
     return result;
-}
+};
 
 const enumerateComparables = async (model: ResourceModel): Promise<string[]> => {
     const result: string[] = [];
@@ -78,12 +66,12 @@ const enumerateComparables = async (model: ResourceModel): Promise<string[]> => 
         }
     }
     return result;
-}
+};
 
 interface AssignmentTarget {
-    TargetId: string,
-    TargetType: 'AWS_ACCOUNT' | string,
-    PermissionSetArn: string
+    TargetId: string;
+    TargetType: 'AWS_ACCOUNT' | string;
+    PermissionSetArn: string;
 }
 
 const splitComparable = (comparable: string): AssignmentTarget => {
@@ -91,11 +79,11 @@ const splitComparable = (comparable: string): AssignmentTarget => {
     return {
         TargetType: 'AWS_ACCOUNT',
         TargetId: parts[0],
-        PermissionSetArn: parts[parts.length - 1]
+        PermissionSetArn: parts[parts.length - 1],
     };
-}
+};
 
-const retryCreateOrDeleteOperation = async (operation: () => Promise<void>, logger: LoggerProxy) => {
+const retryCreateOrDeleteOperation = async (operation: () => Promise<void>, logger: Logger) => {
     let shouldRetry = false;
     let retryCount = 0;
     do {
@@ -113,22 +101,15 @@ const retryCreateOrDeleteOperation = async (operation: () => Promise<void>, logg
             }
             throw err;
         }
-    }
-    while (shouldRetry);
-}
+    } while (shouldRetry);
+};
 
-
-const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogContext, previousModel: ResourceModel, desiredModel: ResourceModel, logger: LoggerProxy) => {
-
-    const [previousComparables, desiredCompareables] = await Promise.all([
-        await enumerateComparables(previousModel),
-        await enumerateComparables(desiredModel)
-    ]);;
-
+const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogContext, previousModel: ResourceModel, desiredModel: ResourceModel, logger: Logger) => {
+    const [previousComparables, desiredCompareables] = await Promise.all([await enumerateComparables(previousModel), await enumerateComparables(desiredModel)]);
 
     logger.log({ ...loggingContext, method: 'compareCreateAndDelete', previousComparables, desiredCompareables });
 
-    const getHasAssignment = async(assignmentRequest: DeleteAccountAssignmentRequest | CreateAccountAssignmentRequest) : Promise<boolean | undefined> => {
+    const getHasAssignment = async (assignmentRequest: DeleteAccountAssignmentRequest | CreateAccountAssignmentRequest): Promise<boolean | undefined> => {
         if (assignmentRequest.TargetType !== 'AWS_ACCOUNT') {
             return undefined;
         }
@@ -140,20 +121,19 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
                 InstanceArn: assignmentRequest.InstanceArn,
                 AccountId: assignmentRequest.TargetId,
                 PermissionSetArn: assignmentRequest.PermissionSetArn,
-                NextToken: response.NextToken
+                NextToken: response.NextToken,
             };
             response = await service.listAccountAssignments(request).promise();
 
-            if (response.AccountAssignments && response.AccountAssignments.find(x => x.PrincipalId === assignmentRequest.PrincipalId)) {
+            if (response.AccountAssignments && response.AccountAssignments.find((x) => x.PrincipalId === assignmentRequest.PrincipalId)) {
                 return true;
             }
-        } while (response.NextToken)
+        } while (response.NextToken);
 
         return false;
-    }
+    };
 
     const deleteAndWait = async (assignmentRequest: DeleteAccountAssignmentRequest): Promise<void> => {
-
         logger.log({ ...loggingContext, method: 'before deleteAndWait', assignmentRequest });
         const response = await service.deleteAccountAssignment(assignmentRequest).promise();
 
@@ -170,14 +150,13 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
             const describeStatusResponse = await service.describeAccountAssignmentDeletionStatus(describeDeleteAssignmentRequest).promise();
             deletionStatus = describeStatusResponse.AccountAssignmentDeletionStatus;
-
         }
 
         logger.log({ ...loggingContext, method: 'after deleteAndWait', assignmentRequest, deletionStatus });
         if (deletionStatus.Status !== 'SUCCEEDED') {
             throw new InternalFailure(`${deletionStatus.FailureReason}:${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
         }
-    }
+    };
 
     const createAndWait = async (createAssignmentRequest: CreateAccountAssignmentRequest): Promise<void> => {
         logger.log({ ...loggingContext, method: 'before createAndWait', createAssignmentRequest });
@@ -186,7 +165,7 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
         const getHasAssignments = await getHasAssignment(createAssignmentRequest);
         if (getHasAssignments === true) {
-            logger.log({ ...loggingContext, message: 'assignment already made, skipping', method: 'createAndWait', createAssignmentRequest});
+            logger.log({ ...loggingContext, message: 'assignment already made, skipping', method: 'createAndWait', createAssignmentRequest });
             return;
         }
 
@@ -202,12 +181,10 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
         if (creationStatus.Status !== 'SUCCEEDED') {
             throw new InternalFailure(`${creationStatus.FailureReason}: ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`);
         }
+    };
 
-    }
-
-    const comparablesToDelete = previousComparables.filter(x => !desiredCompareables.includes(x));
-    const comparablesToCreate = desiredCompareables.filter(x => !previousComparables.includes(x));
-
+    const comparablesToDelete = previousComparables.filter((x) => !desiredCompareables.includes(x));
+    const comparablesToCreate = desiredCompareables.filter((x) => !previousComparables.includes(x));
     logger.log({ ...loggingContext, method: 'compareCreateAndDelete', comparablesToDelete, comparablesToCreate });
 
     logger.log({ ...loggingContext, method: 'before deleting', comparablesToDelete });
@@ -216,9 +193,9 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
             ...splitComparable(deletable),
             InstanceArn: previousModel.instanceArn,
             PrincipalId: previousModel.principalId,
-            PrincipalType: previousModel.principalType
+            PrincipalType: previousModel.principalType,
         };
-        await retryCreateOrDeleteOperation( async () => await deleteAndWait(assignmentRequest), logger);
+        await retryCreateOrDeleteOperation(async () => await deleteAndWait(assignmentRequest), logger);
     }
     logger.log({ ...loggingContext, method: 'after deleting', comparablesToDelete });
 
@@ -228,105 +205,54 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
             ...splitComparable(creatable),
             InstanceArn: desiredModel.instanceArn,
             PrincipalId: desiredModel.principalId,
-            PrincipalType: desiredModel.principalType
+            PrincipalType: desiredModel.principalType,
         };
-        await retryCreateOrDeleteOperation( async () => await createAndWait(createAssignmentRequest), logger);
+        await retryCreateOrDeleteOperation(async () => await createAndWait(createAssignmentRequest), logger);
     }
     logger.log({ ...loggingContext, method: 'after creating', comparablesToCreate });
-
-}
+};
 
 class Resource extends BaseResource<ResourceModel> {
-
     @handlerEvent(Action.Create)
-    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        const loggingContext : LogContext = { handler: 'Create', clientRequestToken: request.clientRequestToken, versionCode };
+    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
+        const { clientRequestToken, awsAccountId } = args.request;
+        const { logger, request, callbackContext} = args;
+
+        const loggingContext: LogContext = { handler: action, clientRequestToken, versionCode };
 
         logger.log({ ...loggingContext, request, callbackContext });
-        try {
-            progress.status = OperationStatus.Success;
-            const accountId = request.awsAccountId;
 
-            model.resourceId = `arn:community::${accountId}:principal-assignments:${model.principalType}:${model.principalId}/${uuidv4()}`;
+        model.resourceId = `arn:community::${awsAccountId}:principal-assignments:${model.principalType}:${model.principalId}/${uuidv4()}`;
 
-            if (session instanceof SessionProxy) {
-                const options = (session as any).options;
+        await compareCreateAndDelete(service, loggingContext, new ResourceModel(), model, logger);
 
-                const service = new SSOAdmin(options);
-
-                await compareCreateAndDelete(service, loggingContext, new ResourceModel(), model, logger);
-            } else {
-                throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-            }
-
-        } catch (err) {
-            logger.log({ ...loggingContext, message: 'error', err });
-            progress.status = OperationStatus.Failed;
-        }
-
-        logger.log({ ...loggingContext, message: 'done', progress });
-        return progress;
+        return model;
     }
 
     @handlerEvent(Action.Update)
-    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy): Promise<ProgressEvent> {
-        const previous: ResourceModel = request.previousResourceState;
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        const loggingContext : LogContext = { handler: 'Update', clientRequestToken: request.clientRequestToken, versionCode };
+    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
+        const { clientRequestToken, previousResourceState } = args.request;
+        const { logger } = args;
+        const previous = new ResourceModel(previousResourceState);
 
-        logger.log({ ...loggingContext, request, callbackContext });
+        const loggingContext: LogContext = { handler: action, clientRequestToken, versionCode };
 
-        try {
-            if (session instanceof SessionProxy) {
-                const options = (session as any).options;
+        await compareCreateAndDelete(service, loggingContext, previous, model, logger);
 
-                const service = new SSOAdmin(options);
-
-                await compareCreateAndDelete(service, loggingContext, previous, model, logger);
-            } else {
-                throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-            }
-
-            progress.status = OperationStatus.Success;
-
-        } catch (err) {
-            logger.log({ ...loggingContext, handler: 'update', message: 'error', err });
-            progress.status = OperationStatus.Failed;
-        }
-        logger.log({ ...loggingContext, handler: 'update', message: 'done', progress });
-        return progress;
+        return model;
     }
 
-
     @handlerEvent(Action.Delete)
-    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        const loggingContext : LogContext = { handler: 'Delete', clientRequestToken: request.clientRequestToken, versionCode };
+    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
+        const { clientRequestToken, previousResourceState } = args.request;
+        const { logger } = args;
+        const loggingContext: LogContext = { handler: action, clientRequestToken, versionCode };
 
-        logger.log({ ...loggingContext, request, callbackContext });
-
-        try {
-            if (session instanceof SessionProxy) {
-                const options = (session as any).options;
-                const service = new SSOAdmin(options);
-
-                await compareCreateAndDelete(service, loggingContext, model, new ResourceModel({}), logger);
-            } else {
-                throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-            }
-
-            progress.status = OperationStatus.Success;
-
-        } catch (err) {
-            logger.log({ ...loggingContext,  message: 'error', err });
-            progress.status = OperationStatus.Failed;
-        }
-        logger.log({ ...loggingContext, message: 'done', progress });
-        return progress;
+        await compareCreateAndDelete(service, loggingContext, model, new ResourceModel({}), logger);
+        return null;
     }
 }
 
@@ -337,5 +263,5 @@ export const entrypoint = resource.entrypoint;
 export const testEntrypoint = resource.testEntrypoint;
 
 const sleep = (time: number): Promise<void> => {
-    return new Promise(resolve => setTimeout(resolve, time));
+    return new Promise((resolve) => setTimeout(resolve, time));
 };
