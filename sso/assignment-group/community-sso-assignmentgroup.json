@@ -107,10 +107,6 @@
                 "sso:ListAccountAssignments",
                 "iam:GetSAMLProvider"
             ]
-        },
-        "list": {
-            "permissions": [
-            ]
         }
     }
 }

@@ -1,0 +1,40 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+      "ResourceId" : "arn:community::123456789012:principal-assignments:GROUP:123123/8f9be413-f9cc-49a1-b901-0a59a6f126c2",
+      "InstanceArn": "arn:aws:sso:::instance/ssoins-123123123123",
+      "PermissionSets": [
+          "ps-123123"
+      ],
+      "PrincipalId": "123123",
+      "PrincipalType": "GROUP",
+      "Targets": [
+          {
+              "TargetType": "AWS_ACCOUNT",
+              "TargetIds": [
+                  "123456789012"
+              ]
+          }
+      ]
+  },
+  "previousResourceState": {
+      "ResourceId" : "arn:community::123456789012:principal-assignments:GROUP:123123/8f9be413-f9cc-49a1-b901-0a59a6f126c2",
+      "InstanceArn": "arn:aws:sso:::instance/ssoins-123123123123",
+      "PermissionSets": [
+          "ps-123123"
+      ],
+      "PrincipalId": "123123",
+      "PrincipalType": "GROUP",
+      "Targets": [
+          {
+              "TargetType": "AWS_ACCOUNT",
+              "TargetIds": [
+                  "123123123123"
+              ]
+          }
+      ]
+  },
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}

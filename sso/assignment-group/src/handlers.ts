@@ -1,4 +1,4 @@
-import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy, Logger } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { SSOAdmin } from 'aws-sdk';
 import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
@@ -217,7 +217,7 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'SSOAdmin', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         const { clientRequestToken, awsAccountId } = args.request;
-        const { logger, request, callbackContext} = args;
+        const { logger, request, callbackContext } = args;
 
         const loggingContext: LogContext = { handler: action, clientRequestToken, versionCode };
 
@@ -227,7 +227,7 @@ class Resource extends BaseResource<ResourceModel> {
 
         await compareCreateAndDelete(service, loggingContext, new ResourceModel(), model, logger);
 
-        return model;
+        return Promise.resolve(model);
     }
 
     @handlerEvent(Action.Update)
@@ -241,18 +241,24 @@ class Resource extends BaseResource<ResourceModel> {
 
         await compareCreateAndDelete(service, loggingContext, previous, model, logger);
 
-        return model;
+        return Promise.resolve(model);
     }
 
     @handlerEvent(Action.Delete)
     @commonAws({ serviceName: 'SSOAdmin', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
-        const { clientRequestToken, previousResourceState } = args.request;
+        const { clientRequestToken } = args.request;
         const { logger } = args;
         const loggingContext: LogContext = { handler: action, clientRequestToken, versionCode };
 
         await compareCreateAndDelete(service, loggingContext, model, new ResourceModel({}), logger);
-        return null;
+        return Promise.resolve(null);
+    }
+
+    @handlerEvent(Action.Read)
+    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
+        return Promise.resolve(model);
     }
 }
 

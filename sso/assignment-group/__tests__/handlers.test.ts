@@ -1,41 +1,64 @@
 import { on, AwsServiceMockBuilder, AwsFunctionMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
 import { SSOAdmin } from 'aws-sdk';
-import { Action, exceptions, OperationStatus, SessionProxy, UnmodeledRequest } from 'cfn-rpdk';
+import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
 import createFixture from './data/create-success.json';
 import deleteFixture from './data/delete-success.json';
 import readFixture from './data/read-success.json';
+import updateFixture from './data/update-success.json';
 import { resource } from '../src/handlers';
-import { ResourceModel } from '../src/models';
+
+const IDENTIFIER = '8f9be413-f9cc-49a1-b901-0a59a6f126c2';
 
 jest.mock('aws-sdk');
 
+jest.mock('uuid', () => {
+    return {
+        v4: () => IDENTIFIER,
+    };
+});
+
 describe('when calling handler', () => {
-    let session: SessionProxy;
+    let testEntrypointPayload: any;
+    let spySession: jest.SpyInstance;
+    let spySessionClient: jest.SpyInstance;
     let ssoAdmin: AwsServiceMockBuilder<SSOAdmin>;
     let createAccountAssignmentMock: AwsFunctionMockBuilder<SSOAdmin>;
     let deleteAccountAssignmentMock: AwsFunctionMockBuilder<SSOAdmin>;
+    let listAccountAssignmentsMock: AwsFunctionMockBuilder<SSOAdmin>;
     let describeAccountAssignmentDeletionStatusMock: AwsFunctionMockBuilder<SSOAdmin>;
     let describeAccountAssignmentCreationStatusMock: AwsFunctionMockBuilder<SSOAdmin>;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
-        session = new SessionProxy({});
         fixtureMap = new Map<Action, Record<string, any>>();
         fixtureMap.set(Action.Create, createFixture);
         fixtureMap.set(Action.Delete, deleteFixture);
         fixtureMap.set(Action.Read, readFixture);
-        //todo: add update
-
+        fixtureMap.set(Action.Update, updateFixture);
     });
 
     beforeEach(async () => {
         ssoAdmin = on(SSOAdmin, { snapshot: false });
-        // createAccountAssignmentMock = ssoAdmin.mock('createAccountAssignment').resolve({AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
-        // deleteAccountAssignmentMock = ssoAdmin.mock('deleteAccountAssignment').resolve({AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status : 'IN_PROGRESS' }});
-        // describeAccountAssignmentDeletionStatusMock = ssoAdmin.mock('describeAccountAssignmentDeletionStatus').resolve({AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status : 'SUCCESS' }});
-        // describeAccountAssignmentCreationStatusMock = ssoAdmin.mock('describeAccountAssignmentCreationStatus').resolve({AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status : 'SUCCESS' }});
-        const fn = () => ssoAdmin.instance as any; //aws-sdk version issue....
-        session['client'] = fn;
+        createAccountAssignmentMock = ssoAdmin.mock('createAccountAssignment').resolve({ AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status: 'SUCCEEDED' } });
+        deleteAccountAssignmentMock = ssoAdmin.mock('deleteAccountAssignment').resolve({ AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status: 'SUCCEEDED' } });
+        listAccountAssignmentsMock = ssoAdmin.mock('listAccountAssignments').resolve({
+            AccountAssignments: [
+                {
+                    PrincipalId: '123123',
+                    PrincipalType: 'GROUP',
+                },
+            ],
+        });
+        describeAccountAssignmentDeletionStatusMock = ssoAdmin.mock('describeAccountAssignmentDeletionStatus').resolve({ AccountAssignmentDeletionStatus: { RequestId: 'abcdef', Status: 'SUCCESS' } });
+        describeAccountAssignmentCreationStatusMock = ssoAdmin.mock('describeAccountAssignmentCreationStatus').resolve({ AccountAssignmentCreationStatus: { RequestId: 'abcdef', Status: 'SUCCESS' } });
+        spySession = jest.spyOn(SessionProxy, 'getSession');
+        spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
+        spySessionClient.mockReturnValue(ssoAdmin.instance);
+        testEntrypointPayload = {
+            credentials: { accessKeyId: '', secretAccessKey: '', sessionToken: '' },
+            region: 'us-east-1',
+            action: 'CREATE',
+        };
     });
 
     afterEach(() => {
@@ -43,44 +66,56 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test('principal assignments all operations fail without session', async () => {
-        const promises: any[] = [];
-        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);
-            promises.push(
-                resource['invokeHandler'](null, request, action, {}).catch((e: exceptions.BaseHandlerException) => {
-                    expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
-                })
-            );
-        });
-        expect.assertions(promises.length);
-        await Promise.all(promises);
-    });
-
     test('create will create account assignment for each principal x target', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
-
-        const progress = await resource['invokeHandler'](session, request, Action.Create, {});
-
-        expect(progress.status).toBe(OperationStatus.Success);
-        expect(progress.resourceModel).toBeDefined();
-
-        expect(createAccountAssignmentMock.mock).toHaveBeenCalledTimes(6);
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject({
+            ...request.desiredResourceState,
+            ResourceId: `arn:community::123456789012:principal-assignments:GROUP:123123/${IDENTIFIER}`,
+        });
+        expect(createAccountAssignmentMock.mock).toHaveBeenCalledTimes(1);
         expect(deleteAccountAssignmentMock.mock).toHaveBeenCalledTimes(0);
-
-        const resourceModel: ResourceModel = progress.resourceModel;
-        expect(resourceModel.resourceId).toContain('arn:community::123456789012:principal-assignments:GROUP:d7fefe8f-992c-4524-bd52-cd54164c1e96');
     });
 
     test('update will create and remove account assignment for each principal x target', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<ResourceModel>(resource['modelCls']);
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+        expect(createAccountAssignmentMock.mock).toHaveBeenCalledTimes(1);
+        expect(deleteAccountAssignmentMock.mock).toHaveBeenCalledTimes(1);
+    });
 
-        const progress = await resource['invokeHandler'](session, request, Action.Update, {});
+    test('update will create and remove account assignment for each principal x target', async () => {
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+        expect(createAccountAssignmentMock.mock).toHaveBeenCalledTimes(1);
+        expect(deleteAccountAssignmentMock.mock).toHaveBeenCalledTimes(1);
+    });
 
-        expect(progress.status).toBe(OperationStatus.Success);
-        expect(progress.resourceModel).toBeDefined();
+    test('delete operation successful - sso assignment group', async () => {
+        const request = fixtureMap.get(Action.Delete);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeNull();
+    });
 
-        expect(createAccountAssignmentMock.mock).toHaveBeenCalledTimes(4);
-        expect(deleteAccountAssignmentMock.mock).toHaveBeenCalledTimes(4);
+    test('read operation successful - sso assignment group', async () => {
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+    });
+
+    test('all operations fail without session - sso assignment group', async () => {
+        expect.assertions(fixtureMap.size);
+        spySession.mockReturnValue(null);
+        for (const [action, request] of fixtureMap) {
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, null);
+            expect(progress.errorCode).toBe(exceptions.InvalidCredentials.name);
+        }
     });
 });
