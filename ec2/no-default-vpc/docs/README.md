@@ -1,6 +1,6 @@
 # Community::Organizations::NoDefaultVPC
 
-Resource type that, when created, removed the Default VPC.
+Resource type that, when created, will remove the Default VPC.
 
 ## Syntax
 
