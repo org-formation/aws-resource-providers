@@ -4,5 +4,6 @@
         "Buckets": 100
     },
     "previousResourceState": null,
+    "awsAccountId": "123456789012",
     "logicalResourceIdentifier": "MyResource"
 }

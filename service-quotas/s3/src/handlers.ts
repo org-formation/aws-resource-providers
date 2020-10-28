@@ -1,115 +1,115 @@
-import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk';
-import { QuotaID, UpsertQuotas } from 'aws-resource-providers-common';
+import { commonAws, UpsertQuotas, QuotaID, HandlerArgs } from 'aws-resource-providers-common';
 
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-type CallbackContext = Record<string, any>;
-
 const quotaCodeForPropertyName: Record<string, QuotaID> = {
     buckets: { QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' },
 };
+
 class Resource extends BaseResource<ResourceModel> {
-    /**
-     * CloudFormation invokes this handler when the resource is initially created
-     * during stack create operations.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
     @handlerEvent(Action.Create)
-    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        const model = new ResourceModel(request.desiredResourceState);
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<ResourceModel> {
+        const accountId = args.request.awsAccountId;
+        model.resourceId = accountId;
 
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        await UpsertQuotas(service, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
 
-        LOGGER.info({ handler: 'create', request, callbackContext });
-        model.resourceId = request.awsAccountId; // there can only be one
-
-        if (session instanceof SessionProxy) {
-            const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-            await UpsertQuotas(serviceQuotas, new ResourceModel(), model, quotaCodeForPropertyName, LOGGER);
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-        }
-        progress.status = OperationStatus.Success;
-        return progress;
+        return Promise.resolve(model);
     }
 
-    /**
-     * CloudFormation invokes this handler when the resource is updated
-     * as part of a stack update operation.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
     @handlerEvent(Action.Update)
-    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        const desired = new ResourceModel(request.desiredResourceState);
-        const previous = new ResourceModel(request.previousResourceState);
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(desired);
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<ResourceModel> {
+        const previousModel = args.request.previousResourceState;
 
-        LOGGER.info({ handler: 'update', request, callbackContext });
+        await UpsertQuotas(service, previousModel, model, quotaCodeForPropertyName, LOGGER);
 
-        if (session instanceof SessionProxy) {
-            const serviceQuotas = session.client('ServiceQuotas') as ServiceQuotas;
-            await UpsertQuotas(serviceQuotas, previous, desired, quotaCodeForPropertyName, LOGGER);
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-        }
-        progress.status = OperationStatus.Success;
-        return progress;
+        return Promise.resolve(model);
     }
 
-    /**
-     * CloudFormation invokes this handler when the resource is deleted, either when
-     * the resource is deleted from the stack as part of a stack update operation,
-     * or the stack itself is deleted.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
     @handlerEvent(Action.Delete)
-    public async delete(session: Optional<SessionProxy>): Promise<ProgressEvent> {
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
-        // TODO: put code here
-        if (session instanceof SessionProxy) {
-            session.client('ServiceQuotas') as ServiceQuotas;
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-        }
-        progress.status = OperationStatus.Success;
-        return progress;
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<null> {
+        args.logger.log({ method: 'delete (no-op)', model });
+        return Promise.resolve(null);
     }
 
-    /**
-     * CloudFormation invokes this handler as part of a stack update operation when
-     * detailed information about the resource's current state is required.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
     @handlerEvent(Action.Read)
-    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
-        const model = new ResourceModel(request.desiredResourceState);
-        // TODO: put code here
-        if (session instanceof SessionProxy) {
-            session.client('ServiceQuotas') as ServiceQuotas;
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<ResourceModel> {
+        const identifier = args.request.logicalResourceIdentifier || model.resourceId!;
+        const updatedModel = await this.updateModelWithValuesFromQuotas(service, identifier, model, quotaCodeForPropertyName, args.logger);
+        return updatedModel;
+    }
+
+    private async updateModelWithValuesFromQuotas(
+        service: ServiceQuotas,
+        identifier: string,
+        model: ResourceModel,
+        quotaCodeForPropertyName: Record<string, QuotaID>,
+        logger: Logger
+    ): Promise<ResourceModel> {
+        const obj = model as any;
+        for (const [propertyName, quota] of Object.entries(quotaCodeForPropertyName)) {
+            try {
+                obj[propertyName] = await this.getQuotaValue(service, quota, logger);
+            } catch (err) {
+                if (err && err.code === 'NoSuchResourceException') {
+                    throw new exceptions.NotFound(ResourceModel.TYPE_NAME, identifier);
+                } else {
+                    throw err;
+                }
+            }
         }
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        return progress;
+        return model;
+    }
+
+    private async getQuotaValue(service: ServiceQuotas, quota: QuotaID, logger: Logger): Promise<number> {
+        logger.log({ method: 'getting quota value', quota });
+        logger.log({ method: 'before get history', quota });
+
+        try {
+            const history = await service.listRequestedServiceQuotaChangeHistoryByQuota(quota).promise();
+            logger.log({ method: 'after get history', quota, history });
+
+            if (history.RequestedQuotas && history.RequestedQuotas.length > 0) {
+                const lastRequest = history.RequestedQuotas.find((x) => x.Status === 'CASE_OPENED' || x.Status === 'PENDING');
+                return lastRequest.DesiredValue;
+            }
+        } catch (err) {
+            if (err && err.code === 'NoSuchResourceException') {
+                //continue, doesn't necessarily mean the resource was not deployed
+                // deploying the resource with its default value will not create any request.
+            } else {
+                throw err;
+            }
+        }
+
+        try {
+            logger.log({ method: 'before get quota', quota });
+            const quotaResponse = await service.getServiceQuota(quota).promise();
+            logger.log({ method: 'after get quota', quota, quotaResponse });
+
+            if (quotaResponse.Quota && quotaResponse.Quota.Value !== undefined) {
+                return quotaResponse.Quota.Value;
+            }
+        } catch (err) {
+            if (err && err.code === 'NoSuchResourceException') {
+                //continue, doesn't necessarily mean the resource was not deployed
+                // deploying the resource with its default value will not create any request.
+            } else {
+                throw err;
+            }
+        }
+
+        const defaultQuota = await service.getAWSDefaultServiceQuota(quota).promise();
+
+        return defaultQuota.Quota.Value;
     }
 }
 
