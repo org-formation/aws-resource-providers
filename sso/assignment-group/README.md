@@ -1,4 +1,4 @@
-// Community::SSO::AssignmentGroup
+# Community::SSO::AssignmentGroup
 
 Congratulations on starting development! Next steps:
 

@@ -1,7 +1,7 @@
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    // setupFiles: ['<rootDir>/setup.js'],
+    setupFiles: ['<rootDir>/setup.js'],
     coverageThreshold: {
         global: {
             branches: 20,
