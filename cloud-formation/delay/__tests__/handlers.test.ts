@@ -1,13 +1,12 @@
-import { Action, exceptions, OperationStatus, UnmodeledRequest } from 'cfn-rpdk';
-import createFixture from '../sam-tests/create.json';
-import deleteFixture from '../sam-tests/delete.json';
-import listFixture from '../sam-tests/list.json';
-import readFixture from '../sam-tests/read.json';
-import updateFixture from '../sam-tests/update.json';
+import { Action, exceptions, OperationStatus } from 'cfn-rpdk';
+import createFixture from './data/create-success.json';
+import deleteFixture from './data/delete-success.json';
+import readFixture from './data/read-success.json';
+import updateFixture from './data/update-success.json';
 import { CallbackContext, resource, Resource } from '../src/handlers';
-import { ResourceModel } from '../src/models';
 
 describe('when calling handler', () => {
+    let testEntrypointPayload: any;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
@@ -16,10 +15,22 @@ describe('when calling handler', () => {
         fixtureMap.set(Action.Read, readFixture);
         fixtureMap.set(Action.Update, updateFixture);
         fixtureMap.set(Action.Delete, deleteFixture);
-        fixtureMap.set(Action.List, listFixture);
     });
 
-    test('parse valid duration', () => {
+    beforeEach(() => {
+        testEntrypointPayload = {
+            credentials: { accessKeyId: '', secretAccessKey: '', sessionToken: '' },
+            region: 'us-east-1',
+            action: 'CREATE',
+        };
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+    });
+
+    test('parse valid duration - cloudformation delay', () => {
         [
             ['PT0S', 0],
             ['PT0020M', 1200],
@@ -32,7 +43,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('parse invalid duration', () => {
+    test('parse invalid duration - cloudformation delay', () => {
         [null, '', 'PT000', '-PT10S', 'P1Y2M3W4DT5H6M7S', 'PT12H1S', 'PT23H58M22S'].forEach((duration: string) => {
             const parseDuration = () => {
                 Resource['parseDuration'](duration);
@@ -41,83 +52,42 @@ describe('when calling handler', () => {
         });
     });
 
-    test('create operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(createFixture).toModeled<ResourceModel>(resource['modelCls']);
-        const callbackContext: CallbackContext = {
-            Remaining: null,
-        };
-        const progress = await resource['invokeHandler'](null, request, Action.Create, callbackContext);
-        expect(progress).toMatchObject({
-            status: OperationStatus.InProgress,
-            message: '',
-            callbackContext: {
-                Remaining: -540,
-            },
-            callbackDelaySeconds: Resource.DEFAULT_DURATION,
-            resourceModel: request.desiredResourceState,
-        });
+    test('create success - cloudformation delay', async () => {
+        const callbackContext: CallbackContext = { Remaining: null };
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, callbackContext, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.InProgress, message: '', callbackContext: { Remaining: -540 }, callbackDelaySeconds: Resource.DEFAULT_DURATION });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('update operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(updateFixture).toModeled<ResourceModel>(resource['modelCls']);
-        const callbackContext: CallbackContext = {
-            Remaining: 700,
-        };
-        const progress = await resource['invokeHandler'](null, request, Action.Update, callbackContext);
-        expect(progress).toMatchObject({
-            status: OperationStatus.InProgress,
-            message: '',
-            callbackContext: {
-                Remaining: 100,
-            },
-            callbackDelaySeconds: 600,
-            resourceModel: request.desiredResourceState,
-        });
+    test('update success - cloudformation delay', async () => {
+        const callbackContext: CallbackContext = { Remaining: 700 };
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, callbackContext, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.InProgress, message: '', callbackContext: { Remaining: 100 }, callbackDelaySeconds: 600 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('delete operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(deleteFixture).toModeled<ResourceModel>(resource['modelCls']);
-        const callbackContext: CallbackContext = {
-            Remaining: 0,
-        };
-        const progress = await resource['invokeHandler'](null, request, Action.Delete, callbackContext);
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-        });
+    test('delete success - cloudformation delay', async () => {
+        const callbackContext: CallbackContext = { Remaining: 0 };
+        const request = fixtureMap.get(Action.Delete);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, callbackContext, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeNull();
     });
 
-    test('read operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(readFixture).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](null, request, Action.Read, {});
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModel: request.desiredResourceState,
-        });
+    test('read success - cloudformation delay', async () => {
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('list operation', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(listFixture).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](null, request, Action.List, {});
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModels: [request.desiredResourceState],
-        });
-    });
-
-    test('all operations successful without session', async () => {
-        const promises: any[] = [];
-        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);
-            expect(request).toBeDefined();
-            promises.push(resource['invokeHandler'](null, request, action, {}));
-        });
-        expect.assertions(promises.length);
-        await Promise.all(promises);
+    test('all operations successful without session - cloudformation delay', async () => {
+        expect.assertions(fixtureMap.size);
+        for (const [action, request] of fixtureMap) {
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, null);
+            expect(progress.status).toBeDefined();
+        }
     });
 });

@@ -1,0 +1,8 @@
+{
+   "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ResourceId": "f3390613-b2b5-4c31-a4c6-66813dff96a6",
+        "MinimumPasswordLength": null
+    },
+    "logicalResourceIdentifier": "MyResource"
+}
