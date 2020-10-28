@@ -1,8 +1,5 @@
-import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, LoggerProxy, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import { ResourceModel } from './models';
-
-// Use this logger to forward log messages to CloudWatch Logs.
-const LOGGER = console;
 
 export interface CallbackContext extends Record<string, any> {
     Remaining?: number;
@@ -42,14 +39,15 @@ export class Resource extends BaseResource<ResourceModel> {
      * @param resourceId The unique identifier for this resource
      * @param model Already modelled desired state data
      */
-    private buildProgress(progress: ProgressEvent<ResourceModel>, callbackContext: CallbackContext, resourceId: string, model?: ResourceModel): ProgressEvent<ResourceModel> {
+    private buildProgress(progress: ProgressEvent<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy, resourceId: string, model?: ResourceModel): ProgressEvent<ResourceModel> {
         let remaining: number = callbackContext.Remaining ?? null;
         model = progress.resourceModel || model;
         if (remaining === null) {
-            model.resourceId = resourceId;
             remaining = model.duration ? Resource.parseDuration(model.duration) : Resource.DEFAULT_DURATION;
         }
-        LOGGER.info('OPERATION remaining', remaining);
+        logger.log('OPERATION remaining', remaining);
+        model.resourceId = resourceId;
+        progress.resourceModel = model;
 
         if (remaining <= 0) {
             progress.callbackDelaySeconds = 0;
@@ -60,7 +58,7 @@ export class Resource extends BaseResource<ResourceModel> {
             };
             progress.callbackDelaySeconds = remaining < 600 ? remaining : 600;
         }
-        console.info('OPERATION progress', progress);
+        logger.log('OPERATION progress', progress);
         return progress;
     }
 
@@ -74,12 +72,12 @@ export class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Create)
-    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        console.info('CREATE request', request);
-        console.info('CREATE callbackContext', callbackContext);
-        const model: ResourceModel = request.desiredResourceState;
+    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy): Promise<ProgressEvent> {
+        logger.log('CREATE request', request);
+        logger.log('CREATE callbackContext', callbackContext);
+        const model = new ResourceModel(request.desiredResourceState);
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        return this.buildProgress(progress, callbackContext, request.clientRequestToken);
+        return this.buildProgress(progress, callbackContext, logger, request.clientRequestToken);
     }
 
     /**
@@ -92,12 +90,12 @@ export class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Update)
-    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        console.info('UPDATE request', request);
-        console.info('UPDATE callbackContext', callbackContext);
-        const model: ResourceModel = request.desiredResourceState;
+    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy): Promise<ProgressEvent> {
+        logger.log('UPDATE request', request);
+        logger.log('UPDATE callbackContext', callbackContext);
+        const model = new ResourceModel(request.desiredResourceState);
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        return this.buildProgress(progress, callbackContext, request.previousResourceState.resourceId);
+        return this.buildProgress(progress, callbackContext, logger, request.previousResourceState.resourceId);
     }
 
     /**
@@ -111,11 +109,15 @@ export class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Delete)
-    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        console.info('DELETE request', request);
-        console.info('DELETE callbackContext', callbackContext);
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
-        return this.buildProgress(progress, callbackContext, request.clientRequestToken, request.desiredResourceState);
+    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy): Promise<ProgressEvent> {
+        logger.log('DELETE request', request);
+        logger.log('DELETE callbackContext', callbackContext);
+        const model = new ResourceModel(request.desiredResourceState);
+        const progress = this.buildProgress(ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(), callbackContext, logger, request.clientRequestToken, model);
+        if (progress.status === OperationStatus.Success || progress.status === OperationStatus.Failed) {
+            progress.resourceModel = null;
+        }
+        return progress;
     }
 
     /**
@@ -128,27 +130,13 @@ export class Resource extends BaseResource<ResourceModel> {
      * state or metadata between subsequent retries
      */
     @handlerEvent(Action.Read)
-    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
-        console.info('READ request', request);
-        const model: ResourceModel = request.desiredResourceState;
+    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext, logger: LoggerProxy): Promise<ProgressEvent> {
+        logger.log('READ request', request);
+        const model = new ResourceModel(request.desiredResourceState);
+        if (!model.resourceId || model.duration) {
+            throw new exceptions.NotFound(ResourceModel.TYPE_NAME, request.logicalResourceIdentifier);
+        }
         const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        return progress;
-    }
-
-    /**
-     * CloudFormation invokes this handler when summary information about multiple
-     * resources of this resource provider is required.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
-    @handlerEvent(Action.List)
-    public async list(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
-        console.info('LIST request', request);
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>().status(OperationStatus.Success).resourceModels([model]).build();
         return progress;
     }
 }

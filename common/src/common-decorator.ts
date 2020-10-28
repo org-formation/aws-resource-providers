@@ -1,4 +1,4 @@
-import { Action, BaseModel, BaseResource, exceptions, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseModel, BaseResource, Constructor, exceptions, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import * as Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
@@ -10,6 +10,7 @@ export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Rec
     session: Optional<SessionProxy>;
     request: ResourceHandlerRequest<R>;
     callbackContext: T;
+    logger?: Logger;
 };
 
 export interface commonAwsOptions {
@@ -23,13 +24,12 @@ interface Session {
 }
 
 /**
- * Decorator for event handler with common behavior
- * to interact with AWS APIs.
+ * Decorator for event handler with common behavior to interact with AWS APIs.
  *
  * @returns {MethodDecorator}
  */
-export function commonAws<T extends Record<string, any>, ResourceModel extends BaseModel>(options: commonAwsOptions): MethodDecorator {
-    return function (target: BaseResource<ResourceModel>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
+export function commonAws<T extends Record<string, any>, R extends BaseModel>(options: commonAwsOptions): MethodDecorator {
+    return function (target: BaseResource<R>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
         const { debug, serviceName } = options;
 
         if (descriptor === undefined) {
@@ -39,7 +39,7 @@ export function commonAws<T extends Record<string, any>, ResourceModel extends B
         const originalMethod = descriptor.value;
 
         // Wrapping the original method with new signature.
-        descriptor.value = async function (session: Optional<SessionProxy | Session>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: T): Promise<ProgressEvent> {
+        descriptor.value = async function (session: Optional<SessionProxy | Session>, request: ResourceHandlerRequest<R>, callbackContext: T, logger?: Logger): Promise<ProgressEvent<R, T>> {
             let action = options.action;
             if (!action) {
                 const events: HandlerEvents = Reflect.getMetadata('handlerEvents', target);
@@ -50,19 +50,27 @@ export function commonAws<T extends Record<string, any>, ResourceModel extends B
                 });
             }
 
-            const handlerArgs = { session, request, callbackContext };
+            logger = logger || console;
 
-            const model: ResourceModel = request.desiredResourceState;
-            const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, T>>(model);
+            const handlerArgs = { session, request, callbackContext, logger };
+            const desiredResourceState = request.desiredResourceState || {};
 
-            if (debug) console.info({ action, request, callbackContext, env: process.env });
+            let ModelClass: Constructor<R> = Object.getPrototypeOf(desiredResourceState).constructor;
+            if ('modelTypeReference' in this) {
+                ModelClass = this['modelTypeReference'] || ModelClass;
+            }
+
+            const model: R = new ModelClass(desiredResourceState);
+            const progress = ProgressEvent.progress<ProgressEvent<R, T>>(model);
+
+            if (debug) logger.log({ action, request, callbackContext });
 
             if (session && (session instanceof SessionProxy || session.client instanceof Function)) {
                 const service = session.client(serviceName as any);
 
-                if (debug) console.info({ action, message: 'before perform' });
-                const modified = await originalMethod.apply(this, [action, handlerArgs, service]);
-                if (debug) console.info({ action, message: 'after perform' });
+                if (debug) logger.log({ action, message: 'before perform common task' });
+                const modified = await originalMethod.apply(this, [action, handlerArgs, service, model]);
+                if (debug) logger.log({ action, message: 'after perform common task' });
 
                 if (modified !== undefined) {
                     if (Array.isArray(modified)) {

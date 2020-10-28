@@ -192,12 +192,12 @@ export class Resource extends BaseResource<ResourceModel> {
 
 export const resource = new Resource(PasswordPolicy.TYPE_NAME, PasswordPolicy);
 
-export const entrypoint = (...args: [any, any]): Promise<CfnResponse<ResourceModel>> => {
+export const entrypoint = (...args: [any, any]): Promise<CfnResponse<any>> => {
     console.info('entrypoint input', ...args);
     return resource.entrypoint(...args);
 };
 
-export const testEntrypoint = (...args: [any, any]): Promise<CfnResponse<ResourceModel>> => {
+export const testEntrypoint = (...args: [any, any]): Promise<CfnResponse<any>> => {
     console.info('testEntrypoint input', ...args);
     return resource.testEntrypoint(...args);
 };

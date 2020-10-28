@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  ApprovalRuleTemplate:
+    Type: 'Community::CodeCommit::ApprovalRuleTemplate'
+    Properties:
+      Name: 'test'
+      Description: 'test'
+      Content:
+        Version: '2018-11-08'
+        DestinationReferences:
+          - 'refs/heads/master'
+        Statements:
+          - Type: 'Approvers'
+            NumberOfApprovalsNeeded: 2
+            ApprovalPoolMembers:
+              - '*'
