@@ -1,24 +1,24 @@
 import { S3Control } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, OperationStatus, SessionProxy, UnmodeledRequest } from 'cfn-rpdk';
-import createFixture from '../sam-tests/create.json';
-import deleteFixture from '../sam-tests/delete.json';
-import readFixture from '../sam-tests/read.json';
-import updateFixture from '../sam-tests/update.json';
+import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
+import createFixture from './data/create-success.json';
+import deleteFixture from './data/delete-success.json';
+import readFixture from './data/read-success.json';
+import updateFixture from './data/update-success.json';
 import { resource } from '../src/handlers';
-import { ResourceModel } from '../src/models';
 
 const IDENTIFIER = '123456789012';
 
 jest.mock('aws-sdk');
 
 describe('when calling handler', () => {
-    let session: SessionProxy;
+    let testEntrypointPayload: any;
+    let spySession: jest.SpyInstance;
+    let spySessionClient: jest.SpyInstance;
     let s3control: AwsServiceMockBuilder<S3Control>;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
-        session = new SessionProxy({});
         fixtureMap = new Map<Action, Record<string, any>>();
         fixtureMap.set(Action.Create, createFixture);
         fixtureMap.set(Action.Read, readFixture);
@@ -35,7 +35,14 @@ describe('when calling handler', () => {
         });
         s3control.mock('putPublicAccessBlock').resolve({});
         s3control.mock('deletePublicAccessBlock').resolve({});
-        session['client'] = () => s3control.instance;
+        spySession = jest.spyOn(SessionProxy, 'getSession');
+        spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
+        spySessionClient.mockReturnValue(s3control.instance);
+        testEntrypointPayload = {
+            credentials: { accessKeyId: '', secretAccessKey: '', sessionToken: '' },
+            region: 'us-east-1',
+            action: 'CREATE',
+        };
     });
 
     afterEach(() => {
@@ -43,63 +50,48 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test('create operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Create)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Create, {});
-        const model = request.desiredResourceState;
-        model.resourceId = IDENTIFIER;
-        expect(progress.serialize()).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModel: model.serialize(),
-        });
+    test('create operation successful - s3 public access block', async () => {
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject({ ...request.desiredResourceState, ResourceId: IDENTIFIER });
     });
 
-    test('update operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Update)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Update, {});
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModel: request.desiredResourceState,
-        });
+    test('update operation successful - s3 public access block', async () => {
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('delete operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Delete)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Delete, {});
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-        });
+    test('delete operation successful - s3 public access block', async () => {
+        const request = fixtureMap.get(Action.Delete);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel).toBeNull();
     });
 
-    test('read operation successful', async () => {
-        const request = UnmodeledRequest.fromUnmodeled(fixtureMap.get(Action.Read)).toModeled<ResourceModel>(resource['modelCls']);
-        const progress = await resource['invokeHandler'](session, request, Action.Read, {});
-        expect(progress).toMatchObject({
-            status: OperationStatus.Success,
-            message: '',
-            callbackDelaySeconds: 0,
-            resourceModel: request.desiredResourceState,
-        });
+    test('read operation successful - s3 public access block', async () => {
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('all operations fail without session', async () => {
-        const promises: any[] = [];
-        fixtureMap.forEach((fixture: Record<string, any>, action: Action) => {
-            const request = UnmodeledRequest.fromUnmodeled(fixture).toModeled<ResourceModel>(resource['modelCls']);
-            promises.push(
-                resource['invokeHandler'](null, request, action, {}).catch((e: exceptions.BaseHandlerException) => {
-                    expect(e).toEqual(expect.any(exceptions.InvalidCredentials));
-                })
-            );
-        });
-        expect.assertions(promises.length);
-        await Promise.all(promises);
+    test('read operation fail not found - s3 public access block', async () => {
+        const mockGet = s3control.mock('getPublicAccessBlock').reject({ ...new Error(), code: 'NoSuchPublicAccessBlockConfiguration' });
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+    });
+
+    test('all operations fail without session - s3 public access block', async () => {
+        expect.assertions(fixtureMap.size);
+        spySession.mockReturnValue(null);
+        for (const [action, request] of fixtureMap) {
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, null);
+            expect(progress.errorCode).toBe(exceptions.InvalidCredentials.name);
+        }
     });
 });

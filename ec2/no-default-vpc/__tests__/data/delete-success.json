@@ -1,8 +1,10 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "Duration": "PT10S"
+        "ResourceId": "arn:community:us-east-1:123456789012:ec2:no-default-vpc/4b90a7e4-b790-456b-a937-0cfdfa211dfe"
     },
     "previousResourceState": null,
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
     "logicalResourceIdentifier": "MyResource"
 }
