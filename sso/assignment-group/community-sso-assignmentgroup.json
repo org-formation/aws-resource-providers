@@ -22,8 +22,7 @@
             },
             "additionalProperties": false,
             "required": [
-                "TargetType",
-                "Title"
+                "TargetType"
             ]
         }
     },
@@ -74,7 +73,7 @@
     "primaryIdentifier": [
         "/properties/ResourceId"
     ],
-    
+
     "handlers": {
         "create": {
             "permissions": [
