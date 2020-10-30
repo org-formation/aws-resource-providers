@@ -1,14 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
+const base = require('./jest.config.base.js');
+
 module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',
+    ...base,
     setupFiles: ['<rootDir>/setup.js'],
-    coverageThreshold: {
-        global: {
-            branches: 20,
-            statements: 20,
-        },
-    },
-    collectCoverage: true,
-    coverageReporters: ['json', 'lcov', 'text'],
-    coveragePathIgnorePatterns: ['node_modules/', '__tests__/data/', 'src/models.ts'],
+    projects: ['<rootDir>/**/jest.config.js'],
+    coverageDirectory: '<rootDir>/coverage/',
 };
