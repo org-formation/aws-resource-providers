@@ -1,0 +1,96 @@
+{
+    "typeName": "Community::CostExplorer::AnomalySubscription",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+        "Subscriber": {
+            "type": "object",
+            "properties": {
+                "Address": {
+                    "type": "string"
+                },
+                "Type": {
+                    "type": "string",
+                    "enum": [
+                        "EMAIL",
+                        "SNS"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "Arn": {
+            "type": "string"
+        },
+        "AccountId": {
+            "type": "string"
+        },
+        "MonitorArnList": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "Subscribers": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Subscriber"
+            }
+        },
+        "Threshold" : {
+            "type": "number"
+        },
+        "Frequency": {
+            "type": "string",
+            "enum": [
+                "DAILY",
+                "IMMEDIATE",
+                "WEEKLY"
+            ]
+        },
+        "SubscriptionName": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "SubscriptionName",
+        "Frequency",
+        "Threshold"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "costExplorer:createAnomalySubscription"
+            ]
+        },
+        "read": {
+            "permissions": [
+
+            ]
+        },
+        "update": {
+            "permissions": [
+                "costExplorer:updateAnomalySubscription"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "costExplorer:deleteAnomalySubscription"
+            ]
+        },
+        "list": {
+            "permissions": [
+
+            ]
+        }
+    }
+}
