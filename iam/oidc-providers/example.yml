@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  OidcProvider:
+    Type: "Community::IAM::OpenIDConnectProvider"
+    Properties:
+      Url: "https://host/path"
+      ThumbprintList:
+        - "00000aaaaabbbbbccccdddddeeeffff111222233"
+      ClientIDList:
+        - "client-id"
