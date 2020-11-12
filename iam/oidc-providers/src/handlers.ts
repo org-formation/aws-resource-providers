@@ -7,8 +7,9 @@ import { AddClientIDToOpenIDConnectProviderRequest, RemoveClientIDFromOpenIDConn
 export class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
     @commonAws({ serviceName: 'IAM', debug: true })
-    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel, logger: Logger): Promise<ResourceModel> {
-        const response = await service.createOpenIDConnectProvider({
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<ResourceModel> {
+        const response = await service
+            .createOpenIDConnectProvider({
                 ClientIDList: model.clientIDList,
                 ThumbprintList: model.thumbprintList,
                 Url: model.url,
@@ -21,45 +22,42 @@ export class Resource extends BaseResource<ResourceModel> {
 
     @handlerEvent(Action.Update)
     @commonAws({ serviceName: 'IAM', debug: true })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel, logger: Logger): Promise<ResourceModel> {
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<ResourceModel> {
         const previousModel = args.request.previousResourceState;
 
         if (previousModel.url !== model.url) {
             throw new exceptions.InvalidRequest(`Changing the url of an oidc provider is not supported.`);
         }
 
-        const prevClientIds = (previousModel.clientIDList ?? []);
-        const clientIds = (model.clientIDList ?? []);
-        const clientIdsNeedToAdd = clientIds.filter(x=>!prevClientIds.includes(x));
-        const clientIdsNeedToRemove = prevClientIds.filter(x=>!clientIds.includes(x));
+        const prevClientIds = previousModel.clientIDList ?? [];
+        const clientIds = model.clientIDList ?? [];
+        const clientIdsNeedToAdd = clientIds.filter((x) => !prevClientIds.includes(x));
+        const clientIdsNeedToRemove = prevClientIds.filter((x) => !clientIds.includes(x));
 
-        for(const clientIdToRemove of clientIdsNeedToRemove) {
+        for (const clientIdToRemove of clientIdsNeedToRemove) {
             const request: RemoveClientIDFromOpenIDConnectProviderRequest = {
                 OpenIDConnectProviderArn: model.arn,
-                ClientID: clientIdToRemove
+                ClientID: clientIdToRemove,
             };
-            console.info({message: 'removing client id', ...request});
+            console.info({ message: 'removing client id', ...request });
             await service.removeClientIDFromOpenIDConnectProvider(request).promise();
         }
 
-        for(const clientIdToAdd of clientIdsNeedToAdd) {
+        for (const clientIdToAdd of clientIdsNeedToAdd) {
             const request: AddClientIDToOpenIDConnectProviderRequest = {
                 OpenIDConnectProviderArn: model.arn,
-                ClientID: clientIdToAdd
+                ClientID: clientIdToAdd,
             };
-            console.info({message: 'adding client id', ...request});
+            console.info({ message: 'adding client id', ...request });
             await service.addClientIDToOpenIDConnectProvider(request).promise();
         }
 
         const updateThumbPrintsRequest: UpdateOpenIDConnectProviderThumbprintRequest = {
             ThumbprintList: model.thumbprintList,
             OpenIDConnectProviderArn: model.arn,
-
-        }
-        console.info({message: 'updating thumb prints', ...updateThumbPrintsRequest, previous: previousModel.thumbprintList});
-        await service
-            .updateOpenIDConnectProviderThumbprint(updateThumbPrintsRequest)
-            .promise();
+        };
+        console.info({ message: 'updating thumb prints', ...updateThumbPrintsRequest, previous: previousModel.thumbprintList });
+        await service.updateOpenIDConnectProviderThumbprint(updateThumbPrintsRequest).promise();
 
         return Promise.resolve(model);
     }
