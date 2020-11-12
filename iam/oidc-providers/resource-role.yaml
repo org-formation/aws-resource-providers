@@ -26,7 +26,9 @@ Resources:
                 - "iam:CreateOpenIDConnectProvider"
                 - "iam:DeleteOpenIDConnectProvider"
                 - "iam:GetOpenIDConnectProvider"
-                - "iam:UpdateOpenIDConnectProvider"
+                - "iam:addClientIDToOpenIDConnectProvider"
+                - "iam:removeClientIDFromOpenIDConnectProvider"
+                - "iam:updateOpenIDConnectProviderThumbprint"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

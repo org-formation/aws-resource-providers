@@ -46,7 +46,9 @@
         },
         "update": {
             "permissions": [
-                "iam:UpdateOpenIDConnectProvider"
+                "iam:updateOpenIDConnectProviderThumbprint",
+                "iam:removeClientIDFromOpenIDConnectProvider",
+                "iam:addClientIDToOpenIDConnectProvider"
             ]
         },
         "delete": {
