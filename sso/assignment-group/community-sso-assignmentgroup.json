@@ -22,8 +22,7 @@
             },
             "additionalProperties": false,
             "required": [
-                "TargetType",
-                "Title"
+                "TargetType"
             ]
         }
     },
@@ -74,12 +73,14 @@
     "primaryIdentifier": [
         "/properties/ResourceId"
     ],
-    
     "handlers": {
         "create": {
             "permissions": [
                 "sso:CreateAccountAssignment",
-                "sso:DescribeAccountAssignmentCreationStatus"
+                "sso:DescribeAccountAssignmentCreationStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider",
+                "iam:CreateRole"
             ]
         },
         "read": {
@@ -91,17 +92,18 @@
                 "sso:CreateAccountAssignment",
                 "sso:DescribeAccountAssignmentCreationStatus",
                 "sso:DeleteAccountAssignment",
-                "sso:DescribeAccountAssignmentDeletionStatus"
+                "sso:DescribeAccountAssignmentDeletionStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider",
+                "iam:CreateRole"
             ]
         },
         "delete": {
             "permissions": [
                 "sso:DeleteAccountAssignment",
-                "sso:DescribeAccountAssignmentDeletionStatus"
-            ]
-        },
-        "list": {
-            "permissions": [
+                "sso:DescribeAccountAssignmentDeletionStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider"
             ]
         }
     }

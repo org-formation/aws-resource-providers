@@ -23,10 +23,13 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "iam:CreateRole"
+                - "iam:GetSAMLProvider"
                 - "sso:CreateAccountAssignment"
                 - "sso:DeleteAccountAssignment"
                 - "sso:DescribeAccountAssignmentCreationStatus"
                 - "sso:DescribeAccountAssignmentDeletionStatus"
+                - "sso:ListAccountAssignments"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
