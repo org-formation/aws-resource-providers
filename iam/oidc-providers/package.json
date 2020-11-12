@@ -1,6 +1,6 @@
 {
     "name": "community-iam-openidconnectprovider",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "AWS custom resource provider named Community::IAM::OpenIDConnectProvider.",
     "main": "dist/handlers.js",
     "files": [
