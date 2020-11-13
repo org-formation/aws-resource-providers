@@ -1,0 +1,57 @@
+{
+    "typeName": "Community::Organizations::EnableAWSServiceAccess",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {},
+    "properties": {
+        "ServicePrincipal": {
+            "description": "The Service Principal of the AWS Service you wish to enable Delegated Access for",
+            "type": "string",
+            "pattern":".*\\.amazonaws\\.com"
+        },
+        "ResourceId": {
+            "description": "Primary Identifier for this resource",
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "ServicePrincipal",
+        "ResourceId"
+    ],
+    "createOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "organizations:EnableAWSServiceAccess"
+                
+            ]
+        },
+        "read": {
+            "permissions": [
+                "organizations:ListAWSServiceAccessForOrganization"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "organizations:EnableAWSServiceAccess",
+                "organizations:DisableAWSServiceAccess"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "organizations:DisableAWSServiceAccess"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "organizations:ListAWSServiceAccessForOrganization"
+            ]
+        }
+    }
+}

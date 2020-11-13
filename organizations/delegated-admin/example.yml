@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  accountId:
+    Type: String
+
+
+Resources:
+  AccessAnalyzerDelegatedAdmin:
+    Type: Community::Organizations::DelegatedAdmin
+    Properties:
+      AccountId: !Ref accountId
+      ServicePrincipal: access-analyzer.amazonaws.com
