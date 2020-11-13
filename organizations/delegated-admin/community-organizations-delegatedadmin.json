@@ -1,0 +1,64 @@
+{
+    "typeName": "Community::Organizations::DelegatedAdmin",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+
+    },
+    "properties": {
+        "AccountId": {
+            "description": "The AWS Account to delegated service to",
+            "type": "string",
+            "pattern": "^[0-9]{12}$"
+        },
+        "ServicePrincipal": {
+            "description": "The Service Principal of the AWS Service you wish to enable Delegated Access for",
+            "type": "string"
+        },
+        "Arn": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "ServicePrincipal",
+        "AccountId"
+    ],
+    "createOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "organizations:RegisterDelegatedAdministrator"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "organizations:ListDelegatedAdministrators"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "organizations:RegisterDelegatedAdministrator",
+                "organizations:DeregisterDelegatedAdministrator"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "organizations:DeregisterDelegatedAdministrator"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "organizations:ListDelegatedAdministrators"
+            ]
+        }
+    }
+}
