@@ -1,0 +1,85 @@
+{
+    "typeName": "Community::Organizations::Policy",
+    "description": "Resource that allows for the creation of an Organizations Policy attached to an OU.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "Content": {
+            "description": "The policy content.",
+            "type": "string"
+        },
+        "Description": {
+            "description": "The policy description.",
+            "type": "string"
+        },
+        "Name": {
+            "description": "The name of the policy.",
+            "type": "string"
+        },
+        "PolicyType": {
+            "type": "string",
+            "enum": [
+                "AISERVICES_OPT_OUT_POLICY",
+                "BACKUP_POLICY",
+                "SERVICE_CONTROL_POLICY",
+                "TAG_POLICY"
+            ]
+        },
+        "TargetIds": {
+            "description": "The list of target IDs to attach the policy to.",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+        },
+        "ResourceId": {
+            "description": "AWS CloudFormation generates a unique identifier for the organizations policy resource.",
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Content",
+        "Description",
+        "Name",
+        "PolicyType",
+        "TargetIds"
+    ],
+    "createOnlyProperties": [
+        "/properties/ResourceId",
+        "/properties/TargetIds"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "organizations:AttachPolicy",
+                "organizations:CreatePolicy"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "organizations:UpdatePolicy"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "organizations:DetachPolicy",
+                "organizations:DeletePolicy"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "organizations:DescribePolicy",
+                "organizations:DescribePolicy"
+            ]
+        }
+    }
+}
