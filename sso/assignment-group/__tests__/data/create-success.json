@@ -1,0 +1,23 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "InstanceArn": "arn:aws:sso:::instance/ssoins-123123123123",
+        "PermissionSets": [
+            "ps-123123"
+        ],
+        "PrincipalId": "123123",
+        "PrincipalType": "GROUP",
+        "Targets": [
+            {
+                "TargetType": "AWS_ACCOUNT",
+                "TargetIds": [
+                    "123123123123"
+                ]
+            }
+        ]
+    },
+    "previousResourceState": null,
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}

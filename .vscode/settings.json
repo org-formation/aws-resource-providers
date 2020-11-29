@@ -2,7 +2,6 @@
     "cSpell.words": [
         "Upsert"
     ],
-    "jest.pathToConfig": "./jest.config.js",
     "jest.enableSnapshotUpdateMessages": false,
     "jest.autoEnable": false,
 }

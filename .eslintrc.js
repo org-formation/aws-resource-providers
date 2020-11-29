@@ -21,9 +21,6 @@ module.exports = {
         },
         'import/resolver': {
             node: {},
-            typescript: {
-                directory: './tsconfig.eslint.json',
-            },
         },
         'import/internal-regex': 'aws\\-promise\\-jest\\-mock$',
     },

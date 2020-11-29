@@ -1,0 +1,111 @@
+{
+    "typeName": "Community::SSO::AssignmentGroup",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers",
+    "definitions": {
+        "Target": {
+            "type": "object",
+            "properties": {
+                "TargetType": {
+                    "type": "string",
+                    "enum": [
+                        "AWS_ACCOUNT",
+                        "AWS_OU"
+                    ]
+                },
+                "TargetIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "TargetType"
+            ]
+        }
+    },
+    "properties": {
+        "InstanceArn": {
+            "type": "string"
+        },
+        "ResourceId": {
+            "type": "string"
+        },
+        "PermissionSets": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "PrincipalId": {
+            "type": "string"
+        },
+        "PrincipalType": {
+            "type": "string",
+            "enum": [
+                "GROUP",
+                "USER"
+            ]
+        },
+        "Targets": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Target"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "InstanceArn",
+        "PermissionSets",
+        "PrincipalId",
+        "PrincipalType",
+        "Targets"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "createOnlyProperties": [
+        "/properties/InstanceArn"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+
+    "handlers": {
+        "create": {
+            "permissions": [
+                "sso:CreateAccountAssignment",
+                "sso:DescribeAccountAssignmentCreationStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider",
+                "iam:CreateRole"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "sso:CreateAccountAssignment",
+                "sso:DescribeAccountAssignmentCreationStatus",
+                "sso:DeleteAccountAssignment",
+                "sso:DescribeAccountAssignmentDeletionStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider",
+                "iam:CreateRole"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "sso:DeleteAccountAssignment",
+                "sso:DescribeAccountAssignmentDeletionStatus",
+                "sso:ListAccountAssignments",
+                "iam:GetSAMLProvider"
+            ]
+        }
+    }
+}
