@@ -1,0 +1,12 @@
+{
+   "clientRequestToken": "9c9ff813-e56a-4690-a340-56e760897f13",
+    "desiredResourceState": {
+      "ResourceId": "9c9ff813-e56a-4690-a340-56e760897f13",
+      "Content": "{\"services\":{\"@@operators_allowed_for_child_policies\":[\"@@none\"],\"default\":{\"@@operators_allowed_for_child_policies\":[\"@@none\"],\"opt_out_policy\":{\"@@operators_allowed_for_child_policies\":[\"@@none\"],\"@@assign\":\"optOut\"}}}}",
+      "Name": "AiGlobalOptOut",
+      "PolicyId": "40209347-34f9-4978-afd7-3b9e6a5d1725",
+      "Type": "AISERVICES_OPT_OUT_POLICY",
+      "TargetId": "r-abcdef"
+    },
+    "logicalResourceIdentifier": "MyResource"
+}
