@@ -1,6 +1,6 @@
 {
     "typeName": "Community::Organizations::Policy",
-    "description": "Resource that allows for the creation of an Organizations Policy attached to an OU.",
+    "description": "Resource that allows for the creation of AWS Organizations policies and attaching to different targets in the organization.",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
     "definitions": {
     },

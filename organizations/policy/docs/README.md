@@ -1,6 +1,6 @@
 # Community::Organizations::Policy
 
-Resource that allows for the creation of an Organizations Policy attached to an OU.
+Resource that allows for the creation of AWS Organizations policies and attaching to different targets in the organization.
 
 ## Syntax
 
