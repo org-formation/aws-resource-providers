@@ -1,41 +1,63 @@
-import { Organizations, S3Control } from 'aws-sdk';
+import { Organizations } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 
 import { ResourceModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {
+    private async listPolicyTargets(service: Organizations, logger: Logger, policyId: string): Promise<Organizations.PolicyTargetSummary[]> {
+        const policyTargets: Organizations.PolicyTargetSummary[] = [];
+        let response: Organizations.ListTargetsForPolicyResponse = {};
+        do {
+            response = await service
+                .listTargetsForPolicy({
+                    PolicyId: policyId,
+                    NextToken: response.NextToken,
+                })
+                .promise();
+            logger.log({ message: 'targets for policy listed', policyId, response });
+            policyTargets.push(...response.Targets);
+        } while (response.NextToken);
+        return Promise.resolve(policyTargets);
+    }
     /**
      * CloudFormation invokes this handler when the resource is initially created
      * during stack create operations.
      */
     @handlerEvent(Action.Create)
-    @commonAws({
-        serviceName: 'Organizations',
-        debug: true,
-    })
-    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<ResourceModel> {
-        const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
-
-        const response = await service
-            .createPolicy({
-                Content: model.content,
-                Description: model.description,
-                Name: model.name,
-                Type: model.policyType,
-            })
-            .promise();
-        model.resourceId = response.Policy.PolicySummary.Id;
-        console.info({ action, message: 'policy creation', policyId: model.resourceId });
+    @commonAws({ serviceName: 'Organizations', debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations, model: ResourceModel): Promise<ResourceModel> {
+        if (model.resourceId) {
+            throw new exceptions.InvalidRequest('Read only property [ResourceId] cannot be provided by the user.');
+        }
+        try {
+            const response = await service
+                .createPolicy({
+                    Content: model.content,
+                    Description: model.description,
+                    Name: model.name,
+                    Type: model.policyType,
+                })
+                .promise();
+            model.resourceId = response.Policy.PolicySummary.Id;
+            args.logger.log({ action, message: 'policy creation', policyId: model.resourceId, response });
+        } catch (err) {
+            if (err?.code === 'DuplicatePolicyException') {
+                args.logger.log(err);
+                throw new exceptions.AlreadyExists(this.typeName, model.name);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
+        }
         for (const targetId of model.targetIds) {
-            await service
+            const response = await service
                 .attachPolicy({
                     PolicyId: model.resourceId,
                     TargetId: targetId,
                 })
                 .promise();
-            console.info({ action, message: 'target ID attachment', targetId: targetId });
+            args.logger.log({ action, message: 'target ID attachment', targetId, response });
         }
 
         return Promise.resolve(model);
@@ -46,26 +68,30 @@ class Resource extends BaseResource<ResourceModel> {
      * as part of a stack update operation.
      */
     @handlerEvent(Action.Update)
-    @commonAws({
-        serviceName: 'Organizations',
-        debug: true,
-    })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<ResourceModel> {
-        const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
+    @commonAws({ serviceName: 'Organizations', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations, model: ResourceModel): Promise<ResourceModel> {
         const policyId = model.resourceId;
+        try {
+            const response = await service
+                .updatePolicy({
+                    Content: model.content,
+                    Description: model.description,
+                    Name: model.name,
+                    PolicyId: policyId,
+                })
+                .promise();
+            args.logger.log({ action, message: 'policy updated', policyId, response });
 
-        await service
-            .updatePolicy({
-                Content: model.content,
-                Description: model.description,
-                Name: model.name,
-                PolicyId: policyId,
-            })
-            .promise();
-        console.info({ action, message: 'policy updated', policyId: policyId });
-
-        return Promise.resolve(model);
+            return Promise.resolve(model);
+        } catch (err) {
+            if (err?.code === 'PolicyNotFoundException') {
+                args.logger.log(err);
+                throw new exceptions.NotFound(this.typeName, policyId);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
+        }
     }
 
     /**
@@ -74,36 +100,39 @@ class Resource extends BaseResource<ResourceModel> {
      * or the stack itself is deleted.
      */
     @handlerEvent(Action.Delete)
-    @commonAws({
-        serviceName: 'Organizations',
-        debug: true,
-    })
-    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<null> {
-        const { desiredResourceState } = args.request;
-
-        const model: ResourceModel = desiredResourceState;
+    @commonAws({ serviceName: 'Organizations', debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations, model: ResourceModel): Promise<null> {
         const policyId = model.resourceId;
 
         for (const targetId of model.targetIds) {
             try {
-                await service
+                const response = await service
                     .detachPolicy({
                         PolicyId: policyId,
                         TargetId: targetId,
                     })
                     .promise();
-                console.info({ action, message: 'policy detached', policyId: policyId, targetId: targetId });
+                args.logger.log({ action, message: 'policy detached', policyId, targetId, response });
             } catch (err) {}
         }
 
-        await service
-            .deletePolicy({
-                PolicyId: policyId,
-            })
-            .promise();
-        console.info({ action, message: 'policy deleted', policyId: policyId });
-
-        return Promise.resolve(null);
+        try {
+            const response = await service
+                .deletePolicy({
+                    PolicyId: policyId,
+                })
+                .promise();
+            args.logger.log({ action, message: 'policy deleted', policyId, response });
+            return Promise.resolve(null);
+        } catch (err) {
+            if (err?.code === 'PolicyNotFoundException') {
+                args.logger.log(err);
+                throw new exceptions.NotFound(this.typeName, policyId);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
+        }
     }
 
     /**
@@ -111,45 +140,36 @@ class Resource extends BaseResource<ResourceModel> {
      * detailed information about the resource's current state is required.
      */
     @handlerEvent(Action.Read)
-    @commonAws({
-        serviceName: 'Organizations',
-        debug: true,
-    })
-    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<ResourceModel> {
-        const { desiredResourceState } = args.request;
-        const model: ResourceModel = desiredResourceState;
-        const policyTargets = await this.listPolicyTargets(service, model.resourceId);
-        const policyIds = policyTargets.map((target) => target.TargetId);
-        model.targetIds = policyIds;
-        const policyDescription = await service
-            .describePolicy({
-                PolicyId: model.resourceId,
-            })
-            .promise();
-        const content = policyDescription.Policy.Content;
-        model.content = content;
-        model.description = policyDescription.Policy.PolicySummary.Description;
-        model.name = policyDescription.Policy.PolicySummary.Name;
-        return Promise.resolve(model);
-    }
-
-    public async listPolicyTargets(service: Organizations, policyId: string): Promise<Organizations.PolicyTargetSummary[]> {
-        const policyTargets: Organizations.PolicyTargetSummary[] = [];
-        let response: Organizations.ListTargetsForPolicyResponse = {};
-        do {
-            response = await service
-                .listTargetsForPolicy({
-                    PolicyId: policyId,
-                    NextToken: response.NextToken,
+    @commonAws({ serviceName: 'Organizations', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations, model: ResourceModel): Promise<ResourceModel> {
+        try {
+            const policyTargets = await this.listPolicyTargets(service, args.logger, model.resourceId);
+            const policyIds = policyTargets.map((target) => target.TargetId);
+            model.targetIds = policyIds;
+            const response = await service
+                .describePolicy({
+                    PolicyId: model.resourceId,
                 })
                 .promise();
-            policyTargets.push(...response.Targets);
-        } while (response.NextToken);
-        return Promise.resolve(policyTargets);
+            args.logger.log({ action, message: 'policy retrieved', policyId: model.resourceId, response });
+            model.content = response.Policy.Content;
+            // Service returns null even if original description was empty
+            model.description = response.Policy.PolicySummary.Description ?? '';
+            model.name = response.Policy.PolicySummary.Name;
+            return Promise.resolve(model);
+        } catch (err) {
+            if (err?.code === 'PolicyNotFoundException') {
+                args.logger.log(err);
+                throw new exceptions.NotFound(this.typeName, model.resourceId);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
+        }
     }
 }
 
-const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
+export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
 

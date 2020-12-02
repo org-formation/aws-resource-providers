@@ -1,0 +1,9 @@
+{
+    "CREATE": {
+        "/Content": "{\"services\":{\"lex\":{\"opt_out_policy\":{\"@@assign\":\"optOut\"}}}}",
+        "/TargetIds": [ "r-abcdef" ]
+    },
+    "UPDATE": {
+        "/Content": "{\"services\":{\"@@operators_allowed_for_child_policies\":[\"@@none\"],\"default\":{\"@@operators_allowed_for_child_policies\":[\"@@none\"],\"opt_out_policy\":{\"@@operators_allowed_for_child_policies\":[\"@@none\"],\"@@assign\":\"optOut\"}}}}"
+    }
+}

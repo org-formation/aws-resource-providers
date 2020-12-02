@@ -1,6 +1,6 @@
 # Community::Organizations::Policy
 
-Resource that allows for the creation of an Organizations Policy attached to an OU.
+Resource that allows for the creation of AWS Organizations policies and attaching to different targets in the organization.
 
 ## Syntax
 
@@ -38,35 +38,53 @@ Properties:
 
 #### Content
 
-The policy content.
+The policy text content to add to the new policy. The text that you supply must adhere to the rules of the policy type you specify in the Type parameter.
 
 _Required_: Yes
 
 _Type_: String
+
+_Minimum_: <code>1</code>
+
+_Maximum_: <code>1000000</code>
+
+_Pattern_: <code>[\s\S]+</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### Description
 
-The policy description.
+An optional description to assign to the policy.
 
 _Required_: Yes
 
 _Type_: String
+
+_Maximum_: <code>512</code>
+
+_Pattern_: <code>[\s\S]*</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### Name
 
-The name of the policy.
+The friendly name to assign to the policy.
 
 _Required_: Yes
 
 _Type_: String
 
+_Minimum_: <code>1</code>
+
+_Maximum_: <code>128</code>
+
+_Pattern_: <code>[\s\S]+</code>
+
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### PolicyType
+
+The type of policy to create.
 
 _Required_: Yes
 
@@ -100,5 +118,5 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 #### ResourceId
 
-AWS CloudFormation generates a unique identifier for the organizations policy resource.
+The unique identifier (ID) of the policy.
 
