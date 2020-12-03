@@ -1,4 +1,4 @@
-import { Action, BaseModel, BaseResource, Constructor, exceptions, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseModel, BaseResource, Constructor, exceptions, ExtendedClient, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import * as Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
@@ -14,13 +14,14 @@ export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Rec
 };
 
 export interface commonAwsOptions {
-    serviceName: ServiceName;
+    serviceName?: ServiceName;
+    service?: Constructor<Client>;
     action?: Action;
     debug?: boolean;
 }
 
 interface Session {
-    client: (...args: any[]) => Client;
+    client: (...args: any[]) => ExtendedClient<Client>;
 }
 
 /**
@@ -30,9 +31,9 @@ interface Session {
  */
 export function commonAws<T extends Record<string, any>, R extends BaseModel>(options: commonAwsOptions): MethodDecorator {
     return function (target: BaseResource<R>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
-        const { debug, serviceName } = options;
+        const { debug, service, serviceName } = options;
 
-        if (descriptor === undefined) {
+        if (!descriptor) {
             descriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
         }
 
@@ -66,10 +67,10 @@ export function commonAws<T extends Record<string, any>, R extends BaseModel>(op
             if (debug) logger.log({ action, request, callbackContext });
 
             if (session && (session instanceof SessionProxy || session.client instanceof Function)) {
-                const service = session.client(serviceName as any);
+                const client = session.client(service || (serviceName as any));
 
                 if (debug) logger.log({ action, message: 'before perform common task' });
-                const modified = await originalMethod.apply(this, [action, handlerArgs, service, model]);
+                const modified = await originalMethod.apply(this, [action, handlerArgs, client, model]);
                 if (debug) logger.log({ action, message: 'after perform common task' });
 
                 if (modified !== undefined) {

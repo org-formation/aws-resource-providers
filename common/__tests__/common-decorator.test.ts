@@ -24,7 +24,7 @@ describe('when calling handler', () => {
 
     class Resource extends BaseResource {
         @handlerEvent(Action.Create)
-        @commonAws({ serviceName: 'S3', debug: true })
+        @commonAws({ service: Aws.S3, debug: true })
         public async create(action: Action, args: HandlerArgs<MockModel>, service: Aws.S3, model: MockModel): Promise<MockModel> {
             model.id = 'id';
             return model;
@@ -35,7 +35,7 @@ describe('when calling handler', () => {
             return model;
         }
         @handlerEvent(Action.List)
-        @commonAws({ serviceName: 'S3' })
+        @commonAws({ service: Aws.S3 })
         public async list(action: Action, args: HandlerArgs<MockModel>, service: Aws.S3, model: MockModel): Promise<MockModel[]> {
             args.logger.log({ action, model });
             return modelList;
@@ -84,7 +84,14 @@ describe('when calling handler', () => {
         expect(progress.resourceModel.serialize()).toMatchObject({ id: 'some-id' });
     });
 
-    test('method success with list', async () => {
+    test('method success with update and service name', async () => {
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request: {} }, null);
+        expect(spySession).toHaveBeenCalledTimes(1);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeDefined();
+    });
+
+    test('method success with list and service constructor', async () => {
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.List, request: {} }, null);
         expect(spySession).toHaveBeenCalledTimes(1);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
@@ -114,9 +121,19 @@ describe('when calling handler', () => {
         }
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request: {} }, null);
         expect(spySession).toHaveBeenCalledTimes(1);
-        expect(spyLogger).toHaveBeenCalledTimes(3);
+        expect(spyLogger).toHaveBeenCalled();
         expect(spyInvokeHandler).toHaveBeenCalledTimes(2);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(JSON.stringify(progress.resourceModel)).toBe('{"id":"id"}');
+    });
+
+    test('decorator return even without descriptor', async () => {
+        const symbolProperty = Symbol.for('baz');
+        const obj = { [symbolProperty]: 73 };
+        const originalDescriptor = Object.getOwnPropertyDescriptor(obj, symbolProperty);
+        const methodDecorator = commonAws({ serviceName: 'S3' });
+        const modifiedDescriptor = methodDecorator(obj, symbolProperty, null) as PropertyDescriptor;
+        expect(modifiedDescriptor.value).not.toBe(originalDescriptor.value);
+        expect(modifiedDescriptor.value).toBeInstanceOf(Function);
     });
 });
