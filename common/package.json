@@ -1,6 +1,6 @@
 {
     "name": "aws-resource-providers-common",
-    "version": "0.2.3",
+    "version": "0.3.0",
     "description": "Common patterns and code that can be used when developing resource type providers for AWS CloudFormation.",
     "private": false,
     "main": "dist/index.js",
@@ -9,7 +9,7 @@
     },
     "scripts": {
         "build": "npx tsc",
-        "prepublishOnly": "npm run build",
+        "prepack": "npm run build",
         "test": "npx jest"
     },
     "files": [
