@@ -20,7 +20,7 @@
         "validate": "cfn validate"
     },
     "dependencies": {
-        "aws-resource-providers-common": "https://github.com/org-formation/aws-resource-providers/releases/download/common-0.1.0/aws-resource-providers-common-0.3.0-rc.2.tgz",
+        "aws-resource-providers-common": "^0.3.0",
         "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.5.0",
         "class-transformer": "^0.3.1"
     },
