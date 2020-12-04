@@ -12,6 +12,10 @@
             "type": "string",
             "pattern": "^[\\d]{12}$"
         },
+        "DisableSupportCaseCreation" : {
+            "type": "boolean",
+            "default": false
+        },
         "SupportLevel": {
             "type": "string",
             "enum": [

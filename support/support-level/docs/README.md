@@ -13,6 +13,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "Community::Support::SupportLevel",
     "Properties" : {
         "<a href="#accountid" title="AccountId">AccountId</a>" : <i>String</i>,
+        "<a href="#disablesupportcasecreation" title="DisableSupportCaseCreation">DisableSupportCaseCreation</a>" : <i>Boolean</i>,
         "<a href="#supportlevel" title="SupportLevel">SupportLevel</a>" : <i>String</i>,
         "<a href="#ccemailaddresses" title="CCEmailAddresses">CCEmailAddresses</a>" : <i>[ String, ... ]</i>
     }
@@ -25,6 +26,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: Community::Support::SupportLevel
 Properties:
     <a href="#accountid" title="AccountId">AccountId</a>: <i>String</i>
+    <a href="#disablesupportcasecreation" title="DisableSupportCaseCreation">DisableSupportCaseCreation</a>: <i>Boolean</i>
     <a href="#supportlevel" title="SupportLevel">SupportLevel</a>: <i>String</i>
     <a href="#ccemailaddresses" title="CCEmailAddresses">CCEmailAddresses</a>: <i>
       - String</i>
@@ -41,6 +43,14 @@ _Type_: String
 _Pattern_: <code>^[\d]{12}$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
+#### DisableSupportCaseCreation
+
+_Required_: No
+
+_Type_: Boolean
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### SupportLevel
 

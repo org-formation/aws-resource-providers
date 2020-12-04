@@ -5,8 +5,13 @@ import { ResourceModel } from './models';
 import { CreateCaseRequest } from 'aws-sdk/clients/support';
 
 export async function createSupportCase(model: ResourceModel, service: Support): Promise<void> {
+
+    if (model.disableSupportCaseCreation) {
+        return;
+    }
+
     const createCaseRequest: CreateCaseRequest = {
-        subject: `Enable ${model.supportLevel} Support for account: ${model.accountId}`,
+        subject: `Enable ${model.supportLevel} support for account: ${model.accountId}`,
         communicationBody: `Hi AWS,
         Please enable ${model.supportLevel} on account ${model.accountId}.
         This case was created automatically - please resolve when done.

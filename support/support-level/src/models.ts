@@ -29,6 +29,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     accountId?: Optional<string>;
+    @Expose({ name: 'DisableSupportCaseCreation' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Boolean, 'disableSupportCaseCreation', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    disableSupportCaseCreation?: Optional<boolean>;
     @Expose({ name: 'SupportLevel' })
     @Transform(
         (value: any, obj: any) =>
