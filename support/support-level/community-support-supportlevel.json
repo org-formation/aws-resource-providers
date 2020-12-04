@@ -1,0 +1,66 @@
+{
+    "typeName": "Community::Support::SupportLevel",
+    "description": "Resource that allows settings the SupportLevel for an Account within the organization through a support ticket. Only works if the master account has either business or enterprise support",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "Arn": {
+            "type": "string"
+        },
+        "AccountId": {
+            "type": "string",
+            "pattern": "^[\\d]{12}$"
+        },
+        "SupportLevel": {
+            "type": "string",
+            "enum": [
+                "developer",
+                "business",
+                "enterprise"
+            ]
+        },
+        "CCEmailAddresses": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "AccountId",
+        "SupportLevel"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "support:CreateCase",
+                "organizations:DescribeOrganization"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "support:CreateCase"
+            ]
+        },
+        "delete": {
+            "permissions": [
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
