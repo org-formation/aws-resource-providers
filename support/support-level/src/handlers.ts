@@ -1,11 +1,10 @@
 import { Organizations, Support } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { CreateCaseRequest } from 'aws-sdk/clients/support';
 
-
-export async function createSupportCase(model: ResourceModel, service: Support) {
+export async function createSupportCase(model: ResourceModel, service: Support): Promise<void> {
     const createCaseRequest: CreateCaseRequest = {
         subject: `Enable ${model.supportLevel} Support for account: ${model.accountId}`,
         communicationBody: `Hi AWS,
@@ -18,13 +17,13 @@ export async function createSupportCase(model: ResourceModel, service: Support) 
         categoryCode: 'other-account-issues',
         severityCode: 'low',
         issueType: 'customer-service',
-        ccEmailAddresses: model.cCEmailAddresses
+        ccEmailAddresses: model.cCEmailAddresses,
     };
 
     await service.createCase(createCaseRequest).promise();
 }
 
-async function checkContextIsOrganizationMasterAccount(args: HandlerArgs<ResourceModel, Record<string, any>>) {
+async function checkContextIsOrganizationMasterAccount(args: HandlerArgs<ResourceModel, Record<string, any>>): Promise<void> {
     try {
         const organizationsClient = args.session.client('Organizations', { region: 'us-east-1' }) as Organizations;
         await organizationsClient.describeOrganization().promise();
@@ -34,17 +33,15 @@ async function checkContextIsOrganizationMasterAccount(args: HandlerArgs<Resourc
 }
 
 class Resource extends BaseResource<ResourceModel> {
-
     @handlerEvent(Action.Create)
     @commonAws({ serviceName: 'Support', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: Support, model: ResourceModel): Promise<ResourceModel> {
-
-        const targetAccountId = args.request.awsAccountId
+        const targetAccountId = args.request.awsAccountId;
 
         await checkContextIsOrganizationMasterAccount(args);
         await createSupportCase(model, service);
 
-        model.arn = `arn:community:organizations::${targetAccountId}:support/support-level-${model.accountId}`
+        model.arn = `arn:community:organizations::${targetAccountId}:support/support-level-${model.accountId}`;
 
         return model;
     }
@@ -52,7 +49,6 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Update)
     @commonAws({ serviceName: 'Support', debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Support, model: ResourceModel): Promise<ResourceModel> {
-
         await createSupportCase(model, service);
 
         return model;
@@ -61,7 +57,6 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Delete)
     @commonAws({ serviceName: 'Support', debug: true })
     public async delete(): Promise<null> {
-
         return null;
     }
 }
@@ -71,4 +66,3 @@ const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 export const entrypoint = resource.entrypoint;
 
 export const testEntrypoint = resource.testEntrypoint;
-
