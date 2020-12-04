@@ -49,7 +49,10 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Update)
     @commonAws({ serviceName: 'Support', debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Support, model: ResourceModel): Promise<ResourceModel> {
-        await createSupportCase(model, service);
+
+        if (args.request.previousResourceState.supportLevel !== args.request.desiredResourceState.supportLevel) {
+            await createSupportCase(model, service);
+        }
 
         return model;
     }

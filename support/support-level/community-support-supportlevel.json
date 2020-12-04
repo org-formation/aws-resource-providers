@@ -35,6 +35,9 @@
     "readOnlyProperties": [
         "/properties/Arn"
     ],
+    "createOnlyProperties": [
+        "/properties/AccountId"
+    ],
     "primaryIdentifier": [
         "/properties/Arn"
     ],
