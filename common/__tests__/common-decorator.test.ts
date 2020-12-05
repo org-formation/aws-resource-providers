@@ -22,7 +22,7 @@ describe('when calling handler', () => {
 
     const modelList = [new MockModel({ id: '1' }), new MockModel({ id: '2' })];
 
-    class Resource extends BaseResource {
+    class Resource extends BaseResource<MockModel> {
         @handlerEvent(Action.Create)
         @commonAws({ service: Aws.S3, debug: true })
         public async create(action: Action, args: HandlerArgs<MockModel>, service: Aws.S3, model: MockModel): Promise<MockModel> {
