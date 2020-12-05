@@ -1,4 +1,4 @@
-import { Action, BaseModel, BaseResource, Constructor, exceptions, ExtendedClient, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseModel, BaseResource, Constructor, exceptions, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
 import * as Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
@@ -21,7 +21,7 @@ export interface commonAwsOptions {
 }
 
 interface Session {
-    client: (...args: any[]) => ExtendedClient<Client>;
+    client: (...args: any[]) => Client;
 }
 
 /**
