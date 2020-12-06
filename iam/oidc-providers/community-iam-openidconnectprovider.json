@@ -26,6 +26,10 @@
     },
     "additionalProperties": false,
     "required": [
+        "Url"
+    ],
+    "createOnlyProperties": [
+        "/properties/Url"
     ],
     "readOnlyProperties": [
         "/properties/Arn"
