@@ -1,11 +1,8 @@
 import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 import { ResourceModel } from './models';
-import { IAM } from 'aws-sdk';
+import IAM from 'aws-sdk/clients/iam';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { AddClientIDToOpenIDConnectProviderRequest, RemoveClientIDFromOpenIDConnectProviderRequest, UpdateOpenIDConnectProviderThumbprintRequest } from 'aws-sdk/clients/iam';
-
-
-
 
 export class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
@@ -81,7 +78,16 @@ export class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Delete)
     @commonAws({ serviceName: 'IAM', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<null> {
-        await service.deleteOpenIDConnectProvider({ OpenIDConnectProviderArn: model.arn }).promise();
+        try {
+            await service.deleteOpenIDConnectProvider({ OpenIDConnectProviderArn: model.arn }).promise();
+        } catch (err) {
+            if (err && err.code === 'NoSuchEntity') {
+                throw new exceptions.NotFound(ResourceModel.TYPE_NAME, model.arn || args.request.logicalResourceIdentifier);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
+        }
         return Promise.resolve(null);
     }
 }
