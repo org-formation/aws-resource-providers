@@ -6,5 +6,5 @@ Resources:
       Url: "https://host/path"
       ThumbprintList:
         - "00000aaaaabbbbbccccdddddeeeffff111222233"
-      ClientIDList:
+      ClientIdList:
         - "client-id"
