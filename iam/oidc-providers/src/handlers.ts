@@ -4,13 +4,16 @@ import { IAM } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { AddClientIDToOpenIDConnectProviderRequest, RemoveClientIDFromOpenIDConnectProviderRequest, UpdateOpenIDConnectProviderThumbprintRequest } from 'aws-sdk/clients/iam';
 
+
+
+
 export class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
     @commonAws({ serviceName: 'IAM', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<ResourceModel> {
         const response = await service
             .createOpenIDConnectProvider({
-                ClientIDList: model.clientIDList,
+                ClientIDList: model.clientIdList,
                 ThumbprintList: model.thumbprintList,
                 Url: model.url,
             })
@@ -29,8 +32,8 @@ export class Resource extends BaseResource<ResourceModel> {
             throw new exceptions.InvalidRequest(`Changing the url of an oidc provider is not supported.`);
         }
 
-        const prevClientIds = previousModel.clientIDList ?? [];
-        const clientIds = model.clientIDList ?? [];
+        const prevClientIds = previousModel.clientIdList ?? [];
+        const clientIds = model.clientIdList ?? [];
         const clientIdsNeedToAdd = clientIds.filter((x) => !prevClientIds.includes(x));
         const clientIdsNeedToRemove = prevClientIds.filter((x) => !clientIds.includes(x));
 
