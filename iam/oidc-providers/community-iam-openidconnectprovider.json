@@ -26,7 +26,8 @@
     },
     "additionalProperties": false,
     "required": [
-        "Url"
+        "Url",
+        "ThumbprintList"
     ],
     "createOnlyProperties": [
         "/properties/Url"
