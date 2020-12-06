@@ -38,15 +38,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     thumbprintList?: Optional<Array<string>>;
-    @Expose({ name: 'ClientIDList' })
+    @Expose({ name: 'ClientIdList' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'clientIDList', value, obj, [Array]),
+            transformValue(String, 'clientIdList', value, obj, [Array]),
         {
             toClassOnly: true,
         }
     )
-    clientIDList?: Optional<Array<string>>;
+    clientIdList?: Optional<Array<string>>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {

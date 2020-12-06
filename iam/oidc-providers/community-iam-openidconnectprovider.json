@@ -17,7 +17,7 @@
                 "type": "string"
             }
         },
-        "ClientIDList": {
+        "ClientIdList": {
             "type": "array",
             "items": {
                 "type": "string"

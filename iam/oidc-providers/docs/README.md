@@ -14,7 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#url" title="Url">Url</a>" : <i>String</i>,
         "<a href="#thumbprintlist" title="ThumbprintList">ThumbprintList</a>" : <i>[ String, ... ]</i>,
-        "<a href="#clientidlist" title="ClientIDList">ClientIDList</a>" : <i>[ String, ... ]</i>
+        "<a href="#clientidlist" title="ClientIdList">ClientIdList</a>" : <i>[ String, ... ]</i>
     }
 }
 </pre>
@@ -27,7 +27,7 @@ Properties:
     <a href="#url" title="Url">Url</a>: <i>String</i>
     <a href="#thumbprintlist" title="ThumbprintList">ThumbprintList</a>: <i>
       - String</i>
-    <a href="#clientidlist" title="ClientIDList">ClientIDList</a>: <i>
+    <a href="#clientidlist" title="ClientIdList">ClientIdList</a>: <i>
       - String</i>
 </pre>
 
@@ -35,11 +35,11 @@ Properties:
 
 #### Url
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 #### ThumbprintList
 
@@ -49,7 +49,7 @@ _Type_: List of String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### ClientIDList
+#### ClientIdList
 
 _Required_: No
 
