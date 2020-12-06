@@ -9,7 +9,8 @@
             "type": "string"
         },
         "Url": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^https:\/\/.*$"
         },
         "ThumbprintList": {
             "type": "array",
