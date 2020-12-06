@@ -55,10 +55,6 @@
             "permissions": [
                 "iam:DeleteOpenIDConnectProvider"
             ]
-        },
-        "list": {
-            "permissions": [
-            ]
         }
     }
 }
