@@ -1,0 +1,100 @@
+{
+    "typeName": "Community::Organizations::Policy",
+    "description": "Resource that allows for the creation of AWS Organizations policies and attaching to different targets in the organization.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "Content": {
+            "description": "The policy text content to add to the new policy. The text that you supply must adhere to the rules of the policy type you specify in the Type parameter.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000000,
+            "pattern": "[\\s\\S]+"
+        },
+        "Description": {
+            "description": "An optional description to assign to the policy.",
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 512,
+            "pattern": "[\\s\\S]*"
+        },
+        "Name": {
+            "description": "The friendly name to assign to the policy.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "[\\s\\S]+"
+        },
+        "PolicyType": {
+            "description": "The type of policy to create.",
+            "type": "string",
+            "enum": [
+                "AISERVICES_OPT_OUT_POLICY",
+                "BACKUP_POLICY",
+                "SERVICE_CONTROL_POLICY",
+                "TAG_POLICY"
+            ]
+        },
+        "TargetIds": {
+            "description": "The list of target IDs to attach the policy to.",
+            "items": {
+                "type": "string",
+                "minLength": 6,
+                "maxLength": 100,
+                "pattern": "^(r-[0-9a-z]{4,32})|(\\d{12})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$"
+            },
+            "minItems": 1,
+            "type": "array"
+        },
+        "ResourceId": {
+            "description": "The unique identifier (ID) of the policy.",
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 130,
+            "pattern": "^p-[0-9a-zA-Z_]{8,128}$"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Content",
+        "Description",
+        "Name",
+        "PolicyType",
+        "TargetIds"
+    ],
+    "createOnlyProperties": [
+        "/properties/TargetIds"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "organizations:AttachPolicy",
+                "organizations:CreatePolicy"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "organizations:UpdatePolicy"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "organizations:DetachPolicy",
+                "organizations:DeletePolicy"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "organizations:DescribePolicy",
+                "organizations:ListTargetsForPolicy"
+            ]
+        }
+    }
+}

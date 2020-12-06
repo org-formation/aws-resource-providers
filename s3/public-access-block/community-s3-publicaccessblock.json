@@ -23,8 +23,6 @@
     },
     "additionalProperties": false,
     "required": [
-        "TestCode",
-        "Title"
     ],
     "readOnlyProperties": [
         "/properties/ResourceId"
@@ -53,5 +51,5 @@
                 "s3:PutAccountPublicAccessBlock"
             ]
         }
-    }   
+    }
 }
