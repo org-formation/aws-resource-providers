@@ -159,6 +159,7 @@ describe('when calling handler', () => {
     test('all operations fail without session - iam password policy', async () => {
         expect.assertions(fixtureMap.size);
         spySession.mockReturnValue(null);
+        jest.spyOn(global, 'setTimeout').mockImplementation((callback: any) => callback());
         for (const [action, request] of fixtureMap) {
             const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, null);
             expect(progress.errorCode).toBe(exceptions.InvalidCredentials.name);
