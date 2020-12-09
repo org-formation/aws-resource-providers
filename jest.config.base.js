@@ -7,7 +7,8 @@ module.exports = {
             statements: 20,
         },
     },
-    collectCoverage: true,
+    collectCoverage: false,
+    coverageProvider: 'v8',
     coverageReporters: ['json', 'lcov', 'text'],
     coveragePathIgnorePatterns: ['node_modules/', '__tests__/data/', 'src/models.ts'],
 };

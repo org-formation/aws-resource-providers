@@ -10,8 +10,8 @@
         "build": "npx lerna run build",
         "lint": "npx eslint --ext .ts,.js .",
         "lint:fix": "npx eslint --fix --ext .ts,.js .",
-        "test": "npx jest --run-in-band --no-cache",
-        "test:silent": "jest --run-in-band --reporters jest-silent-reporter",
+        "test": "npx jest --no-cache --collect-coverage --coverageProvider v8",
+        "test:silent": "npx jest --run-in-band --collect-coverage --coverageProvider v8 --reporters jest-silent-reporter",
         "test:debug": "npx --node-arg=--inspect jest --runInBand",
         "test:integration": "npx lerna run test:integration -- -vv",
         "validate": "npx lerna run validate -- -vv"
