@@ -1,5 +1,5 @@
 import { Action, BaseModel, BaseResource, Constructor, exceptions, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
-import * as Aws from 'aws-sdk/clients/all';
+import Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
 type ServiceName = keyof ClientMap;
@@ -14,6 +14,9 @@ export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Rec
 };
 
 export interface commonAwsOptions {
+    /**
+     * @deprecated since version 0.3.0
+     */
     serviceName?: ServiceName;
     service?: Constructor<Client>;
     action?: Action;

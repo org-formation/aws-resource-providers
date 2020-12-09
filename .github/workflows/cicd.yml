@@ -41,7 +41,7 @@ jobs:
         id: automated_testing
         run: |
           npm run lint
-          npm test
+          npm run test:ci
       - name: Upload Coverage
         id: codecov
         run: |

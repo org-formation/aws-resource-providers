@@ -10,14 +10,15 @@
         "build": "npx lerna run build",
         "lint": "npx eslint --ext .ts,.js .",
         "lint:fix": "npx eslint --fix --ext .ts,.js .",
-        "test": "npx jest --run-in-band --no-cache --collect-coverage --coverageProvider v8",
-        "test:silent": "npx jest --run-in-band --collect-coverage --coverageProvider v8 --reporters jest-silent-reporter",
+        "test": "npx jest --run-in-band --silent",
+        "test:ci": "npx jest --run-in-band --logHeapUsage --no-cache --silent --collect-coverage --coverage-provider v8 --ci",
+        "test:silent": "npx jest --run-in-band --reporters jest-silent-reporter",
         "test:debug": "npx --node-arg=--inspect jest --runInBand",
         "test:integration": "npx lerna run test:integration -- -vv",
         "validate": "npx lerna run validate -- -vv"
     },
     "engines": {
-        "node": ">=10.4.0",
+        "node": ">=12.0.0",
         "npm": ">=6.9.0"
     },
     "repository": {
@@ -36,9 +37,10 @@
     },
     "devDependencies": {
         "@jurijzahn8019/aws-promise-jest-mock": "^2.3.1",
-        "@tsconfig/node10": "^1.0.7",
+        "@tsconfig/node12": "^1.0.7",
         "@types/jest": "^26.0.16",
         "@types/node": "^12.0.0",
+        "@types/uuid": "^7.0.3",
         "@typescript-eslint/eslint-plugin": "^4.8.1",
         "@typescript-eslint/parser": "^4.8.1",
         "aws-sdk": "^2.656.0",
@@ -49,14 +51,14 @@
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-prefer-arrow": "^1.2.2",
         "eslint-plugin-prettier": "^3.1.3",
-        "jest": "^26.6.3",
-        "jest-circus": "^26.6.3",
+        "jest": "^26.4.2",
+        "jest-circus": "^26.4.2",
         "jest-silent-reporter": "^0.4.0",
         "lerna": "^3.22.1",
         "npm-run-all": "^4.1.5",
         "prettier": "^2.2.1",
         "rimraf": "^3.0.2",
-        "ts-jest": "^26.4.4",
+        "ts-jest": "^26.3.0",
         "typescript": "^4.1.2"
     },
     "prettier": {
