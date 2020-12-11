@@ -6,6 +6,6 @@ module.exports = {
     ...base,
     setupFiles: ['<rootDir>/setup.js'],
     // testRunner: 'jest-circus/runner',
-    projects: ['<rootDir>/**/jest.config.js'],
+    // projects: ['<rootDir>/**/jest.config.js'],
     coverageDirectory: '<rootDir>/coverage/',
 };
