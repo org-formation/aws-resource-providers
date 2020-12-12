@@ -1,0 +1,10 @@
+{
+    "clientRequestToken": "9c9ff813-e56a-4690-a340-56e760897f13",
+    "desiredResourceState": {
+      "MasterAccountId": "123456789010"
+    },
+    "previousResourceState": null,
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}

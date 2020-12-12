@@ -1,0 +1,14 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ResourceId": "arn:community::123456789012:securityhub:master",
+        "MasterAccountId": "123456789011"
+    },
+    "previousResourceState": {
+        "ResourceId": "arn:community::123456789012:securityhub:master",
+        "MasterAccountId": "123456789010"
+    },
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}
