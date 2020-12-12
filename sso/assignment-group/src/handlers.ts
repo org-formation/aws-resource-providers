@@ -214,7 +214,7 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         const { clientRequestToken, awsAccountId } = args.request;
         const { logger, request, callbackContext } = args;
@@ -231,7 +231,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         const { clientRequestToken, previousResourceState } = args.request;
         const { logger } = args;
@@ -245,7 +245,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         const { clientRequestToken } = args.request;
         const { logger } = args;
@@ -256,7 +256,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         return Promise.resolve(model);
     }
