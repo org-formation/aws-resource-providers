@@ -82,7 +82,7 @@ describe('when calling handler', () => {
         });
     });
 
-    test('create operation fail already exists - code commit approval rule template', async () => {
+    test('create operation fail already exists - organizations policy', async () => {
         const mockCreate = organizations.mock('createPolicy').reject({
             ...new Error(),
             code: 'DuplicatePolicyException',
@@ -107,7 +107,7 @@ describe('when calling handler', () => {
         expect(progress.resourceModel).toBeNull();
     });
 
-    test('delete operation fail not found - code commit approval rule template', async () => {
+    test('delete operation fail not found - organizations policy', async () => {
         const mockGet = organizations.mock('deletePolicy').reject({
             ...new Error(),
             code: 'PolicyNotFoundException',
@@ -125,7 +125,7 @@ describe('when calling handler', () => {
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('read operation  fail not found - code commit approval rule template', async () => {
+    test('read operation  fail not found - organizations policy', async () => {
         expect.assertions(4);
         const mockGet = organizations.mock('listTargetsForPolicy').reject({
             ...new Error(),
