@@ -1,24 +1,22 @@
 import { SecurityHub } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { ResourceModel } from './models';
-import { BaseResource, handlerEvent, Action } from 'cfn-rpdk';
-import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 
-// Use this logger to forward log messages to CloudWatch Logs.
-const LOGGER = console;
+import { ResourceModel } from './models';
+
 const versionCode = '1';
 
 interface LogContext {
-    handler: 'Create' | 'Update' | 'Delete';
+    handler: Action;
     versionCode: string;
     clientRequestToken: string;
 }
 
-async function inviteMembers(desiredModel: ResourceModel, loggingContext: LogContext, service: SecurityHub) {
-    LOGGER.info({ ...loggingContext, method: 'inviteMembers', desiredModel });
+async function inviteMembers(desiredModel: ResourceModel, logger: Logger, loggingContext: LogContext, service: SecurityHub) {
+    logger.log({ ...loggingContext, method: 'inviteMembers', desiredModel });
 
     if (desiredModel.memberAccountIDs === undefined) {
-        throw new InternalFailure(`memberAccountIds are undefined`);
+        throw new exceptions.InternalFailure(`memberAccountIds are undefined`);
     }
     const accountDetails = desiredModel.memberAccountIDs.map((x) => ({ AccountId: x }));
 
@@ -26,61 +24,72 @@ async function inviteMembers(desiredModel: ResourceModel, loggingContext: LogCon
         AccountDetails: accountDetails,
     };
 
-    LOGGER.info({ ...loggingContext, method: 'before createMembers', desiredModel, createRequest });
+    logger.log({ ...loggingContext, method: 'before createMembers', desiredModel, createRequest });
     const createResponse = await service.createMembers(createRequest).promise();
-    LOGGER.info({ ...loggingContext, method: 'after createMembers', desiredModel, createRequest, createResponse });
+    logger.log({ ...loggingContext, method: 'after createMembers', desiredModel, createRequest, createResponse });
 
     const inviteRequest = {
         AccountIds: desiredModel.memberAccountIDs,
     };
-    LOGGER.info({ ...loggingContext, method: 'before inviteMembers', desiredModel, inviteRequest });
+    logger.log({ ...loggingContext, method: 'before inviteMembers', desiredModel, inviteRequest });
     const inviteResponse = await service.inviteMembers(inviteRequest).promise();
-    LOGGER.info({ ...loggingContext, method: 'after inviteMembers', desiredModel, inviteRequest, inviteResponse });
+    logger.log({ ...loggingContext, method: 'after inviteMembers', desiredModel, inviteRequest, inviteResponse });
 }
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'SecurityHub', debug: true })
-    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub): Promise<ResourceModel> {
-        const { desiredResourceState, awsAccountId, clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: 'Create', clientRequestToken: clientRequestToken, versionCode };
+    @commonAws({ service: SecurityHub, debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
+        const { awsAccountId, clientRequestToken } = args.request;
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
 
-        LOGGER.info({ ...loggingContext, message: 'begin', args });
-        await inviteMembers(desiredResourceState, loggingContext, service);
+        args.logger.log({ ...loggingContext, message: 'begin', args });
+        await inviteMembers(model, args.logger, loggingContext, service);
 
-        desiredResourceState.resourceId = `arn:community::${awsAccountId}:securityhub:member-invitations`;
+        model.resourceId = `arn:community::${awsAccountId}:securityhub:member-invitations`;
 
-        LOGGER.info({ ...loggingContext, message: 'done', desiredResourceState });
-        return desiredResourceState;
+        args.logger.log({ ...loggingContext, message: 'done', model });
+        return model;
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'SecurityHub', debug: true })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub): Promise<ResourceModel> {
-        const { desiredResourceState, clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: 'Update', clientRequestToken: clientRequestToken, versionCode };
+    @commonAws({ service: SecurityHub, debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
+        const { clientRequestToken } = args.request;
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
 
-        LOGGER.info({ ...loggingContext, message: 'begin', args });
+        args.logger.log({ ...loggingContext, message: 'begin', args });
 
-        await inviteMembers(desiredResourceState, loggingContext, service);
+        await inviteMembers(model, args.logger, loggingContext, service);
 
-        LOGGER.info({ ...loggingContext, message: 'done' });
-        return desiredResourceState;
+        args.logger.log({ ...loggingContext, message: 'done' });
+        return model;
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'SecurityHub', debug: true })
-    public async delete(action: Action, args: HandlerArgs<ResourceModel>): Promise<ResourceModel> {
-        const { desiredResourceState, clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: 'Delete', clientRequestToken: clientRequestToken, versionCode };
+    @commonAws({ service: SecurityHub, debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, _service: SecurityHub, model: ResourceModel): Promise<null> {
+        const { clientRequestToken } = args.request;
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
 
-        LOGGER.info({ ...loggingContext, message: 'noop', args });
+        args.logger.log({ ...loggingContext, message: 'noop', args });
 
-        return desiredResourceState;
+        return null;
+    }
+
+    @handlerEvent(Action.Read)
+    @commonAws({ service: SecurityHub, debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, _service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
+        const { clientRequestToken } = args.request;
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
+
+        args.logger.log({ ...loggingContext, message: 'noop', args });
+
+        return model;
     }
 }
 
-const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
+export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
 
