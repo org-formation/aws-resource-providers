@@ -1,5 +1,5 @@
-import { Action, BaseModel, BaseResource, Constructor, exceptions, ExtendedClient, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
-import * as Aws from 'aws-sdk/clients/all';
+import { Action, BaseModel, BaseResource, Constructor, exceptions, Logger, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import Aws from 'aws-sdk/clients/all';
 
 type ClientMap = typeof Aws;
 type ServiceName = keyof ClientMap;
@@ -14,6 +14,9 @@ export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Rec
 };
 
 export interface commonAwsOptions {
+    /**
+     * @deprecated since version 0.3.0
+     */
     serviceName?: ServiceName;
     service?: Constructor<Client>;
     action?: Action;
@@ -21,7 +24,7 @@ export interface commonAwsOptions {
 }
 
 interface Session {
-    client: (...args: any[]) => ExtendedClient<Client>;
+    client: (...args: any[]) => Client;
 }
 
 /**
@@ -38,6 +41,21 @@ export function commonAws<T extends Record<string, any>, R extends BaseModel>(op
         }
 
         const originalMethod = descriptor.value;
+
+        function retrieveClient(session: SessionProxy | Session, service: Constructor<Client> | string): any {
+            let errorMessage = '';
+            if (session && (session instanceof SessionProxy || typeof session.client === 'function')) {
+                try {
+                    const client = session.client(service);
+                    if (client) {
+                        return client;
+                    }
+                } catch (err) {
+                    errorMessage = err.message;
+                }
+            }
+            throw new exceptions.InvalidCredentials(`no aws session found - did you forget to register the execution role?\n${errorMessage}`);
+        }
 
         // Wrapping the original method with new signature.
         descriptor.value = async function (session: Optional<SessionProxy | Session>, request: ResourceHandlerRequest<R>, callbackContext: T, logger?: Logger): Promise<ProgressEvent<R, T>> {
@@ -66,28 +84,24 @@ export function commonAws<T extends Record<string, any>, R extends BaseModel>(op
 
             if (debug) logger.log({ action, request, callbackContext });
 
-            if (session && (session instanceof SessionProxy || session.client instanceof Function)) {
-                const client = session.client(service || (serviceName as any));
+            const client: Client = retrieveClient(session, service || serviceName);
 
-                if (debug) logger.log({ action, message: 'before perform common task' });
-                const modified = await originalMethod.apply(this, [action, handlerArgs, client, model]);
-                if (debug) logger.log({ action, message: 'after perform common task' });
+            if (debug) logger.log({ action, message: 'before perform common task' });
+            const modified = await originalMethod.apply(this, [action, handlerArgs, client, model]);
+            if (debug) logger.log({ action, message: 'after perform common task' });
 
-                if (modified !== undefined) {
-                    if (Array.isArray(modified)) {
-                        progress.resourceModel = null;
-                        progress.resourceModels = modified;
-                    } else {
-                        progress.resourceModel = modified;
-                        progress.resourceModels = null;
-                    }
+            if (modified !== undefined) {
+                if (Array.isArray(modified)) {
+                    progress.resourceModel = null;
+                    progress.resourceModels = modified;
+                } else {
+                    progress.resourceModel = modified;
+                    progress.resourceModels = null;
                 }
-
-                progress.status = OperationStatus.Success;
-                return Promise.resolve(progress);
-            } else {
-                throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
             }
+
+            progress.status = OperationStatus.Success;
+            return Promise.resolve(progress);
         };
         return descriptor;
     };
