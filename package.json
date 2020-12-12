@@ -11,7 +11,7 @@
         "lint": "npx eslint --ext .ts,.js .",
         "lint:fix": "npx eslint --fix --ext .ts,.js .",
         "test": "npx jest --run-in-band --silent",
-        "test:ci": "npx jest --logHeapUsage --no-cache --silent --collect-coverage --ci",
+        "test:ci": "npx jest --logHeapUsage --no-cache --collect-coverage --ci",
         "test:silent": "npx jest --run-in-band --reporters jest-silent-reporter",
         "test:debug": "npx --node-arg=--inspect jest --runInBand",
         "test:integration": "npx lerna run test:integration -- -vv",

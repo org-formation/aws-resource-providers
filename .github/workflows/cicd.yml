@@ -19,7 +19,7 @@ jobs:
       AWS_DEFAULT_REGION: "eu-central-1"
       LOG_PATH: /tmp/debug-logs
       PIP_LOG_FILE: /tmp/pip.log
-      NODE_OPTIONS: "--max_old_space_size=8000"
+      NODE_OPTIONS: "--max_old_space_size=7000"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
