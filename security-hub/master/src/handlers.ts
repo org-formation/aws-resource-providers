@@ -1,80 +1,88 @@
 import { SecurityHub } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { ResourceModel } from './models';
-import { BaseResource, handlerEvent, Action } from 'cfn-rpdk';
-import { AcceptInvitationRequest } from 'aws-sdk/clients/securityhub';
+import { Action, BaseResource, handlerEvent, Logger } from 'cfn-rpdk';
 
-// Use this logger to forward log messages to CloudWatch Logs.
-const LOGGER = console;
 const versionCode = '1';
 
 interface LogContext {
-    handler: 'Create' | 'Update' | 'Delete';
+    handler: Action;
     versionCode: string;
     clientRequestToken: string;
 }
 
-async function acceptMaster(desiredModel: ResourceModel, loggingContext: LogContext, service: SecurityHub) {
-    LOGGER.info({ ...loggingContext, method: 'acceptMaster', desiredModel });
+async function acceptMaster(desiredModel: ResourceModel, logger: Logger, loggingContext: LogContext, service: SecurityHub) {
+    logger.log({ ...loggingContext, method: 'acceptMaster', desiredModel });
 
     const invitations = await service.listInvitations().promise();
-    LOGGER.info({ ...loggingContext, method: 'after listInvitations', invitations });
+    logger.log({ ...loggingContext, method: 'after listInvitations', invitations });
 
     for (const invitation of invitations.Invitations) {
         if (invitation.AccountId === desiredModel.masterAccountId) {
-            const acceptInvitationRequest: AcceptInvitationRequest = { InvitationId: invitation.InvitationId, MasterId: desiredModel.masterAccountId };
+            const acceptInvitationRequest: SecurityHub.AcceptInvitationRequest = { InvitationId: invitation.InvitationId, MasterId: desiredModel.masterAccountId };
 
-            LOGGER.info({ ...loggingContext, method: 'before acceptInvitation', acceptInvitationRequest });
+            logger.log({ ...loggingContext, method: 'before acceptInvitation', acceptInvitationRequest });
             const acceptResponse = await service.acceptInvitation(acceptInvitationRequest).promise();
-            LOGGER.info({ ...loggingContext, method: 'after acceptInvitation', acceptResponse });
+            logger.log({ ...loggingContext, method: 'after acceptInvitation', acceptResponse });
         }
     }
 
-    LOGGER.info({ ...loggingContext, method: 'acceptMaster', desiredModel });
+    logger.log({ ...loggingContext, method: 'acceptMaster', desiredModel });
 }
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'SecurityHub', debug: true })
-    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub): Promise<ResourceModel> {
-        const { desiredResourceState, awsAccountId, clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: 'Create', clientRequestToken: clientRequestToken, versionCode };
+    @commonAws({ service: SecurityHub, debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
+        const { awsAccountId, clientRequestToken } = args.request;
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
 
-        LOGGER.info({ ...loggingContext, message: 'begin', args });
-        await acceptMaster(desiredResourceState, loggingContext, service);
+        args.logger.log({ ...loggingContext, message: 'begin', args });
+        await acceptMaster(model, args.logger, loggingContext, service);
 
-        desiredResourceState.resourceId = `arn:community::${awsAccountId}:securityhub:master`;
+        model.resourceId = `arn:community::${awsAccountId}:securityhub:master`;
 
-        LOGGER.info({ ...loggingContext, message: 'done', desiredResourceState });
-        return desiredResourceState;
+        args.logger.log({ ...loggingContext, message: 'done', model });
+        return model;
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'SecurityHub', debug: true })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub): Promise<ResourceModel> {
+    @commonAws({ service: SecurityHub, debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
         const { desiredResourceState, clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: 'Update', clientRequestToken: clientRequestToken, versionCode };
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
 
-        LOGGER.info({ ...loggingContext, message: 'begin', args });
-        await acceptMaster(desiredResourceState, loggingContext, service);
+        args.logger.log({ ...loggingContext, message: 'begin', args });
+        await acceptMaster(desiredResourceState, args.logger, loggingContext, service);
 
-        LOGGER.info({ ...loggingContext, message: 'done' });
+        args.logger.log({ ...loggingContext, message: 'done' });
         return desiredResourceState;
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'SecurityHub', debug: true })
-    public async delete(action: Action, args: HandlerArgs<ResourceModel> /*, service: SecurityHub*/): Promise<ResourceModel> {
-        const { desiredResourceState, clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: 'Delete', clientRequestToken: clientRequestToken, versionCode };
+    @commonAws({ service: SecurityHub, debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>): Promise<ResourceModel> {
+        const { clientRequestToken } = args.request;
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
 
-        LOGGER.info({ ...loggingContext, message: 'noop', args });
+        args.logger.log({ ...loggingContext, message: 'noop', args });
 
-        return desiredResourceState;
+        return null;
+    }
+
+    @handlerEvent(Action.Read)
+    @commonAws({ service: SecurityHub, debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, _service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
+        const { clientRequestToken } = args.request;
+        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
+
+        args.logger.log({ ...loggingContext, message: 'noop', args });
+
+        return model;
     }
 }
 
-const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
+export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
 
