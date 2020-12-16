@@ -1,0 +1,66 @@
+{
+    "typeName": "Community::IAM::OpenIDConnectProvider",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "Arn": {
+            "type": "string"
+        },
+        "Url": {
+            "type": "string",
+            "pattern": "^https:\/\/.*$"
+        },
+        "ThumbprintList": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "ClientIdList": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Url",
+        "ThumbprintList"
+    ],
+    "createOnlyProperties": [
+        "/properties/Url"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "iam:CreateOpenIDConnectProvider"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "iam:GetOpenIDConnectProvider"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "iam:updateOpenIDConnectProviderThumbprint",
+                "iam:removeClientIDFromOpenIDConnectProvider",
+                "iam:addClientIDToOpenIDConnectProvider"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "iam:DeleteOpenIDConnectProvider"
+            ]
+        }
+    }
+}
