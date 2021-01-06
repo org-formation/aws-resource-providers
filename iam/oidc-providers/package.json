@@ -12,15 +12,15 @@
         "submit": "npm run prepack && cfn submit -vv --region us-east-1 --set-default",
         "package": "npm run prepack && cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
         "version": "npm run package && aws s3 cp ${npm_package_name}-${npm_package_version}.zip s3://community-resource-provider-catalog/${npm_package_name}-${npm_package_version}.zip && aws s3 cp resource-role.yaml s3://community-resource-provider-catalog/${npm_package_name}-resource-role-${npm_package_version}.yml",
-        "test": "npx jest --config ../../jest.config.js --rootDir .",
+        "test": "npx jest",
         "test:integration": "npx npm-run-all -p -r samstart cfntest",
         "cfntest": "cfn test -vv >> cfn.log",
         "samstart": "sam local start-lambda -l sam.log",
         "validate": "cfn validate"
     },
     "dependencies": {
-        "aws-resource-providers-common": "^0.2.0",
-        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.4.0",
+        "aws-resource-providers-common": "^0.3.0",
+        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.5.0",
         "class-transformer": "^0.3.1"
     },
     "devDependencies": {
