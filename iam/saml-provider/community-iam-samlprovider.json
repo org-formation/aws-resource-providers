@@ -20,7 +20,7 @@
         "Name",
         "MetadataDocument"
     ],
-    "readOnlyProperties": [
+    "createOnlyProperties": [
         "/properties/Arn"
     ],
     "primaryIdentifier": [
