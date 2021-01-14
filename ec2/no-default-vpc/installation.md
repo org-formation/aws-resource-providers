@@ -34,10 +34,10 @@ aws cloudformation set-type-default-version \
 For more information on AWS Organization Formation, see: https://github.com/org-formation/org-formation-cli
 
 ``` yaml
-CommunityEc2EbsEncryptionDefaultsRP:
+CommunityEc2NoDefaultVpcsRP:
   Type: register-type
-  SchemaHandlerPackage: s3://community-resource-provider-catalog/community-ec2-ebsencryptiondefaults-0.1.0.zip
-  ResourceType: 'Community::Organizations::EbsEncryptionDefaults'
+  SchemaHandlerPackage: s3://community-resource-provider-catalog/community-organizations-nodefaultvpc-0.1.0.zip
+  ResourceType: 'Community::Organizations::NoDefaultVPC'
   MaxConcurrentTasks: 10
   OrganizationBinding:
     IncludeMasterAccount: true
