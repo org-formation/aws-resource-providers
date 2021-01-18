@@ -14,6 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#metadatadocument" title="MetadataDocument">MetadataDocument</a>" : <i>String</i>,
+        "<a href="#arn" title="Arn">Arn</a>" : <i>String</i>
     }
 }
 </pre>
@@ -25,6 +26,7 @@ Type: Community::IAM::SamlProvider
 Properties:
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#metadatadocument" title="MetadataDocument">MetadataDocument</a>: <i>String</i>
+    <a href="#arn" title="Arn">Arn</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -45,19 +47,16 @@ _Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
+#### Arn
+
+_Required_: No
+
+_Type_: String
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
 ## Return Values
 
 ### Ref
 
 When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the Arn.
-
-### Fn::GetAtt
-
-The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of this type. The following are the available attributes and sample return values.
-
-For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
-
-#### Arn
-
-Returns the <code>Arn</code> value.
-
