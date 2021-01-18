@@ -1,15 +1,13 @@
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, handlerEvent } from 'cfn-rpdk';
 import { ResourceModel } from './models';
 import { IAM, ServiceQuotas } from 'aws-sdk';
 import { commonAws, HandlerArgs, QuotaID, UpsertQuotas } from 'aws-resource-providers-common';
-import { Console } from 'console';
 
 const quotaCodeForPropertyName: Record<string, QuotaID> = {
     tables: { QuotaCode: 'L-F98FE922', ServiceCode: 'dynamodb' },
 };
 
 class Resource extends BaseResource<ResourceModel> {
-
     @handlerEvent(Action.Create)
     @commonAws({ serviceName: 'ServiceQuotas', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<ResourceModel> {
@@ -30,7 +28,7 @@ class Resource extends BaseResource<ResourceModel> {
 
     @handlerEvent(Action.Delete)
     @commonAws({ serviceName: 'ServiceQuotas', debug: true })
-    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: ServiceQuotas, model: ResourceModel): Promise<null> {
+    public async delete(): Promise<null> {
         return Promise.resolve(null);
     }
 }
