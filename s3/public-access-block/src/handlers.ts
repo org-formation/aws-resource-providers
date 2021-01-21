@@ -22,8 +22,6 @@ class Resource extends BaseResource<ResourceModel> {
             response,
         });
 
-        model.resourceId = accountId;
-
         logger.log({ action, message: 'done', model });
         return model;
     }
@@ -32,6 +30,7 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'S3Control', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control, model: ResourceModel): Promise<ResourceModel> {
         const accountId = args.request.awsAccountId;
+        model.resourceId = accountId;
         return this.upsertAccountPublicAccessBlock(action, service, args.logger, model, accountId);
     }
 
