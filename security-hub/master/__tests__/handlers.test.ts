@@ -38,6 +38,7 @@ describe('when calling handler', () => {
             ],
         });
         securityHub.mock('acceptInvitation').resolve({});
+        securityHub.mock('deleteInvitations').resolve({});
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
         spySessionClient.mockReturnValue(securityHub.instance);
@@ -77,11 +78,40 @@ describe('when calling handler', () => {
         expect(progress.resourceModel).toBeNull();
     });
 
+    test('delete operation fail not found - security hub master', async () => {
+        const mockGet = securityHub.mock('deleteInvitations').reject({
+            ...new Error(),
+            code: 'ResourceNotFoundException',
+        });
+        const request = fixtureMap.get(Action.Delete);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+    });
+
     test('read operation successful - security hub master', async () => {
+        const mockGet = securityHub.mock('listInvitations').resolve({
+            Invitations: [
+                {
+                    AccountId: '123456789012',
+                    InvitationId: '123456789012',
+                    MemberStatus: 'ENABLED',
+                },
+            ],
+        });
         const request = fixtureMap.get(Action.Read);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+    });
+
+    test('read operation  fail not found - security hub master', async () => {
+        const mockGet = securityHub.mock('listInvitations').resolve({ Invitations: [] });
+        const request = fixtureMap.get(Action.Read);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
     });
 
     test('all operations fail without session - security hub master', async () => {
