@@ -1,9 +1,8 @@
 {
     "typeName": "Community::SecurityHub::Master",
     "description": "An example resource schema demonstrating some basic constructs and validation rules.",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
-       
     },
     "properties": {
         "MasterAccountId": {
@@ -26,22 +25,24 @@
     "handlers": {
         "create": {
             "permissions": [
-                "securityhub:listinvitations",
-                "securityhub:acceptinvitation"
+                "securityhub:ListInvitations",
+                "securityhub:AcceptInvitation"
             ]
         },
         "read": {
             "permissions": [
+                "securityhub:ListInvitations"
             ]
         },
         "update": {
             "permissions": [
-                "securityhub:listinvitations",
-                "securityhub:acceptinvitation"
+                "securityhub:ListInvitations",
+                "securityhub:AcceptInvitation"
             ]
         },
         "delete": {
             "permissions": [
+                "securityhub:DeleteInvitations"
             ]
         }
     }
