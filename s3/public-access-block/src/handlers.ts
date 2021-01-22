@@ -8,11 +8,11 @@ class Resource extends BaseResource<ResourceModel> {
         const request: S3Control.PutPublicAccessBlockRequest = {
             AccountId: accountId,
             PublicAccessBlockConfiguration: {
-                IgnorePublicAcls : model.ignorePublicAcls,
+                IgnorePublicAcls: model.ignorePublicAcls,
                 BlockPublicAcls: model.blockPublicAcls,
                 BlockPublicPolicy: model.blockPublicPolicy,
-                RestrictPublicBuckets: model.restrictPublicBuckets
-            }
+                RestrictPublicBuckets: model.restrictPublicBuckets,
+            },
         };
 
         logger.log({
