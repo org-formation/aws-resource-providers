@@ -17,7 +17,7 @@ aws cloudformation describe-stacks \
 
 # register the cloudformation type
 aws cloudformation register-type \
-  --type-name Community::Organizations::EbsEncryptionDefaults \
+  --type-name Community::Organizations::NoDefaultVPC \
   --type RESOURCE \
   --schema-handler-package s3://community-resource-provider-catalog/community-organizations-nodefaultvpc-0.1.0.zip \
   --execution-role <role-arn-from-output>
