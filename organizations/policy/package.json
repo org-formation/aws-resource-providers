@@ -1,6 +1,6 @@
 {
     "name": "community-organizations-policy",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "CloudFormation Resource Provider for AWS Organizations Policy",
     "private": true,
     "main": "dist/handlers.js",
@@ -36,7 +36,7 @@
     "dependencies": {
         "aws-resource-providers-common": "^0.3.0",
         "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.5.0",
-        "class-transformer": "^0.3.1",
+        "class-transformer": "0.3.1",
         "uuid": "^7.0.3"
     },
     "devDependencies": {
