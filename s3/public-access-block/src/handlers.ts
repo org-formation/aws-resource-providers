@@ -8,27 +8,12 @@ class Resource extends BaseResource<ResourceModel> {
         const request: S3Control.PutPublicAccessBlockRequest = {
             AccountId: accountId,
             PublicAccessBlockConfiguration: {
-                // IgnorePublicAcls: model.ignorePublicAcls,
-                // BlockPublicAcls: model.blockPublicAcls,
-                // BlockPublicPolicy: model.blockPublicPolicy,
-                // RestrictPublicBuckets: model.restrictPublicBuckets,
+                IgnorePublicAcls: model.ignorePublicAcls,
+                BlockPublicAcls: model.blockPublicAcls,
+                BlockPublicPolicy: model.blockPublicPolicy,
+                RestrictPublicBuckets: model.restrictPublicBuckets,
             },
         };
-        if (model.ignorePublicAcls !== undefined) {
-            request.PublicAccessBlockConfiguration.IgnorePublicAcls = (model.ignorePublicAcls == true);
-        }
-
-        if (model.blockPublicAcls !== undefined) {
-            request.PublicAccessBlockConfiguration.BlockPublicAcls = (model.blockPublicAcls == true);
-        }
-
-        if (model.blockPublicPolicy !== undefined) {
-            request.PublicAccessBlockConfiguration.BlockPublicPolicy = (model.blockPublicPolicy == true);
-        }
-
-        if (model.restrictPublicBuckets !== undefined) {
-            request.PublicAccessBlockConfiguration.RestrictPublicBuckets = (model.restrictPublicBuckets == true);
-        }
 
         logger.log({
             action,
