@@ -7,7 +7,12 @@ class Resource extends BaseResource<ResourceModel> {
     private async upsertAccountPublicAccessBlock(action: Action, service: S3Control, logger: Logger, model: ResourceModel, accountId: string): Promise<ResourceModel> {
         const request: S3Control.PutPublicAccessBlockRequest = {
             AccountId: accountId,
-            PublicAccessBlockConfiguration: model.serialize(),
+            PublicAccessBlockConfiguration: {
+                IgnorePublicAcls: model.ignorePublicAcls,
+                BlockPublicAcls: model.blockPublicAcls,
+                BlockPublicPolicy: model.blockPublicPolicy,
+                RestrictPublicBuckets: model.restrictPublicBuckets,
+            },
         };
 
         logger.log({
