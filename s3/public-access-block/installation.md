@@ -4,7 +4,7 @@
 ``` bash
 # first install the execution role
 aws cloudformation create-stack \
-  --template-url https://community-resource-provider-catalog.s3.amazonaws.com/community-s3-publicaccessblock-resource-role-0.2.1.yml \
+  --template-url https://community-resource-provider-catalog.s3.amazonaws.com/community-s3-publicaccessblock-resource-role-0.2.2.yml \
   --stack-name community-s3-publicaccessblock-resource-role \
   --capabilities CAPABILITY_IAM
 
@@ -19,7 +19,7 @@ aws cloudformation describe-stacks \
 aws cloudformation register-type \
   --type-name Community::S3::PublicAccessBlock \
   --type RESOURCE \
-  --schema-handler-package s3://community-resource-provider-catalog/community-s3-publicaccessblock-0.2.1.zip \
+  --schema-handler-package s3://community-resource-provider-catalog/community-s3-publicaccessblock-0.2.2.zip \
   --execution-role <role-arn-from-output>
 
 aws cloudformation describe-type-registration --registration-token <registration-token>
@@ -37,7 +37,7 @@ For more information on AWS Organization Formation, see: https://github.com/org-
 ``` yaml
 CommunityS3PublicAccessBlockRP:
   Type: register-type
-  SchemaHandlerPackage: s3://community-resource-provider-catalog/community-s3-publicaccessblock-0.2.1.zip
+  SchemaHandlerPackage: s3://community-resource-provider-catalog/community-s3-publicaccessblock-0.2.2.zip
   ResourceType: 'Community::S3::PublicAccessBlock'
   MaxConcurrentTasks: 10
   OrganizationBinding:
