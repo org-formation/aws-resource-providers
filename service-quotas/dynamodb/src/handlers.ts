@@ -31,6 +31,15 @@ class Resource extends BaseResource<ResourceModel> {
     public async delete(): Promise<null> {
         return Promise.resolve(null);
     }
+
+    @handlerEvent(Action.Read)
+    @commonAws({ serviceName: 'ServiceQuotas', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<ResourceModel> {
+        const read = new ResourceModel({
+            Arn: model.arn,
+        });
+        return Promise.resolve(read);
+    }
 }
 
 export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
