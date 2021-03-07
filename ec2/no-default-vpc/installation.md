@@ -1,4 +1,4 @@
-# Community::Organizations::EbsEncryptionDefaults
+# Community::Organizations::NoDefaultVPC
 
 ## Installation using AWS CLI
 ``` bash
