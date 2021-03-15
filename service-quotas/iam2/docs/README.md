@@ -1,6 +1,6 @@
 # Community::ServiceQuotas::IAM
 
-Custom Service Quota limits for IAM resources. e.g: to increase the maximum number of stacks per account.
+Custom Service Quota limits for IAM resources. e.g: to increase the maximum number of IAM Roles per account.
 
 ## Syntax
 
@@ -13,6 +13,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "Community::ServiceQuotas::IAM",
     "Properties" : {
         "<a href="#roles" title="Roles">Roles</a>" : <i>Integer</i>,
+        "<a href="#customermanagedpolicies" title="CustomerManagedPolicies">CustomerManagedPolicies</a>" : <i>Integer</i>,
     }
 }
 </pre>
@@ -23,6 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: Community::ServiceQuotas::IAM
 Properties:
     <a href="#roles" title="Roles">Roles</a>: <i>Integer</i>
+    <a href="#customermanagedpolicies" title="CustomerManagedPolicies">CustomerManagedPolicies</a>: <i>Integer</i>
 </pre>
 
 ## Properties
@@ -37,9 +39,9 @@ _Type_: Integer
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### CustomerManagedStacks
+#### CustomerManagedPolicies
 
-Maximum number of AWS IAM Customer Managed Stacks that you can create (default = 1500).
+Maximum number of AWS IAM Customer Managed Policies that you can create (default = 1500).
 
 _Required_: No
 

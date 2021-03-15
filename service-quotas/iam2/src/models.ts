@@ -20,7 +20,6 @@ export class ResourceModel extends BaseModel {
         }
     )
     roles?: Optional<integer>;
-
     @Expose({ name: 'CustomerManagedPolicies' })
     @Transform(
         (value: any, obj: any) =>
@@ -30,7 +29,6 @@ export class ResourceModel extends BaseModel {
         }
     )
     customerManagedPolicies?: Optional<integer>;
-    
     @Expose({ name: 'ResourceId' })
     @Transform(
         (value: any, obj: any) =>

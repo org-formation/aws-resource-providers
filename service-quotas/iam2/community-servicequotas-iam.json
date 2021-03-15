@@ -1,9 +1,9 @@
 {
     "typeName": "Community::ServiceQuotas::IAM",
     "description": "Custom Service Quota limits for IAM resources. e.g: to increase the maximum number of IAM Roles per account.",
-    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
     "definitions": {
-       
+        
     },
     "properties": {
         "Roles": {
