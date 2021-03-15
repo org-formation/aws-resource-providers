@@ -1,0 +1,8 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "Roles": 1000
+    },
+    "previousResourceState": null,
+    "logicalResourceIdentifier": "MyResource"
+}

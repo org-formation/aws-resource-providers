@@ -1,0 +1,64 @@
+{
+    "typeName": "Community::ServiceQuotas::IAM",
+    "description": "Custom Service Quota limits for IAM resources. e.g: to increase the maximum number of IAM Roles per account.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {
+       
+    },
+    "properties": {
+        "Roles": {
+            "description":"Maximum number of AWS IAM Roles that you can create (default = 1000).",
+            "type": "integer",
+            "default": 1000,
+            "minimum": 1000
+        },
+        "CustomerManagedPolicies": {
+            "description":"Maximum number of AWS IAM Customer Managed Policies that you can create (default = 1500).",
+            "type": "integer",
+            "default": 1500,
+            "minimum": 1500
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits",
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits",
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
+            ]
+        },
+        "delete": {
+            "permissions": [
+            ]
+        }
+    }
+}
