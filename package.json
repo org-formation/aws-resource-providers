@@ -32,7 +32,7 @@
     },
     "homepage": "https://github.com/org-formation/aws-resource-providers#readme",
     "dependencies": {
-        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.5.0",
+        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^1.0.1",
         "class-transformer": "^0.3.1"
     },
     "devDependencies": {
