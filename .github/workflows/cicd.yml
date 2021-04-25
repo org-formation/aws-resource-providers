@@ -22,18 +22,17 @@ jobs:
       NODE_OPTIONS: "--max_old_space_size=7000"
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.7
       - name: Install Dependencies Python
         id: install_python
         run: |
           mkdir "$LOG_PATH"
-          pip install --upgrade pip
-          pip install --use-feature=2020-resolver aws-sam-cli cloudformation-cli-typescript-plugin
-      - uses: actions/setup-node@v1
+          pip install --upgrade 'attrs==19.2.0' aws-sam-cli cloudformation-cli-typescript-plugin
+      - uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 14
       - name: Install Dependencies Node.js
         id: install_nodejs
         run: |
