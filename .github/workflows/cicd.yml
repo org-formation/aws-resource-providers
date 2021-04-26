@@ -29,7 +29,7 @@ jobs:
         id: install_python
         run: |
           mkdir "$LOG_PATH"
-          pip install --upgrade 'attrs==19.2.0' aws-sam-cli cloudformation-cli-typescript-plugin
+          pip install 'aws-sam-cli==1.22.0' cloudformation-cli-typescript-plugin
       - uses: actions/setup-node@v2
         with:
           node-version: 14
