@@ -29,7 +29,7 @@ jobs:
         id: install_python
         run: |
           mkdir "$LOG_PATH"
-          pip install 'docker==4.2.2' 'aws-sam-cli==1.23.0' 'cloudformation_cli==0.2.7' cloudformation-cli-typescript-plugin
+          pip install --no-deps 'docker==4.2.2' 'aws-sam-cli==1.23.0' 'cloudformation_cli==0.2.7' cloudformation-cli-typescript-plugin
       - uses: actions/setup-node@v2
         with:
           node-version: 14
