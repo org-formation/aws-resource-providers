@@ -75,6 +75,7 @@
     "primaryIdentifier": [
         "/properties/ResourceId"
     ],
+    "replacementStrategy": "delete_then_create",
     "handlers": {
         "create": {
             "permissions": [
