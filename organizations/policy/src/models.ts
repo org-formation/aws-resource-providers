@@ -1,5 +1,5 @@
 // This is a generated file. Modifications will be overwritten.
-import { BaseModel, Dict, integer, Integer, Optional, transformValue } from 'cfn-rpdk';
+import { BaseModel, Dict, integer, Integer, Optional, transformValue } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { Exclude, Expose, Type, Transform } from 'class-transformer';
 
 export class ResourceModel extends BaseModel {
@@ -20,6 +20,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     content?: Optional<string>;
+    @Expose({ name: 'PolicyDocument' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Object, 'policyDocument', value, obj, [Map]),
+        {
+            toClassOnly: true,
+        }
+    )
+    policyDocument?: Optional<Map<string, object>>;
     @Expose({ name: 'Description' })
     @Transform(
         (value: any, obj: any) =>

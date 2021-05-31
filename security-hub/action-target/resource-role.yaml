@@ -15,7 +15,7 @@ Resources:
             Principal:
               Service: resources.cloudformation.amazonaws.com
             Action: sts:AssumeRole
-      Path: "/community-types/"
+      Path: "/"
       Policies:
         - PolicyName: ResourceTypePolicy
           PolicyDocument:
@@ -23,8 +23,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "s3:GetAccountPublicAccessBlock"
-                - "s3:PutAccountPublicAccessBlock"
+                - "securityhub:CreateActionTarget"
+                - "securityhub:DeleteActionTarget"
+                - "securityhub:DescribeActionTargets"
+                - "securityhub:UpdateActionTarget"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

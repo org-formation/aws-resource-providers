@@ -1,13 +1,13 @@
-import { Organizations } from 'aws-sdk';
+import { SecurityHub } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, OperationStatus, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
+import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
 import createFixture from './data/create-success.json';
 import deleteFixture from './data/delete-success.json';
 import readFixture from './data/read-success.json';
 import updateFixture from './data/update-success.json';
 import { resource } from '../src/handlers';
 
-const IDENTIFIER = '9c9ff813-e56a-4690-a340-56e760897f13';
+const IDENTIFIER = 'arn:aws:securityhub:us-east-1:123456789012:action/custom/test';
 
 jest.mock('aws-sdk');
 
@@ -15,7 +15,7 @@ describe('when calling handler', () => {
     let testEntrypointPayload: any;
     let spySession: jest.SpyInstance;
     let spySessionClient: jest.SpyInstance;
-    let organizations: AwsServiceMockBuilder<Organizations>;
+    let securityhub: AwsServiceMockBuilder<SecurityHub>;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
@@ -27,39 +27,24 @@ describe('when calling handler', () => {
     });
 
     beforeEach(async () => {
-        organizations = on(Organizations, { snapshot: false });
-        organizations.mock('describePolicy').resolve({
-            Policy: {
-                PolicySummary: {
-                    Id: IDENTIFIER,
-                    Name: 'AiGlobalOptOut',
-                    Type: 'AISERVICES_OPT_OUT_POLICY',
+        securityhub = on(SecurityHub, { snapshot: false });
+        securityhub.mock('describeActionTargets').resolve({
+            ActionTargets: [
+                {
+                    ActionTargetArn: IDENTIFIER,
+                    Name: 'test',
+                    Description: 'test',
                 },
-                Content:
-                    '{"services":{"@@operators_allowed_for_child_policies":["@@none"],"default":{"@@operators_allowed_for_child_policies":["@@none"],"opt_out_policy":{"@@operators_allowed_for_child_policies":["@@none"],"@@assign":"optOut"}}}}',
-            },
+            ],
         });
-        organizations.mock('listTargetsForPolicy').resolve({
-            Targets: [{ TargetId: IDENTIFIER }],
+        securityhub.mock('createActionTarget').resolve({
+            ActionTargetArn: IDENTIFIER,
         });
-        organizations.mock('createPolicy').resolve({
-            Policy: {
-                PolicySummary: {
-                    Id: IDENTIFIER,
-                    Name: 'AiGlobalOptOut',
-                    Type: 'AISERVICES_OPT_OUT_POLICY',
-                },
-                Content:
-                    '{"services":{"@@operators_allowed_for_child_policies":["@@none"],"default":{"@@operators_allowed_for_child_policies":["@@none"],"opt_out_policy":{"@@operators_allowed_for_child_policies":["@@none"],"@@assign":"optOut"}}}}',
-            },
-        });
-        organizations.mock('attachPolicy').resolve({});
-        organizations.mock('updatePolicy').resolve({});
-        organizations.mock('detachPolicy').resolve({});
-        organizations.mock('deletePolicy').resolve({});
+        securityhub.mock('updateActionTarget').resolve({});
+        securityhub.mock('deleteActionTarget').resolve({});
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
-        spySessionClient.mockReturnValue(organizations.instance);
+        spySessionClient.mockReturnValue(securityhub.instance);
         testEntrypointPayload = {
             credentials: { accessKeyId: '', secretAccessKey: '', sessionToken: '' },
             region: 'us-east-1',
@@ -72,20 +57,20 @@ describe('when calling handler', () => {
         jest.restoreAllMocks();
     });
 
-    test('create operation successful - organizations policy', async () => {
+    test('create operation successful - security hub action target', async () => {
         const request = fixtureMap.get(Action.Create);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject({
             ...request.desiredResourceState,
-            ResourceId: IDENTIFIER,
+            Arn: IDENTIFIER,
         });
     });
 
-    test('create operation fail already exists - code commit approval rule template', async () => {
-        const mockCreate = organizations.mock('createPolicy').reject({
+    test('create operation fail already exists - security hub action target', async () => {
+        const mockCreate = securityhub.mock('createActionTarget').reject({
             ...new Error(),
-            code: 'DuplicatePolicyException',
+            code: 'ResourceConflictException',
         });
         const request = fixtureMap.get(Action.Create);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
@@ -93,24 +78,35 @@ describe('when calling handler', () => {
         expect(mockCreate.mock).toHaveBeenCalledTimes(1);
     });
 
-    test('update operation successful - organizations policy', async () => {
+    test('update operation successful - security hub action target', async () => {
         const request = fixtureMap.get(Action.Update);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('delete operation successful - organizations policy', async () => {
+    test('update operation fail not found - security hub action target', async () => {
+        const mockGet = securityhub.mock('updateActionTarget').reject({
+            ...new Error(),
+            code: 'ResourceNotFoundException',
+        });
+        const request = fixtureMap.get(Action.Update);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+    });
+
+    test('delete operation successful - security hub action target', async () => {
         const request = fixtureMap.get(Action.Delete);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel).toBeNull();
     });
 
-    test('delete operation fail not found - code commit approval rule template', async () => {
-        const mockGet = organizations.mock('deletePolicy').reject({
+    test('delete operation fail not found - security hub action target', async () => {
+        const mockGet = securityhub.mock('deleteActionTarget').reject({
             ...new Error(),
-            code: 'PolicyNotFoundException',
+            code: 'ResourceNotFoundException',
         });
         const request = fixtureMap.get(Action.Delete);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
@@ -118,29 +114,25 @@ describe('when calling handler', () => {
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
     });
 
-    test('read operation successful - organizations policy', async () => {
+    test('read operation successful - security hub action target', async () => {
         const request = fixtureMap.get(Action.Read);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
     });
 
-    test('read operation  fail not found - code commit approval rule template', async () => {
-        expect.assertions(4);
-        const mockGet = organizations.mock('listTargetsForPolicy').reject({
+    test('read operation  fail not found - security hub action target', async () => {
+        const mockGet = securityhub.mock('describeActionTargets').reject({
             ...new Error(),
-            code: 'PolicyNotFoundException',
+            code: 'ResourceNotFoundException',
         });
-        const spyRetrieve = jest.spyOn<any, any>(resource, 'listPolicyTargets');
         const request = fixtureMap.get(Action.Read);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request }, null);
         expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.NotFound.name });
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
-        expect(spyRetrieve).toHaveBeenCalledTimes(1);
-        expect(spyRetrieve).toHaveReturned();
     });
 
-    test('all operations fail without session - organizations policy', async () => {
+    test('all operations fail without session - security hub action target', async () => {
         expect.assertions(fixtureMap.size);
         spySession.mockReturnValue(null);
         for (const [action, request] of fixtureMap) {

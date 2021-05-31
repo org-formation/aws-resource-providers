@@ -1,0 +1,14 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ResourceId": "9c9ff813-e56a-4690-a340-56e760897f13",
+        "PolicyDocument": {"services":{"@@operators_allowed_for_child_policies":["@@none"],"default":{"@@operators_allowed_for_child_policies":["@@none"],"opt_out_policy":{"@@operators_allowed_for_child_policies":["@@none"],"@@assign":"optOut"}}}},
+        "Name": "AiGlobalOptOut",
+        "Description": "some description",
+        "PolicyType": "AISERVICES_OPT_OUT_POLICY",
+        "TargetIds": [ "r-abcdef" ]
+    },
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}
