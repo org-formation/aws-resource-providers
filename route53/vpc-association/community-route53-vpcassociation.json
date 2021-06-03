@@ -1,0 +1,83 @@
+{
+    "typeName": "Community::Route53::VPCAssociation",
+    "description": "Associates an Amazon VPC with a private hosted zone.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+        "VPC": {
+            "description": "A complex type that contains information about the VPC that you want to associate with a private hosted zone.",
+            "type": "object",
+            "properties": {
+                "VPCRegion": {
+                    "type": "string",
+                    "description": "The region that an Amazon VPC was created in."
+                },
+                "VPCId": {
+                    "type": "string",
+                    "description": "The ID of an Amazon VPC.",
+                    "maxLength": 32
+                }
+            },
+            "required": [
+                "VPCRegion",
+                "VPCId"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "ResourceId": {
+            "type": "string",
+            "description": "The ID of this resource."
+        },
+        "HostedZoneId": {
+            "description": "The ID of the private hosted zone that you want to associate an Amazon VPC with.\n\nNote that you can't associate a VPC with a hosted zone that doesn't have an existing VPC association.",
+            "type": "string"
+        },
+        "VPC": {
+            "$ref": "#/definitions/VPC"
+        }
+    },
+    "additionalProperties": false,
+    "createOnlyProperties": [
+        "/properties/HostedZoneId",
+        "/properties/VPC"
+    ],
+    "replacementStrategy": "create_then_delete",
+    "required": [
+        "HostedZoneId",
+        "VPC"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "route53:AssociateVPCWithHostedZone",
+                "ec2:DescribeVpcs"
+            ]
+        },
+        "read": {
+            "permissions": []
+        },
+        "update": {
+            "permissions": [
+                "route53:DisassociateVPCFromHostedZone",
+                "route53:AssociateVPCWithHostedZone",
+                "ec2:DescribeVpcs"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "route53:DisassociateVPCFromHostedZone",
+                "ec2:DescribeVpcs"
+            ]
+        },
+        "list": {
+            "permissions": []
+        }
+    }
+}
