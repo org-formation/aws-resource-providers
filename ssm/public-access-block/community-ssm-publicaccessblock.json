@@ -1,0 +1,45 @@
+{
+    "typeName": "Community::SSM::PublicAccessBlock",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "properties": {
+        "BlockPublicSharing": {
+            "description": "To prevent unwanted access to your documents, set this value to true (default is false)",
+            "type": "boolean"
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ssm:UpdateServiceSetting"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "ssm:GetServiceSetting"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ssm:UpdateServiceSetting"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ssm:UpdateServiceSetting"
+            ]
+        }
+    }
+}
