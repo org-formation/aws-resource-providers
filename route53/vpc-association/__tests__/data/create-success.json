@@ -1,0 +1,12 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "HostedZoneId": "Z123456789012345678",
+        "VPC": {
+            "VPCRegion": "us-east-1",
+            "VPCId": "v-12345678901234567"
+        }
+    },
+    "previousResourceState": null,
+    "logicalResourceIdentifier": "MyResource"
+}
