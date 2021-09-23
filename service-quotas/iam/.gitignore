@@ -9,19 +9,10 @@ dist/
 
 # RPDK logs
 rpdk.log*
-sam.log
-cfn.log
 
 # Node.js
 node_modules/
 coverage/
 
-# GitGuardian local files
-.cache_ggshield
-.gitguardian.yaml
-
-.DS_Store
-.vscode
-utils
-*.zip
-*.tgz
+# contains credentials
+sam-tests/

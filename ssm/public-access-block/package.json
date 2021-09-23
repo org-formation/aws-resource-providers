@@ -1,7 +1,7 @@
 {
-    "name": "community-organizations-policy",
-    "version": "0.2.1",
-    "description": "CloudFormation Resource Provider for AWS Organizations Policy",
+    "name": "community-ssm-publicaccessblock",
+    "version": "0.1.0",
+    "description": "AWS custom resource provider named Community::SSM::PublicAccessBlock.",
     "private": true,
     "main": "dist/handlers.js",
     "files": [
@@ -11,7 +11,7 @@
         "build": "npx tsc",
         "fixrolepath": "sed 's/Path: \\\"\\/\\\"/Path: \\\"\\/community-types\\/\\\"/g' resource-role.yaml > tmp.txt && mv tmp.txt resource-role.yaml",
         "prepack": "cfn generate && npm run build && npm run fixrolepath",
-        "submit": "npm run prepack && cfn submit -vv --region us-east-1 --set-default",
+        "submit": "npm run prepack && cfn submit -vv --region eu-west-1 --set-default",
         "package": "npm run prepack && cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
         "version": "npm run package && aws s3 cp ${npm_package_name}-${npm_package_version}.zip s3://community-resource-provider-catalog/${npm_package_name}-${npm_package_version}.zip && aws s3 cp resource-role.yaml s3://community-resource-provider-catalog/${npm_package_name}-resource-role-${npm_package_version}.yml",
         "test": "npx jest",
@@ -19,19 +19,6 @@
         "cfntest": "cfn test -vv >> cfn.log",
         "samstart": "sam local start-lambda -l sam.log",
         "validate": "cfn validate"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/org-formation/aws-resource-providers.git"
-    },
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/org-formation/aws-resource-providers/issues"
-    },
-    "homepage": "https://github.com/org-formation/aws-resource-providers#readme",
-    "engines": {
-        "node": ">=10.4.0",
-        "npm": ">=6.0.0"
     },
     "dependencies": {
         "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",
@@ -41,7 +28,6 @@
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
-        "@types/uuid": "^7.0.3",
         "typescript": "^4.1.2"
     },
     "optionalDependencies": {
