@@ -29,7 +29,10 @@ jobs:
         id: install_python
         run: |
           mkdir "$LOG_PATH"
-          pip install --upgrade pip aws-sam-cli git+https://github.com/eduardomourar/cloudformation-cli-typescript-plugin.git#egg=cloudformation-cli-typescript-plugin
+          pip install --upgrade pip git+https://github.com/eduardomourar/cloudformation-cli-typescript-plugin.git#egg=cloudformation-cli-typescript-plugin
+          curl -s -L https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip -o sam.zip
+          unzip -q sam.zip -d sam-install
+          sudo ./sam-install/install --update
       - uses: actions/setup-node@v1
         with:
           node-version: 12
