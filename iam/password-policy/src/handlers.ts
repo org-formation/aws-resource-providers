@@ -1,18 +1,9 @@
 import { IAM } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { v4 as uuidv4 } from 'uuid';
-import { Action, BaseResource, exceptions, handlerEvent, Optional, CfnResponse } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger, Optional, CfnResponse } from 'cfn-rpdk';
 
 import { ResourceModel } from './models';
-
-// Use this logger to forward log messages to CloudWatch Logs.
-const LOGGER = console;
-
-/*
-// The following can be used for debugging AWS SDK
-config.logger = LOGGER;
-Error.stackTraceLimit = Infinity;
-*/
 
 export class PasswordPolicy extends ResourceModel {
     readonly resourceId?: Optional<string>;
@@ -29,19 +20,19 @@ export class Resource extends BaseResource<ResourceModel> {
      * @param resourceId The resource unique identifier
      * @param request The current state for the password policy
      */
-    private async retrievePasswordPolicy(service: IAM, logicalResourceId?: string, resourceId?: string, request?: PasswordPolicy): Promise<PasswordPolicy> {
+    private async retrievePasswordPolicy(service: IAM, logger: Logger, logicalResourceId?: string, resourceId?: string, request?: PasswordPolicy): Promise<PasswordPolicy> {
         let result: PasswordPolicy = null;
         try {
             const response = await service.getAccountPasswordPolicy().promise();
-            console.info('getAccountPasswordPolicy response', response);
+            logger.log('getAccountPasswordPolicy response', response);
             const passwordPolicy = request && Object.keys(request).length && request.serialize ? request.serialize() : JSON.parse(JSON.stringify(response.PasswordPolicy));
             result = PasswordPolicy.deserialize({
                 ...passwordPolicy,
                 ResourceId: resourceId,
             });
-            LOGGER.info(PasswordPolicy.TYPE_NAME, `[${result.resourceId}] [${logicalResourceId}]`, 'successfully retrieved.');
+            logger.log(PasswordPolicy.TYPE_NAME, `[${result.resourceId}] [${logicalResourceId}]`, 'successfully retrieved.');
         } catch (err) {
-            LOGGER.log(err);
+            logger.log(err);
             if (err && err.code === 'NoSuchEntity') {
                 throw new exceptions.NotFound(PasswordPolicy.TYPE_NAME, resourceId || logicalResourceId);
             } else {
@@ -63,19 +54,19 @@ export class Resource extends BaseResource<ResourceModel> {
      * in the template
      * @param resourceId The resource unique identifier
      */
-    private async upsertPasswordPolicy(service: IAM, request: PasswordPolicy, logicalResourceId?: string, resourceId?: string): Promise<PasswordPolicy> {
+    private async upsertPasswordPolicy(service: IAM, logger: Logger, request: PasswordPolicy, logicalResourceId?: string, resourceId?: string): Promise<PasswordPolicy> {
         let result: PasswordPolicy = null;
         const params = JSON.parse(JSON.stringify(request));
         delete params['ResourceId'];
         delete params['ExpirePasswords'];
-        console.info('updateAccountPasswordPolicy input', params);
+        logger.log('updateAccountPasswordPolicy input', params);
         const response = await service.updateAccountPasswordPolicy(params).promise();
-        console.info('updateAccountPasswordPolicy response', response);
+        logger.log('updateAccountPasswordPolicy response', response);
         result = PasswordPolicy.deserialize({
             ...params,
             ResourceId: resourceId || uuidv4(),
         });
-        LOGGER.info(PasswordPolicy.TYPE_NAME, `[${result.resourceId}] [${logicalResourceId}]`, 'successfully upserted.');
+        logger.log(PasswordPolicy.TYPE_NAME, `[${result.resourceId}] [${logicalResourceId}]`, 'successfully upserted.');
         return Promise.resolve(result);
     }
 
@@ -84,25 +75,21 @@ export class Resource extends BaseResource<ResourceModel> {
      * during stack create operations.
      */
     @handlerEvent(Action.Create)
-    @commonAws({
-        serviceName: 'IAM',
-        debug: true,
-    })
-    public async create(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM): Promise<PasswordPolicy> {
-        const { desiredResourceState, logicalResourceIdentifier } = args.request;
-        if (desiredResourceState?.resourceId) {
-            LOGGER.info(this.typeName, `[${desiredResourceState.resourceId}] [${logicalResourceIdentifier}]`, 'cannot contain identifier.');
+    @commonAws({ service: IAM, debug: true })
+    public async create(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM, model: PasswordPolicy): Promise<PasswordPolicy> {
+        const { logicalResourceIdentifier } = args.request;
+        if (model?.resourceId) {
+            args.logger.log(this.typeName, `[${model.resourceId}] [${logicalResourceIdentifier}]`, 'cannot contain identifier.');
             throw new exceptions.InvalidRequest('Resource identifier cannot be provided during creation.');
         }
-        let model: PasswordPolicy = desiredResourceState;
         try {
-            await this.retrievePasswordPolicy(service, logicalResourceIdentifier);
+            await this.retrievePasswordPolicy(service, args.logger, logicalResourceIdentifier);
             throw new exceptions.AlreadyExists(PasswordPolicy.TYPE_NAME, logicalResourceIdentifier);
         } catch (err) {}
-        model = await this.upsertPasswordPolicy(service, model, logicalResourceIdentifier);
-        console.info('CREATE model primary identifier', model.getPrimaryIdentifier());
-        console.info('CREATE model additional identifiers', model.getAdditionalIdentifiers());
-        return Promise.resolve(model);
+        const result = await this.upsertPasswordPolicy(service, args.logger, model, logicalResourceIdentifier);
+        args.logger.log('CREATE model primary identifier', result.getPrimaryIdentifier());
+        args.logger.log('CREATE model additional identifiers', result.getAdditionalIdentifiers());
+        return Promise.resolve(result);
     }
 
     /**
@@ -110,23 +97,19 @@ export class Resource extends BaseResource<ResourceModel> {
      * as part of a stack update operation.
      */
     @handlerEvent(Action.Update)
-    @commonAws({
-        serviceName: 'IAM',
-        debug: true,
-    })
-    public async update(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM): Promise<PasswordPolicy> {
-        const { desiredResourceState, logicalResourceIdentifier, previousResourceState } = args.request;
+    @commonAws({ service: IAM, debug: true })
+    public async update(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM, model: PasswordPolicy): Promise<PasswordPolicy> {
+        const { logicalResourceIdentifier, previousResourceState } = args.request;
         const resourceId = previousResourceState.resourceId;
-        if (!desiredResourceState?.resourceId) {
-            throw new exceptions.NotFound(this.typeName, desiredResourceState.resourceId);
-        } else if (desiredResourceState.resourceId !== resourceId) {
-            LOGGER.info(this.typeName, `[NEW ${desiredResourceState.resourceId}] [${logicalResourceIdentifier}]`, `does not match identifier from saved resource [OLD ${resourceId}].`);
+        if (!model?.resourceId) {
+            throw new exceptions.NotFound(this.typeName, model.resourceId);
+        } else if (model.resourceId !== resourceId) {
+            args.logger.log(this.typeName, `[NEW ${model.resourceId}] [${logicalResourceIdentifier}]`, `does not match identifier from saved resource [OLD ${resourceId}].`);
             throw new exceptions.NotUpdatable('No resource matching the provided identifier.');
         }
-        let model: PasswordPolicy = desiredResourceState;
-        await this.retrievePasswordPolicy(service, logicalResourceIdentifier, resourceId);
-        model = await this.upsertPasswordPolicy(service, model, logicalResourceIdentifier, resourceId);
-        return Promise.resolve(model);
+        await this.retrievePasswordPolicy(service, args.logger, logicalResourceIdentifier, resourceId);
+        const result = await this.upsertPasswordPolicy(service, args.logger, model, logicalResourceIdentifier, resourceId);
+        return Promise.resolve(result);
     }
 
     /**
@@ -135,19 +118,14 @@ export class Resource extends BaseResource<ResourceModel> {
      * or the stack itself is deleted.
      */
     @handlerEvent(Action.Delete)
-    @commonAws({
-        serviceName: 'IAM',
-        debug: true,
-    })
-    public async delete(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM): Promise<null> {
-        const { desiredResourceState, logicalResourceIdentifier } = args.request;
-
-        let model: PasswordPolicy = desiredResourceState;
-        model = await this.retrievePasswordPolicy(service, logicalResourceIdentifier, model.resourceId);
-        if (model) {
+    @commonAws({ service: IAM, debug: true })
+    public async delete(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM, model: PasswordPolicy): Promise<null> {
+        const { logicalResourceIdentifier } = args.request;
+        const result = await this.retrievePasswordPolicy(service, args.logger, logicalResourceIdentifier, model.resourceId);
+        if (result) {
             const response = await service.deleteAccountPasswordPolicy().promise();
-            console.info('deleteAccountPasswordPolicy response', response);
-            LOGGER.info(this.typeName, `[${model.resourceId}] [${logicalResourceIdentifier}]`, 'successfully deleted.');
+            args.logger.log('deleteAccountPasswordPolicy response', response);
+            args.logger.log(this.typeName, `[${result.resourceId}] [${logicalResourceIdentifier}]`, 'successfully deleted.');
         }
         return Promise.resolve(null);
     }
@@ -157,13 +135,10 @@ export class Resource extends BaseResource<ResourceModel> {
      * detailed information about the resource's current state is required.
      */
     @handlerEvent(Action.Read)
-    @commonAws({
-        serviceName: 'IAM',
-        debug: true,
-    })
-    public async read(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM): Promise<PasswordPolicy> {
-        const { desiredResourceState, logicalResourceIdentifier } = args.request;
-        return await this.retrievePasswordPolicy(service, logicalResourceIdentifier, desiredResourceState.resourceId, desiredResourceState);
+    @commonAws({ service: IAM, debug: true })
+    public async read(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM, model: PasswordPolicy): Promise<PasswordPolicy> {
+        const { logicalResourceIdentifier } = args.request;
+        return await this.retrievePasswordPolicy(service, args.logger, logicalResourceIdentifier, model.resourceId, model);
     }
 
     /**
@@ -171,16 +146,13 @@ export class Resource extends BaseResource<ResourceModel> {
      * resources of this resource provider is required.
      */
     @handlerEvent(Action.List)
-    @commonAws({
-        serviceName: 'IAM',
-        debug: true,
-    })
-    public async list(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM): Promise<PasswordPolicy[]> {
-        const { desiredResourceState, logicalResourceIdentifier } = args.request;
+    @commonAws({ service: IAM, debug: true })
+    public async list(action: Action, args: HandlerArgs<PasswordPolicy>, service: IAM, model: PasswordPolicy): Promise<PasswordPolicy[]> {
+        const { logicalResourceIdentifier } = args.request;
         const models: Array<PasswordPolicy> = [];
         try {
-            const model: PasswordPolicy = await this.retrievePasswordPolicy(service, logicalResourceIdentifier, desiredResourceState.resourceId, desiredResourceState);
-            models.push(model);
+            const result: PasswordPolicy = await this.retrievePasswordPolicy(service, args.logger, logicalResourceIdentifier, model.resourceId, model);
+            models.push(result);
         } catch (err) {
             if (!(err instanceof exceptions.NotFound)) {
                 throw err;
@@ -193,11 +165,11 @@ export class Resource extends BaseResource<ResourceModel> {
 export const resource = new Resource(PasswordPolicy.TYPE_NAME, PasswordPolicy);
 
 export const entrypoint = (...args: [any, any]): Promise<CfnResponse<any>> => {
-    console.info('entrypoint input', ...args);
+    // console.log('entrypoint input', ...args);
     return resource.entrypoint(...args);
 };
 
 export const testEntrypoint = (...args: [any, any]): Promise<CfnResponse<any>> => {
-    console.info('testEntrypoint input', ...args);
+    // console.log('testEntrypoint input', ...args);
     return resource.testEntrypoint(...args);
 };

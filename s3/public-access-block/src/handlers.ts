@@ -7,7 +7,12 @@ class Resource extends BaseResource<ResourceModel> {
     private async upsertAccountPublicAccessBlock(action: Action, service: S3Control, logger: Logger, model: ResourceModel, accountId: string): Promise<ResourceModel> {
         const request: S3Control.PutPublicAccessBlockRequest = {
             AccountId: accountId,
-            PublicAccessBlockConfiguration: model.serialize(),
+            PublicAccessBlockConfiguration: {
+                IgnorePublicAcls: model.ignorePublicAcls,
+                BlockPublicAcls: model.blockPublicAcls,
+                BlockPublicPolicy: model.blockPublicPolicy,
+                RestrictPublicBuckets: model.restrictPublicBuckets,
+            },
         };
 
         logger.log({
@@ -22,8 +27,6 @@ class Resource extends BaseResource<ResourceModel> {
             response,
         });
 
-        model.resourceId = accountId;
-
         logger.log({ action, message: 'done', model });
         return model;
     }
@@ -32,6 +35,7 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'S3Control', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: S3Control, model: ResourceModel): Promise<ResourceModel> {
         const accountId = args.request.awsAccountId;
+        model.resourceId = accountId;
         return this.upsertAccountPublicAccessBlock(action, service, args.logger, model, accountId);
     }
 

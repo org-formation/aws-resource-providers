@@ -1,6 +1,6 @@
 import { Organizations } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 
 import { ResourceModel } from './models';
 
@@ -30,15 +30,21 @@ class Resource extends BaseResource<ResourceModel> {
         if (model.resourceId) {
             throw new exceptions.InvalidRequest('Read only property [ResourceId] cannot be provided by the user.');
         }
+        if (!model.policyDocument && !model.content) {
+            throw new exceptions.InvalidRequest('Either PolicyDocument or Content must be specified.');
+        }
+        if (!!model.policyDocument && !!model.content) {
+            throw new exceptions.InvalidRequest('Either PolicyDocument or Content must be specified.');
+        }
         try {
-            const response = await service
-                .createPolicy({
-                    Content: model.content,
-                    Description: model.description,
-                    Name: model.name,
-                    Type: model.policyType,
-                })
-                .promise();
+            const request = {
+                Content: model.content ?? serializeMap(model.policyDocument),
+                Description: model.description,
+                Name: model.name,
+                Type: model.policyType,
+            };
+            args.logger.log(request);
+            const response = await service.createPolicy(request).promise();
             model.resourceId = response.Policy.PolicySummary.Id;
             args.logger.log({ action, message: 'policy creation', policyId: model.resourceId, response });
         } catch (err) {
@@ -71,10 +77,16 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'Organizations', debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations, model: ResourceModel): Promise<ResourceModel> {
         const policyId = model.resourceId;
+        if (!model.policyDocument && !model.content) {
+            throw new exceptions.InvalidRequest('Either PolicyDocument or Content must be specified.');
+        }
+        if (!!model.policyDocument && !!model.content) {
+            throw new exceptions.InvalidRequest('Either PolicyDocument or Content must be specified.');
+        }
         try {
             const response = await service
                 .updatePolicy({
-                    Content: model.content,
+                    Content: model.content ?? serializeMap(model.policyDocument),
                     Description: model.description,
                     Name: model.name,
                     PolicyId: policyId,
@@ -168,6 +180,15 @@ class Resource extends BaseResource<ResourceModel> {
         }
     }
 }
+
+const serializeMap = (map: any) => {
+    const obj = Array.from(map).reduce((obj: Record<string, any>, [key, value]) => {
+        obj[key] = value;
+        return obj;
+    }, {});
+
+    return JSON.stringify(obj);
+};
 
 export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
