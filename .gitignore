@@ -16,6 +16,10 @@ cfn.log
 node_modules/
 coverage/
 
+# GitGuardian local files
+.cache_ggshield
+.gitguardian.yaml
+
 .DS_Store
 .vscode
 utils

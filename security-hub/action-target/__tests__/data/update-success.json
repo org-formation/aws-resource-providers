@@ -1,0 +1,18 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "Arn": "arn:aws:securityhub:us-east-1:123456789012:action/custom/test",
+        "Id": "test",
+        "Name": "test2",
+        "Description": "test2"
+    },
+    "previousResourceState": {
+        "Arn": "arn:aws:securityhub:us-east-1:123456789012:action/custom/test",
+        "Id": "test",
+        "Name": "test",
+        "Description": "test"
+    },
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}
