@@ -36,7 +36,7 @@ class Resource extends BaseResource<ResourceModel> {
 
         return Promise.resolve(model);
     }
-    @handlerEvent(Action.Update)
+    @handlerEvent(Action.Delete)
     @commonAws({ serviceName: 'Account', debug: true })
     public async delete(action: Action, args: never, service: AWS.Account, model: ResourceModel): Promise<ResourceModel> {
         const _ = await service
