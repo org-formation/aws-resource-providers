@@ -21,6 +21,7 @@ A community driven repository where you can find AWS Resource Type Providers for
 | Community::SSM::PublicAccessBlock | Region level settings to provide secure defaults on SSM | in progress |  [installation](ssm/public-access-block/installation.md) <br/> [docs](ssm/public-access-block/docs/README.md) <br/> [example](ssm/public-access-block/example.yml)  |
 | Community::ServiceQuotas::CloudFormation | Custom Service Quota limits for CloudFormation resources. e.g: to increase the maximum number of stacks per account | in progress | [installation](service-quotas/cloud-formation/installation.md) <br/> [docs](service-quotas/cloud-formation/docs/README.md) <br/> [example](service-quotas/cloud-formation/example.yml) |
 | Community::ServiceQuotas::S3 | Custom Service Quota limits for S3 resources. e.g: to increase the maximum number of buckets per account | in progress | [installation](service-quotas/s3/installation.md) <br/> [docs](service-quotas/s3/docs/README.md) <br/> [example](service-quotas/s3/example.yml)  |
+| Community::Account::AlternateContact | Resource that manages alternate contacts | in progress | [installation](account/alternate-contact/installation.md) <br/> [docs](account/alternate-contact/docs/README.md) <br/> [example](account/alternate-contact/example.yml) |
 
 The following resource providers used to be part of this community effort but are now supported by AWS natively:
 
