@@ -1,4 +1,4 @@
-# Community::Organizations::NoDefaultVPC
+# Community::Account::AlternateContact
 
 ## Installation using AWS CLI
 ``` bash
@@ -17,7 +17,7 @@ aws cloudformation describe-stacks \
 
 # register the cloudformation type
 aws cloudformation register-type \
-  --type-name Community::Organizations::NoDefaultVPC \
+  --type-name Community::Account::AlternateContact \
   --type RESOURCE \
   --schema-handler-package s3://community-resource-provider-catalog/community-account-alternatecontact-0.1.0.zip \
   --execution-role <role-arn-from-output>
