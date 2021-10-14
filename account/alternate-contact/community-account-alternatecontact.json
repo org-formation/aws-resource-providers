@@ -27,7 +27,11 @@
     },
     "additionalProperties": false,
     "required": [
-        "AlternateContactType"
+        "AlternateContactType",
+        "Name",
+        "EmailAddress",
+        "PhoneNumber",
+        "Title"
     ],
     "createOnlyProperties": [
         "/properties/AlternateContactType"
