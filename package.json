@@ -33,7 +33,7 @@
     "homepage": "https://github.com/org-formation/aws-resource-providers#readme",
     "dependencies": {
         "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^1.0.1",
-        "class-transformer": "^0.3.1"
+        "class-transformer": "0.3.1"
     },
     "devDependencies": {
         "@jurijzahn8019/aws-promise-jest-mock": "^2.4.28",
