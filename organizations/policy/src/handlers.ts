@@ -1,6 +1,6 @@
 import { Organizations } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
 
 import { ResourceModel } from './models';
 

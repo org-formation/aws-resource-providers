@@ -1,6 +1,6 @@
 import { Organizations } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, OperationStatus, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
+import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
 import createFixture from './data-policy/create-success.json';
 import deleteFixture from './data-policy/delete-success.json';
 import readFixture from './data-policy/read-success.json';
