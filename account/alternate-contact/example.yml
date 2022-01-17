@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Resources:
+  BillingContact:
+    Type: 'Community::Account::AlternateContact'
+    Properties:
+      AlternateContactType: BILLING
+      Title: CFO
+      Name: Bill
+      PhoneNumber: +1 123 123 123 111
+      EmailAddress: bill@company.com
+
+  OperationsContact:
+    Type: 'Community::Account::AlternateContact'
+    Properties:
+      AlternateContactType: OPERATIONS
+      Title: COO
+      Name: Oliver
+      PhoneNumber: +1 123 123 123 222
+      EmailAddress: oliver@company.com
+
+  SecurityContact:
+    Type: 'Community::Account::AlternateContact'
+    Properties:
+      AlternateContactType: SECURITY
+      Title: CISO
+      Name: Sam
+      PhoneNumber: +1 123 123 123 333
+      EmailAddress: sam@company.com
