@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-var-requires */
-/** @typedef {import('ts-jest/dist/types')} */
 /** @type {import('@jest/types').Config.InitialOptions} */
 
 module.exports = {
-    preset: 'ts-jest',
     testEnvironment: 'node',
-    globals: {
-        'ts-jest': { diagnostics: false },
+    transform: {
+        '^.+\\.(t|j)sx?$': '@swc/jest',
     },
     coverageThreshold: {
         global: {
