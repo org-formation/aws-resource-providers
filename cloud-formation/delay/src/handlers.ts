@@ -1,4 +1,4 @@
-import { Action, BaseResource, exceptions, handlerEvent, LoggerProxy, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, LoggerProxy, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 
 export interface CallbackContext extends Record<string, any> {

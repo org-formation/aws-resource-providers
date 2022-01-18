@@ -1,7 +1,7 @@
 import { SecurityHub } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {

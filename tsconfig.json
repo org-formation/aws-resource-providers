@@ -11,11 +11,7 @@
         "experimentalDecorators": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        "outDir": "dist",
-        "baseUrl": ".",
-        "paths": {
-            "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": ["./node_modules/cfn-rpdk"]
-        }
+        "outDir": "dist"
     },
     "include": [
         "**/src/**/*.ts"

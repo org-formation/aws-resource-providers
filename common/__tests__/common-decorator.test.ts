@@ -1,6 +1,6 @@
 import { STS } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, BaseModel, BaseResource, BaseResourceHandlerRequest, exceptions, handlerEvent, OperationStatus, SessionProxy } from 'cfn-rpdk';
+import { Action, BaseModel, BaseResource, BaseResourceHandlerRequest, exceptions, handlerEvent, OperationStatus, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { Exclude, Expose } from 'class-transformer';
 import { commonAws, HandlerArgs } from '../src/common-decorator';
 

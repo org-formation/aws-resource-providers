@@ -1,4 +1,4 @@
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { SSOAdmin } from 'aws-sdk';
 import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
