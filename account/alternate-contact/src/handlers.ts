@@ -1,6 +1,5 @@
 import { Action, BaseResource, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { commonAws } from 'aws-resource-providers-common';
-import { mainModule } from 'process';
 import { ResourceModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {

@@ -9,7 +9,7 @@
     ],
     "scripts": {
         "build": "npx tsc",
-        "fixrolepath" : "sed 's/Path: \\\"\\/\\\"/Path: \\\"\\/community-types\\/\\\"/g' resource-role.yaml > tmp.txt && mv tmp.txt resource-role.yaml",
+        "fixrolepath": "sed 's/Path: \\\"\\/\\\"/Path: \\\"\\/community-types\\/\\\"/g' resource-role.yaml > tmp.txt && mv tmp.txt resource-role.yaml",
         "prepack": "cfn generate && npm run build && npm run fixrolepath",
         "submit": "npm run prepack && cfn submit -vv --region eu-west-1 --set-default",
         "package": "npm run prepack && cfn submit --dry-run -vv && cp ${npm_package_name}.zip ${npm_package_name}-${npm_package_version}.zip",
@@ -34,9 +34,9 @@
         "npm": ">=6.0.0"
     },
     "dependencies": {
-        "aws-resource-providers-common": "^0.3.0",
-        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.5.0",
-        "class-transformer": "^0.3.1",
+        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",
+        "aws-resource-providers-common": "^0.5.0",
+        "class-transformer": "0.3.1",
         "uuid": "^7.0.3"
     },
     "devDependencies": {
@@ -45,6 +45,6 @@
         "typescript": "^4.1.2"
     },
     "optionalDependencies": {
-        "aws-sdk": "^2.656.0"
+        "aws-sdk": "^2.1058.0"
     }
 }

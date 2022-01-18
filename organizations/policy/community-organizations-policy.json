@@ -1,7 +1,7 @@
 {
     "typeName": "Community::Organizations::Policy",
     "description": "Resource that allows for the creation of AWS Organizations policies and attaching to different targets in the organization.",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
     "definitions": {
     },
     "properties": {
