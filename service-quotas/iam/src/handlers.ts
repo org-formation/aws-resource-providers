@@ -1,4 +1,14 @@
-import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
+import {
+    Action,
+    BaseResource,
+    exceptions,
+    handlerEvent,
+    OperationStatus,
+    Optional,
+    ProgressEvent,
+    ResourceHandlerRequest,
+    SessionProxy,
+} from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { ServiceQuotas } from 'aws-sdk';
 import { QuotaID, UpsertQuotas } from 'aws-resource-providers-common';
