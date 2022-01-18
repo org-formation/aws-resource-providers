@@ -18,7 +18,7 @@
     "author": "org-formation",
     "license": "MIT",
     "dependencies": {
-        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^1.0.1"
+        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "npm:@org-formation/cfn-rpdk@^1.0.1"
     },
     "devDependencies": {
         "@types/node": "^12.0.0",
