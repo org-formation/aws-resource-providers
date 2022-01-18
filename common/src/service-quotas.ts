@@ -1,5 +1,5 @@
 import { ServiceQuotas } from 'aws-sdk';
-import { BaseModel } from 'cfn-rpdk';
+import { BaseModel } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { RequestServiceQuotaIncreaseRequest } from 'aws-sdk/clients/servicequotas';
 
 export type QuotaID = { QuotaCode: string; ServiceCode: string };

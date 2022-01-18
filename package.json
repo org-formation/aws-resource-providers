@@ -32,6 +32,7 @@
     },
     "homepage": "https://github.com/org-formation/aws-resource-providers#readme",
     "dependencies": {
+        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",
         "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.5.0",
         "class-transformer": "^0.3.1"
     },
@@ -68,5 +69,9 @@
         "printWidth": 200,
         "trailingComma": "es5",
         "endOfLine": "lf"
+    },
+    "volta": {
+        "node": "14.17.3",
+        "npm": "6.14.12"
     }
 }
