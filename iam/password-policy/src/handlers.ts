@@ -1,7 +1,7 @@
 import { IAM } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { v4 as uuidv4 } from 'uuid';
-import { Action, BaseResource, exceptions, handlerEvent, Logger, Optional, CfnResponse } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger, Optional, CfnResponse } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 
 import { ResourceModel } from './models';
 

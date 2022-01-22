@@ -1,0 +1,6 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  DynamoDB:
+    Type: 'Community::ServiceQuotas::DynamoDB'
+    Properties:
+      Tables: 256
