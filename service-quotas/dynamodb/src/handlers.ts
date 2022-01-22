@@ -1,4 +1,4 @@
-import { Action, BaseResource, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { IAM, ServiceQuotas } from 'aws-sdk';
 import { commonAws, HandlerArgs, QuotaID, UpsertQuotas } from 'aws-resource-providers-common';
