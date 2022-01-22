@@ -1,6 +1,6 @@
 import { S3Control } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {

@@ -10,7 +10,7 @@
             "description": "The Amazon Resource Name (ARN) of the custom action target.",
             "minLength": 25,
             "maxLength": 256,
-            "pattern": "^arn:aws:securityhub:[A-Za-z0-9-]{1,64}:[0-9]{12}:action/custom/.+$"
+            "pattern": "^arn:aws[-a-z]*:securityhub:[A-Za-z0-9-]{1,64}:[0-9]{12}:action/custom/.+$"
         },
         "Id": {
             "type": "string",

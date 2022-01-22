@@ -1,0 +1,22 @@
+{
+    "module": {
+        "type": "commonjs",
+        "noInterop": true
+    },
+    "jsc": {
+        "parser": {
+            "syntax": "typescript",
+            "tsx": false,
+            "dynamicImport": false,
+            "decorators": true
+        },
+        "transform": {
+            "legacyDecorator": true,
+            "decoratorMetadata": true
+        },
+        "target": "es2019",
+        "loose": false,
+        "externalHelpers": false,
+        "keepClassNames": false
+    }
+}
