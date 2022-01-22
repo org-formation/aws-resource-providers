@@ -1,11 +1,10 @@
 import { Organizations, Support } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { CreateCaseRequest } from 'aws-sdk/clients/support';
 
 export async function createSupportCase(model: ResourceModel, service: Support): Promise<void> {
-
     if (model.disableSupportCaseCreation) {
         return;
     }
@@ -66,9 +65,18 @@ class Resource extends BaseResource<ResourceModel> {
     public async delete(): Promise<null> {
         return null;
     }
+
+    @handlerEvent(Action.Read)
+    @commonAws({ serviceName: 'Support', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: Support, model: ResourceModel): Promise<ResourceModel> {
+        const read = new ResourceModel({
+            Arn: model.arn,
+        });
+        return Promise.resolve(read);
+    }
 }
 
-const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
+export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
 
