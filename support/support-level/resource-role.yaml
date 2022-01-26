@@ -15,7 +15,7 @@ Resources:
             Principal:
               Service: resources.cloudformation.amazonaws.com
             Action: sts:AssumeRole
-      Path: "/"
+      Path: "/community-types/"
       Policies:
         - PolicyName: ResourceTypePolicy
           PolicyDocument:
