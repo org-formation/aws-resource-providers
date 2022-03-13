@@ -1,6 +1,6 @@
 {
     "name": "community-support-supportlevel",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "AWS custom resource provider named Community::Support::SupportLevel.",
     "main": "dist/handlers.js",
     "files": [

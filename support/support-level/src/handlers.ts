@@ -31,7 +31,10 @@ async function checkContextIsOrganizationMasterAccount(args: HandlerArgs<Resourc
     try {
         const organizationsClient = args.session.client('Organizations', { region: 'us-east-1' }) as Organizations;
         await organizationsClient.describeOrganization().promise();
-    } catch (err) {
+    } catch (err: any) {
+        if ('code' in err && err.code === 'TooManyRequestsException') {
+            return;
+        }
         throw new exceptions.InvalidRequest(`Account does not seem to be the master account of an AWS Organization.\n${err}`);
     }
 }
