@@ -1,6 +1,6 @@
 {
     "name": "community-ec2-ebsencryptiondefaults",
-    "version": "0.2.0",
+    "version": "0.2.2",
     "description": "AWS custom resource provider named Community::Organizations::EbsEncryptionDefaults.",
     "private": true,
     "main": "dist/handlers.js",

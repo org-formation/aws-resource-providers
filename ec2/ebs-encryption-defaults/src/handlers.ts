@@ -8,7 +8,6 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'EC2', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
         model.resourceId = 'region-defaults'; // there can only be one
-
         if (model.defaultEbsEncryptionKeyId !== undefined || model.enableEbsEncryptionByDefault !== undefined) {
             if (model.enableEbsEncryptionByDefault === true) {
                 await service.enableEbsEncryptionByDefault().promise();
