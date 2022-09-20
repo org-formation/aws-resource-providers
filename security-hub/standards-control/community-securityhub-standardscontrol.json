@@ -1,0 +1,70 @@
+{
+    "typeName": "Community::SecurityHub::StandardsControl",
+    "description": "Resource that allows  management of Security Hub Standards Controls",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "documentationUrl": "https://github.com/org-formation/aws-resource-providers/tree/master/security-hub/standards-control/docs",
+    "definitions": {},
+    "properties": {
+        "ResourceId": {
+            "description": "AWS CloudFormation generates a unique identifier for the delay resource.",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "StandardCode": {
+            "type": "string",
+            "enum": [
+                "CIS",
+                "PCIDSS",
+                "AFSBP"
+            ]
+        },
+        "ControlId": {
+            "type": "string"
+        },
+        "ControlStatus": {
+            "type": "string",
+            "enum": [
+                "ENABLED",
+                "DISABLED"
+            ]
+        },
+        "DisabledReason": {
+            "type": "string",
+            "description": "The description for the custom action target."
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "StandardCode",
+        "ControlId",
+        "ControlStatus"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "securityhub:UpdateStandardsControl"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "securityhub:DescribeStandardsControls"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "securityhub:UpdateStandardsControl"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "securityhub:UpdateStandardsControl"
+            ]
+        }
+    }
+}
