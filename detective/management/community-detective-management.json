@@ -1,0 +1,53 @@
+{
+    "typeName": "Community::Detective::Management",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "ResourceId": {
+            "type":"string"
+        },
+        "ManagementAccountId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "ManagementAccountId"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "createOnlyProperties": [
+        "/properties/ManagementAccountId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "detective:ListInvitations",
+                "detective:AcceptInvitation"
+            ]
+        },
+        "read": {
+            "permissions": [
+              
+            ]
+        },
+        "update": {
+            "permissions": [
+            ]
+        },
+        "delete": {
+            "permissions": [
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
