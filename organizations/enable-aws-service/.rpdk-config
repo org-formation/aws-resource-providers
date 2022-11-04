@@ -1,0 +1,16 @@
+{
+    "typeName": "Community::Organizations::EnableAWSServiceAccess",
+    "language": "typescript",
+    "runtime": "nodejs12.x",
+    "entrypoint": "dist/handlers.entrypoint",
+    "testEntrypoint": "dist/handlers.testEntrypoint",
+    "settings": {
+        "version": false,
+        "subparser_name": null,
+        "verbose": 0,
+        "force": false,
+        "type_name": null,
+        "useDocker": true,
+        "protocolVersion": "2.0.0"
+    }
+}

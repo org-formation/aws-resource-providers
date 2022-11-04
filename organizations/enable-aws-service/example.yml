@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Sample template to change password policy in account
+
+#Parameters:
+
+
+Resources:
+  EnableAWSServiceAA:
+    Type: Community::Organizations::EnableAWSServiceAccess
+    Properties:
+      ServicePrincipal: access-analyzer.amazonaws.com
