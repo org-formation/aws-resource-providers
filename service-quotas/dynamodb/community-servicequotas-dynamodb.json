@@ -1,0 +1,55 @@
+{
+    "typeName": "Community::ServiceQuotas::DynamoDB",
+    "description": "Custom Service Quota limits for DynamoDB resources. e.g: to increase the maximum number of tables per region.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "Tables": {
+            "description":"The maximum number of tables that can be created per region. (default = 256).",
+            "type": "integer",
+            "default": 256,
+            "minimum": 256
+        },
+        "Arn": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits",
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "servicequotas:requestServiceQuotaIncrease",
+                "servicequotas:listRequestedServiceQuotaChangeHistoryByQuota",
+                "servicequotas:getServiceQuota",
+                "cloudformation:DescribeAccountLimits",
+                "servicequotas:GetAWSDefaultServiceQuota",
+                "iam:CreateServiceLinkedRole"
+            ]
+        },
+        "delete": {
+            "permissions": [
+            ]
+        }
+    }
+}

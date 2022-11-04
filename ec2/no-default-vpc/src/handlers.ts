@@ -1,6 +1,6 @@
 import { EC2 } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { v4 as uuidv4 } from 'uuid';
 import { ResourceModel } from './models';
 import { FilterList } from 'aws-sdk/clients/ec2';

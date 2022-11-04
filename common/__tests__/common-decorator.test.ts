@@ -1,6 +1,15 @@
-import * as Aws from 'aws-sdk';
+import { STS } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, BaseModel, BaseResource, BaseResourceHandlerRequest, exceptions, handlerEvent, OperationStatus, SessionProxy } from 'cfn-rpdk';
+import {
+    Action,
+    BaseModel,
+    BaseResource,
+    BaseResourceHandlerRequest,
+    exceptions,
+    handlerEvent,
+    OperationStatus,
+    SessionProxy,
+} from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { Exclude, Expose } from 'class-transformer';
 import { commonAws, HandlerArgs } from '../src/common-decorator';
 
@@ -10,7 +19,7 @@ describe('when calling handler', () => {
     let testEntrypointPayload: any;
     let spySession: jest.SpyInstance;
     let spySessionClient: jest.SpyInstance;
-    let iam: AwsServiceMockBuilder<Aws.IAM>;
+    let sts: AwsServiceMockBuilder<STS>;
     let resource: Resource;
 
     class MockModel extends BaseModel {
@@ -22,31 +31,31 @@ describe('when calling handler', () => {
 
     const modelList = [new MockModel({ id: '1' }), new MockModel({ id: '2' })];
 
-    class Resource extends BaseResource {
+    class Resource extends BaseResource<MockModel> {
         @handlerEvent(Action.Create)
-        @commonAws({ serviceName: 'S3', debug: true })
-        public async create(action: Action, args: HandlerArgs<MockModel>, service: Aws.S3, model: MockModel): Promise<MockModel> {
+        @commonAws({ service: STS, debug: true })
+        public async create(action: Action, args: HandlerArgs<MockModel>, service: STS, model: MockModel): Promise<MockModel> {
             model.id = 'id';
             return model;
         }
         @handlerEvent(Action.Update)
-        @commonAws({ serviceName: 'S3' })
-        public async update(action: Action, args: HandlerArgs<MockModel>, service: Aws.S3, model: MockModel): Promise<MockModel> {
+        @commonAws({ serviceName: 'STS' })
+        public async update(action: Action, args: HandlerArgs<MockModel>, service: STS, model: MockModel): Promise<MockModel> {
             return model;
         }
         @handlerEvent(Action.List)
-        @commonAws({ serviceName: 'S3' })
-        public async list(action: Action, args: HandlerArgs<MockModel>, service: Aws.S3, model: MockModel): Promise<MockModel[]> {
+        @commonAws({ service: STS })
+        public async list(action: Action, args: HandlerArgs<MockModel>, service: STS, model: MockModel): Promise<MockModel[]> {
             args.logger.log({ action, model });
             return modelList;
         }
     }
 
     beforeEach(async () => {
-        iam = on(Aws.IAM, { snapshot: false });
+        sts = on(STS, { snapshot: false });
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
-        spySessionClient.mockReturnValue(iam.instance);
+        spySessionClient.mockReturnValue(sts.instance);
         testEntrypointPayload = {
             credentials: { accessKeyId: '', secretAccessKey: '', sessionToken: '' },
             region: 'us-east-1',
@@ -78,13 +87,20 @@ describe('when calling handler', () => {
         const progress = await resource.testEntrypoint(testEntrypointPayload, null);
         expect(spySession).toHaveBeenCalledTimes(1);
         expect(spySessionClient).toHaveBeenCalledTimes(1);
-        expect(spySessionClient).toHaveBeenCalledWith('S3');
+        expect(spySessionClient).toHaveBeenCalledWith('STS');
         expect(spyDeserialize).toHaveBeenCalledTimes(2);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel.serialize()).toMatchObject({ id: 'some-id' });
     });
 
-    test('method success with list', async () => {
+    test('method success with update and service name', async () => {
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request: {} }, null);
+        expect(spySession).toHaveBeenCalledTimes(1);
+        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeDefined();
+    });
+
+    test('method success with list and service constructor', async () => {
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.List, request: {} }, null);
         expect(spySession).toHaveBeenCalledTimes(1);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
@@ -93,7 +109,7 @@ describe('when calling handler', () => {
 
     test('method success with generic session', async () => {
         spySession.mockReturnValue({
-            client: () => iam.instance,
+            client: () => sts.instance,
         });
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request: {} }, null);
         expect(spySession).toHaveBeenCalledTimes(1);
@@ -114,9 +130,19 @@ describe('when calling handler', () => {
         }
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request: {} }, null);
         expect(spySession).toHaveBeenCalledTimes(1);
-        expect(spyLogger).toHaveBeenCalledTimes(3);
+        expect(spyLogger).toHaveBeenCalled();
         expect(spyInvokeHandler).toHaveBeenCalledTimes(2);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(JSON.stringify(progress.resourceModel)).toBe('{"id":"id"}');
+    });
+
+    test('decorator return even without descriptor', async () => {
+        const symbolProperty = Symbol.for('baz');
+        const obj = { [symbolProperty]: 73 };
+        const originalDescriptor = Object.getOwnPropertyDescriptor(obj, symbolProperty);
+        const methodDecorator = commonAws({ serviceName: 'STS' });
+        const modifiedDescriptor = methodDecorator(obj, symbolProperty, null) as PropertyDescriptor;
+        expect(modifiedDescriptor.value).not.toBe(originalDescriptor.value);
+        expect(modifiedDescriptor.value).toBeInstanceOf(Function);
     });
 });

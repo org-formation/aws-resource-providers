@@ -1,5 +1,5 @@
 {
-    "extends": "@tsconfig/node10/tsconfig.json",
+    "extends": "@tsconfig/node12/tsconfig.json",
     "compilerOptions": {
         "noImplicitAny": true,
         "allowJs": true,
@@ -10,10 +10,11 @@
         "sourceMap": false,
         "experimentalDecorators": true,
         "resolveJsonModule": true,
+        "esModuleInterop": true,
         "outDir": "dist"
     },
     "include": [
-        "src/**/*.ts"
+        "**/src/**/*.ts"
     ],
     "exclude": [
         "**/node_modules"

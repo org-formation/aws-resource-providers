@@ -1,7 +1,6 @@
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { SSOAdmin } from 'aws-sdk';
-import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
 import { v4 as uuidv4 } from 'uuid';
 import { DeleteAccountAssignmentRequest, CreateAccountAssignmentRequest } from 'aws-sdk/clients/ssoadmin';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
@@ -154,7 +153,7 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
         logger.log({ ...loggingContext, method: 'after deleteAndWait', assignmentRequest, deletionStatus });
         if (deletionStatus.Status !== 'SUCCEEDED') {
-            throw new InternalFailure(`${deletionStatus.FailureReason}:${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
+            throw new exceptions.InternalFailure(`${deletionStatus.FailureReason}:${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
         }
     };
 
@@ -179,7 +178,9 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
         logger.log({ ...loggingContext, method: 'after createAndWait', createAssignmentRequest, creationStatus });
         if (creationStatus.Status !== 'SUCCEEDED') {
-            throw new InternalFailure(`${creationStatus.FailureReason}: ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`);
+            throw new exceptions.InternalFailure(
+                `${creationStatus.FailureReason}: ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`
+            );
         }
     };
 
@@ -214,7 +215,7 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         const { clientRequestToken, awsAccountId } = args.request;
         const { logger, request, callbackContext } = args;
@@ -231,7 +232,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         const { clientRequestToken, previousResourceState } = args.request;
         const { logger } = args;
@@ -245,7 +246,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         const { clientRequestToken } = args.request;
         const { logger } = args;
@@ -256,7 +257,7 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Read)
-    @commonAws({ serviceName: 'SSOAdmin', debug: true })
+    @commonAws({ service: SSOAdmin, debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: SSOAdmin, model: ResourceModel): Promise<ResourceModel> {
         return Promise.resolve(model);
     }

@@ -1,4 +1,4 @@
-import { Action, BaseResource, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { ResourceModel } from './models';
 import { EC2 } from 'aws-sdk';
@@ -8,7 +8,6 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ serviceName: 'EC2', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
         model.resourceId = 'region-defaults'; // there can only be one
-
         if (model.defaultEbsEncryptionKeyId !== undefined || model.enableEbsEncryptionByDefault !== undefined) {
             if (model.enableEbsEncryptionByDefault === true) {
                 await service.enableEbsEncryptionByDefault().promise();

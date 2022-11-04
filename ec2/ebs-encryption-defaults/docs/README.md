@@ -1,4 +1,4 @@
-# Community::EC2::EbsEncryptionDefaults
+# Community::Organizations::EbsEncryptionDefaults
 
 Region level EBS encryption defaults: encryption enabled/disabled and KmsKeyId.
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "Community::EC2::EbsEncryptionDefaults",
+    "Type" : "Community::Organizations::EbsEncryptionDefaults",
     "Properties" : {
         "<a href="#enableebsencryptionbydefault" title="EnableEbsEncryptionByDefault">EnableEbsEncryptionByDefault</a>" : <i>Boolean</i>,
         "<a href="#defaultebsencryptionkeyid" title="DefaultEbsEncryptionKeyId">DefaultEbsEncryptionKeyId</a>" : <i>String</i>
@@ -21,7 +21,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: Community::EC2::EbsEncryptionDefaults
+Type: Community::Organizations::EbsEncryptionDefaults
 Properties:
     <a href="#enableebsencryptionbydefault" title="EnableEbsEncryptionByDefault">EnableEbsEncryptionByDefault</a>: <i>Boolean</i>
     <a href="#defaultebsencryptionkeyid" title="DefaultEbsEncryptionKeyId">DefaultEbsEncryptionKeyId</a>: <i>String</i>

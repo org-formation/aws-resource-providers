@@ -1,13 +1,20 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/** @type {import('@jest/types').Config.InitialOptions} */
+
 module.exports = {
-    preset: 'ts-jest',
     testEnvironment: 'node',
+    transform: {
+        '^.+\\.(t|j)sx?$': '@swc/jest',
+    },
     coverageThreshold: {
         global: {
             branches: 20,
             statements: 20,
         },
     },
-    collectCoverage: true,
+    collectCoverage: false,
+    coverageProvider: 'v8',
     coverageReporters: ['json', 'lcov', 'text'],
     coveragePathIgnorePatterns: ['node_modules/', '__tests__/data/', 'src/models.ts'],
 };

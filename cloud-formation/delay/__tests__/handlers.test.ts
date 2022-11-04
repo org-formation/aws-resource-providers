@@ -1,4 +1,4 @@
-import { Action, exceptions, OperationStatus } from 'cfn-rpdk';
+import { Action, exceptions, OperationStatus } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import createFixture from './data/create-success.json';
 import deleteFixture from './data/delete-success.json';
 import readFixture from './data/read-success.json';

@@ -1,6 +1,6 @@
 import { ServiceQuotas } from 'aws-sdk';
 import { on, AwsServiceMockBuilder, AwsFunctionMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, SessionProxy, OperationStatus } from 'cfn-rpdk';
+import { Action, exceptions, SessionProxy, OperationStatus } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import createFixture from './data/create-success.json';
 import readFixture from './data/read-success.json';
 import deleteFixture from './data/delete-success.json';
@@ -8,7 +8,6 @@ import updateDecreaseBucketsFixture from './data/update-fail-decrease-buckets.js
 import updateFixture from './data/update-success.json';
 import { resource } from '../src/handlers';
 import { ResourceModel } from '../src/models';
-import { ListRequestedServiceQuotaChangeHistoryByQuotaResponse, GetServiceQuotaResponse, GetAWSDefaultServiceQuotaResponse } from 'aws-sdk/clients/servicequotas';
 
 jest.mock('aws-sdk');
 
@@ -61,18 +60,11 @@ describe('when calling handler', () => {
         expect(progress.resourceModel.serialize()).toMatchObject({ ...request.desiredResourceState, ResourceId: IDENTIFIER });
 
         expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
-        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
-            QuotaCode: 'L-DC2B2D3D',
-            ServiceCode: 's3',
-        });
+        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(requestServiceQuotaIncreaseMock.mock).toBeCalledTimes(1);
-        expect(requestServiceQuotaIncreaseMock.mock).toHaveBeenCalledWith({
-            QuotaCode: 'L-DC2B2D3D',
-            ServiceCode: 's3',
-            DesiredValue: 100,
-        });
+        expect(requestServiceQuotaIncreaseMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3', DesiredValue: 100 } as any);
     });
 
     test('update operation successful - service quotas s3', async () => {
@@ -82,18 +74,11 @@ describe('when calling handler', () => {
         expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
 
         expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
-        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
-            QuotaCode: 'L-DC2B2D3D',
-            ServiceCode: 's3',
-        });
+        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(requestServiceQuotaIncreaseMock.mock).toBeCalledTimes(1);
-        expect(requestServiceQuotaIncreaseMock.mock).toHaveBeenCalledWith({
-            QuotaCode: 'L-DC2B2D3D',
-            ServiceCode: 's3',
-            DesiredValue: 110,
-        });
+        expect(requestServiceQuotaIncreaseMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3', DesiredValue: 110 } as any);
     });
 
     test('update decrease bucket limit fails - service quotas s3', async () => {
@@ -111,7 +96,7 @@ describe('when calling handler', () => {
     });
 
     test('read operation successful (from change history) - service quotas s3', async () => {
-        const history: ListRequestedServiceQuotaChangeHistoryByQuotaResponse = {
+        const history: ServiceQuotas.ListRequestedServiceQuotaChangeHistoryByQuotaResponse = {
             RequestedQuotas: [{ Status: 'CASE_OPENED', DesiredValue: 123 }],
         };
         listRequestedServiceQuotaChangeHistoryByQuotaMock.resolve(history as any);
@@ -123,17 +108,13 @@ describe('when calling handler', () => {
         expect(resourceModel.buckets).toBe(123);
 
         expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(getServiceQuotaMock.mock).toBeCalledTimes(0);
     });
 
     test('read operation successful (from service quota) - service quotas s3', async () => {
-        const error = {
-            code: 'NoSuchResourceException',
-            message: 'not found',
-            name: 'Error',
-        } as Error;
-        const getQuotaResponse: GetServiceQuotaResponse = { Quota: { Value: 124 } };
+        const error = { code: 'NoSuchResourceException', message: 'not found', name: 'Error' } as Error;
+        const getQuotaResponse: ServiceQuotas.GetServiceQuotaResponse = { Quota: { Value: 124 } };
 
         listRequestedServiceQuotaChangeHistoryByQuotaMock.reject(error);
         getServiceQuotaMock.resolve(getQuotaResponse as any);
@@ -145,23 +126,14 @@ describe('when calling handler', () => {
         expect(resourceModel.buckets).toBe(124);
 
         expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
-        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
-            QuotaCode: 'L-DC2B2D3D',
-            ServiceCode: 's3',
-        });
+        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
     });
 
     test('read operation successful (from aws default) - service quotas s3', async () => {
-        const error = {
-            code: 'NoSuchResourceException',
-            message: 'not found',
-            name: 'Error',
-        } as Error;
-        const getQuotaResponse: GetAWSDefaultServiceQuotaResponse = {
-            Quota: { Value: 125 },
-        };
+        const error = { code: 'NoSuchResourceException', message: 'not found', name: 'Error' } as Error;
+        const getQuotaResponse: ServiceQuotas.GetAWSDefaultServiceQuotaResponse = { Quota: { Value: 125 } };
 
         listRequestedServiceQuotaChangeHistoryByQuotaMock.reject(error);
         getServiceQuotaMock.reject(error);
@@ -174,17 +146,11 @@ describe('when calling handler', () => {
         expect(resourceModel.buckets).toBe(125);
 
         expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toBeCalledTimes(1);
-        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' });
+        expect(listRequestedServiceQuotaChangeHistoryByQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(getServiceQuotaMock.mock).toBeCalledTimes(1);
-        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({
-            QuotaCode: 'L-DC2B2D3D',
-            ServiceCode: 's3',
-        });
+        expect(getServiceQuotaMock.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
         expect(getAWSDefaultServiceQuota.mock).toBeCalledTimes(1);
-        expect(getAWSDefaultServiceQuota.mock).toHaveBeenCalledWith({
-            QuotaCode: 'L-DC2B2D3D',
-            ServiceCode: 's3',
-        });
+        expect(getAWSDefaultServiceQuota.mock).toHaveBeenCalledWith({ QuotaCode: 'L-DC2B2D3D', ServiceCode: 's3' } as any);
     });
 
     test('all operations fail without session - service quotas s3', async () => {
