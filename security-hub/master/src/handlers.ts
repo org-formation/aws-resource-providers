@@ -1,118 +1,46 @@
+import { Action, BaseResource, exceptions, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { SecurityHub } from 'aws-sdk';
+import { ResourceModel, TypeConfigurationModel } from './models';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
-
-import { ResourceModel } from './models';
-
-const versionCode = '1';
-
-interface LogContext {
-    handler: Action;
-    versionCode: string;
-    clientRequestToken: string;
-}
-
-async function acceptMaster(desiredModel: ResourceModel, logger: Logger, loggingContext: LogContext, service: SecurityHub) {
-    logger.log({ ...loggingContext, method: 'acceptMaster', desiredModel });
-
-    const invitations = await service.listInvitations().promise();
-    logger.log({ ...loggingContext, method: 'after listInvitations', invitations });
-
-    for (const invitation of invitations.Invitations) {
-        if (invitation.AccountId === desiredModel.masterAccountId && invitation.MemberStatus === 'INVITED') {
-            const acceptInvitationRequest: SecurityHub.AcceptInvitationRequest = { InvitationId: invitation.InvitationId, MasterId: desiredModel.masterAccountId };
-
-            logger.log({ ...loggingContext, method: 'before acceptInvitation', acceptInvitationRequest });
-            const acceptResponse = await service.acceptInvitation(acceptInvitationRequest).promise();
-            logger.log({ ...loggingContext, method: 'after acceptInvitation', acceptResponse });
-        }
-    }
-
-    logger.log({ ...loggingContext, method: 'acceptMaster', desiredModel });
-}
 
 class Resource extends BaseResource<ResourceModel> {
+    /**
+     * CloudFormation invokes this handler when the resource is initially created
+     * during stack create operations.
+     *
+     * @param session Current AWS session passed through from caller
+     * @param request The request object for the provisioning request passed to the implementor
+     * @param callbackContext Custom context object to allow the passing through of additional
+     * state or metadata between subsequent retries
+     * @param typeConfiguration Configuration data for this resource type, in the given account
+     * and region
+     * @param logger Logger to proxy requests to default publishers
+     */
     @handlerEvent(Action.Create)
     @commonAws({ service: SecurityHub, debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
-        const { awsAccountId, clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
-        if (model.resourceId) {
-            throw new exceptions.InvalidRequest('Read only property [ResourceId] cannot be provided by the user.');
-        }
-        args.logger.log({ ...loggingContext, message: 'begin', args });
-        await acceptMaster(model, args.logger, loggingContext, service);
+        const invitations = await service.listInvitations().promise();
 
-        model.resourceId = `arn:community::${awsAccountId}:securityhub:master`;
+        const foundInvite = invitations.Invitations.find((invitation) => invitation.AccountId === model.masterAccountId && invitation.MemberStatus === 'INVITED');
+        if (!foundInvite) throw new exceptions.NotFound(`Unable to find invite from ${model.masterAccountId}.`, model.masterAccountId);
 
-        args.logger.log({ ...loggingContext, message: 'done', model });
+        const acceptInvitationRequest: SecurityHub.AcceptInvitationRequest = { InvitationId: foundInvite.InvitationId, MasterId: model.masterAccountId };
+
+        await service.acceptInvitation(acceptInvitationRequest).promise();
+
+        model.resourceId = 'Accepted/' + model.masterAccountId;
         return model;
     }
-
     @handlerEvent(Action.Update)
     @commonAws({ service: SecurityHub, debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
-        const { clientRequestToken, logicalResourceIdentifier, previousResourceState } = args.request;
-        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
-        if (!model.resourceId) {
-            throw new exceptions.NotFound(this.typeName, logicalResourceIdentifier);
-        } else if (model.resourceId !== previousResourceState.resourceId) {
-            args.logger.log(this.typeName, `[NEW ${model.resourceId}] [${logicalResourceIdentifier}] does not match identifier from saved resource [OLD ${previousResourceState.resourceId}].`);
-            throw new exceptions.NotUpdatable('Read only property [ResourceId] cannot be updated.');
-        }
-        args.logger.log({ ...loggingContext, message: 'begin', args });
-        await acceptMaster(model, args.logger, loggingContext, service);
-
-        args.logger.log({ ...loggingContext, message: 'done' });
-        return model;
+        throw new exceptions.NotUpdatable();
     }
 
     @handlerEvent(Action.Delete)
     @commonAws({ service: SecurityHub, debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<null> {
-        const { clientRequestToken, logicalResourceIdentifier } = args.request;
-        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
-        if (!model.resourceId) {
-            throw new exceptions.NotFound(this.typeName, logicalResourceIdentifier);
-        }
-
-        try {
-            const deleteInvitationRequest: SecurityHub.DeleteInvitationsRequest = { AccountIds: [model.masterAccountId] };
-            args.logger.log({ ...loggingContext, method: 'before deleteInvitations', deleteInvitationRequest });
-            const acceptResponse = await service.deleteInvitations(deleteInvitationRequest).promise();
-            args.logger.log({ ...loggingContext, method: 'after deleteInvitations', acceptResponse });
-        } catch (err) {
-            if (err?.code === 'ResourceNotFoundException') {
-                throw new exceptions.NotFound(this.typeName, model.masterAccountId);
-            } else {
-                // Raise the original exception
-                throw err;
-            }
-        }
-
-        return null;
-    }
-
-    @handlerEvent(Action.Read)
-    @commonAws({ service: SecurityHub, debug: true })
-    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
-        const { clientRequestToken, logicalResourceIdentifier } = args.request;
-        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
-        if (!model.resourceId) {
-            throw new exceptions.NotFound(this.typeName, logicalResourceIdentifier);
-        }
-
-        args.logger.log({ ...loggingContext, message: 'begin', args });
-        const result = await service.listInvitations().promise();
-        const enabledInvitations = (result.Invitations || []).filter((value: SecurityHub.Invitation) => {
-            return value.MemberStatus === 'ENABLED';
-        });
-        if (!enabledInvitations.length) {
-            throw new exceptions.NotFound(this.typeName, model.masterAccountId);
-        }
-
-        args.logger.log({ ...loggingContext, message: 'done', result });
-        return model;
+        return Promise.resolve(null);
     }
 }
 
