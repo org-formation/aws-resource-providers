@@ -1,7 +1,7 @@
 import { IAM } from 'aws-sdk';
 import uuid from 'uuid';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, OperationStatus, SessionProxy } from 'cfn-rpdk';
+import { Action, exceptions, OperationStatus, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import createInvalidRequest from './data/create-invalid-request.json';
 import createFixture from './data/create-success.json';
 import deleteFixture from './data/delete-success.json';

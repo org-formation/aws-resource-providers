@@ -1,6 +1,17 @@
-import { Action, BaseResource, exceptions, handlerEvent, OperationStatus, Optional, ProgressEvent, ResourceHandlerRequest, SessionProxy } from 'cfn-rpdk';
+import {
+    Action,
+    BaseResource,
+    exceptions,
+    handlerEvent,
+    OperationStatus,
+    Optional,
+    ProgressEvent,
+    ResourceHandlerRequest,
+    SessionProxy,
+} from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { IAM } from 'aws-sdk';
+import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { CreateSAMLProviderRequest, UpdateSAMLProviderRequest, DeleteSAMLProviderRequest } from 'aws-sdk/clients/iam';
 
 // Use this logger to forward log messages to CloudWatch Logs.
@@ -10,121 +21,64 @@ type CallbackContext = Record<string, any>;
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
-    public async create(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        LOGGER.info('create');
-        LOGGER.info(callbackContext);
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-
-        LOGGER.info(request);
-        LOGGER.info(model);
-
-        if (session instanceof SessionProxy) {
-            const client: IAM = session.client('IAM') as IAM;
-            const createSamlProviderRequest: CreateSAMLProviderRequest = {
+    @commonAws({ serviceName: 'IAM', debug: true })
+    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<ResourceModel> {
+        const response = await service
+            .createSAMLProvider({
                 Name: model.name,
                 SAMLMetadataDocument: model.metadataDocument,
-            };
-            LOGGER.info(createSamlProviderRequest);
-            const response = await client.createSAMLProvider(createSamlProviderRequest).promise();
+            })
+            .promise();
 
-            LOGGER.info(response);
-            model.arn = response.SAMLProviderArn;
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-        }
-        return progress;
+        model.arn = response.SAMLProviderArn;
+        return Promise.resolve(model);
     }
 
-    /**
-     * CloudFormation invokes this handler when the resource is updated
-     * as part of a stack update operation.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
     @handlerEvent(Action.Update)
-    public async update(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        LOGGER.info('update');
-        LOGGER.info(callbackContext);
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+    @commonAws({ serviceName: 'IAM', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<ResourceModel> {
+        const previousModel = args.request.previousResourceState;
 
-        LOGGER.info(request);
-        LOGGER.info(model);
+        if (previousModel.name !== model.name) {
+            throw new exceptions.InvalidRequest(`Changing the name of a saml provider is not supported.`);
+        }
 
-        if (session instanceof SessionProxy) {
-            const client: IAM = session.client('IAM') as IAM;
-            const updateSamlProviderRequest: UpdateSAMLProviderRequest = {
+        await service
+            .updateSAMLProvider({
                 SAMLProviderArn: model.arn,
                 SAMLMetadataDocument: model.metadataDocument,
-            };
+            })
+            .promise();
 
-            LOGGER.info(updateSamlProviderRequest);
-            const response = await client.updateSAMLProvider(updateSamlProviderRequest).promise();
-
-            LOGGER.info(response);
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-        }
-        return progress;
+        return Promise.resolve(model);
     }
 
-    /**
-     * CloudFormation invokes this handler when the resource is deleted, either when
-     * the resource is deleted from the stack as part of a stack update operation,
-     * or the stack itself is deleted.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
     @handlerEvent(Action.Delete)
-    public async delete(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>, callbackContext: CallbackContext): Promise<ProgressEvent> {
-        LOGGER.info('delete');
-        LOGGER.info(callbackContext);
-
-        const model: ResourceModel = request.desiredResourceState;
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
-
-        if (session instanceof SessionProxy) {
-            const client: IAM = session.client('IAM') as IAM;
-            const deleteSamlProviderRequest: DeleteSAMLProviderRequest = {
-                SAMLProviderArn: model.arn,
-            };
-
-            LOGGER.info(deleteSamlProviderRequest);
-            const response = await client.deleteSAMLProvider(deleteSamlProviderRequest).promise();
-            progress.status = OperationStatus.Success;
-            LOGGER.info(response);
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
+    @commonAws({ serviceName: 'IAM', debug: true })
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<null> {
+        try {
+            await service.deleteSAMLProvider({ SAMLProviderArn: model.arn }).promise();
+        } catch (err) {
+            if (err && err.code === 'NoSuchEntity') {
+                throw new exceptions.NotFound(ResourceModel.TYPE_NAME, model.arn || args.request.logicalResourceIdentifier);
+            } else {
+                // Raise the original exception
+                throw err;
+            }
         }
-        return progress;
+        return Promise.resolve(null);
     }
 
-    /**
-     * CloudFormation invokes this handler as part of a stack update operation when
-     * detailed information about the resource's current state is required.
-     *
-     * @param session Current AWS session passed through from caller
-     * @param request The request object for the provisioning request passed to the implementor
-     * @param callbackContext Custom context object to allow the passing through of additional
-     * state or metadata between subsequent retries
-     */
     @handlerEvent(Action.Read)
-    public async read(session: Optional<SessionProxy>, request: ResourceHandlerRequest<ResourceModel>): Promise<ProgressEvent> {
-        const model: ResourceModel = request.desiredResourceState;
-        // TODO: put code here
-        if (session instanceof SessionProxy) {
-        } else {
-            throw new exceptions.InvalidCredentials('no aws session found - did you forget to register the execution role?');
-        }
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        return progress;
+    @commonAws({ serviceName: 'IAM', debug: true })
+    public async read(action: Action, args: HandlerArgs<ResourceModel>, service: IAM, model: ResourceModel): Promise<ResourceModel> {
+        const response = await service.getSAMLProvider({ SAMLProviderArn: model.arn }).promise();
+        const read = new ResourceModel({
+            Name: model.name,
+            MetadataDocument: response.SAMLMetadataDocument,
+            Arn: model.arn,
+        });
+        return Promise.resolve(read);
     }
 }
 

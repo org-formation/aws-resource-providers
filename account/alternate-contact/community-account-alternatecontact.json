@@ -1,0 +1,69 @@
+{
+    "typeName": "Community::Account::AlternateContact",
+    "description": "Community type to manage account alternate contacts",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "AlternateContactType": {
+            "type": "string",
+            "enum": [ "BILLING","OPERATIONS","SECURITY" ]
+        },
+        "Name": {
+            "type": "string"
+        },
+        "EmailAddress": {
+            "type": "string"
+        },
+        "PhoneNumber": {
+            "type": "string"
+        },
+        "Title": {
+            "type": "string"
+        },
+        "AccountId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "AlternateContactType",
+        "Name",
+        "EmailAddress",
+        "PhoneNumber",
+        "Title"
+    ],
+    "createOnlyProperties": [
+        "/properties/AlternateContactType"
+    ],
+    "primaryIdentifier": [
+        "/properties/AlternateContactType"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "account:PutAlternateContact"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "account:GetAlternateContact"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "account:PutAlternateContact"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "account:DeleteAlternateContact"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "account:GetAlternateContact"
+            ]
+        }
+    }
+}

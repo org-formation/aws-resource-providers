@@ -12,6 +12,10 @@
             "maxLength": 1000000,
             "pattern": "[\\s\\S]+"
         },
+        "PolicyDocument": {
+            "description": "The policy document to add to the new policy",
+            "type": "object"
+        },
         "Description": {
             "description": "An optional description to assign to the policy.",
             "type": "string",
@@ -57,7 +61,6 @@
     },
     "additionalProperties": false,
     "required": [
-        "Content",
         "Description",
         "Name",
         "PolicyType",
@@ -72,6 +75,7 @@
     "primaryIdentifier": [
         "/properties/ResourceId"
     ],
+    "replacementStrategy": "delete_then_create",
     "handlers": {
         "create": {
             "permissions": [

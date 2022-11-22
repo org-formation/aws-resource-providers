@@ -1,7 +1,6 @@
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { SSOAdmin } from 'aws-sdk';
-import { InternalFailure } from 'cfn-rpdk/dist/exceptions';
 import { v4 as uuidv4 } from 'uuid';
 import { DeleteAccountAssignmentRequest, CreateAccountAssignmentRequest } from 'aws-sdk/clients/ssoadmin';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
@@ -155,7 +154,7 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
         logger.log({ ...loggingContext, method: 'after deleteAndWait', assignmentRequest, deletionStatus });
         if (deletionStatus.Status !== 'SUCCEEDED') {
-            throw new InternalFailure(`${deletionStatus.FailureReason}:${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
+            throw new exceptions.InternalFailure(`${deletionStatus.FailureReason}:${assignmentRequest.PrincipalId}, ${assignmentRequest.TargetId} ${assignmentRequest.PermissionSetArn}`);
         }
     };
 
@@ -181,7 +180,9 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
 
         logger.log({ ...loggingContext, method: 'after createAndWait', createAssignmentRequest, creationStatus });
         if (creationStatus.Status !== 'SUCCEEDED') {
-            throw new InternalFailure(`${creationStatus.FailureReason}: ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`);
+            throw new exceptions.InternalFailure(
+                `${creationStatus.FailureReason}: ${createAssignmentRequest.PrincipalId}, ${createAssignmentRequest.TargetId} ${createAssignmentRequest.PermissionSetArn}`
+            );
         }
     };
 

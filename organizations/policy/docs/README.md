@@ -13,6 +13,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "Community::Organizations::Policy",
     "Properties" : {
         "<a href="#content" title="Content">Content</a>" : <i>String</i>,
+        "<a href="#policydocument" title="PolicyDocument">PolicyDocument</a>" : <i>Map</i>,
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#policytype" title="PolicyType">PolicyType</a>" : <i>String</i>,
@@ -27,6 +28,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: Community::Organizations::Policy
 Properties:
     <a href="#content" title="Content">Content</a>: <i>String</i>
+    <a href="#policydocument" title="PolicyDocument">PolicyDocument</a>: <i>Map</i>
     <a href="#description" title="Description">Description</a>: <i>String</i>
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#policytype" title="PolicyType">PolicyType</a>: <i>String</i>
@@ -40,7 +42,7 @@ Properties:
 
 The policy text content to add to the new policy. The text that you supply must adhere to the rules of the policy type you specify in the Type parameter.
 
-_Required_: Yes
+_Required_: No
 
 _Type_: String
 
@@ -49,6 +51,16 @@ _Minimum_: <code>1</code>
 _Maximum_: <code>1000000</code>
 
 _Pattern_: <code>[\s\S]+</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### PolicyDocument
+
+The policy document to add to the new policy
+
+_Required_: No
+
+_Type_: Map
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

@@ -1,0 +1,9 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "AccountId": "123123123123",
+        "SupportLevel": "SupportLevel"
+    },
+    "previousResourceState": null,
+    "logicalResourceIdentifier": "MyResource"
+}

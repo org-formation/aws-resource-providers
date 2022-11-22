@@ -1,0 +1,13 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ResourceId": "Z123456789012345678/us-east-1/v-12345678901234567",
+        "HostedZoneId": "Z123456789012345678",
+        "VPC": {
+            "VPCRegion": "us-east-1",
+            "VPCId": "v-12345678901234567"
+        }
+    },
+    "awsAccountId": "123456789012",
+    "logicalResourceIdentifier": "MyResource"
+}

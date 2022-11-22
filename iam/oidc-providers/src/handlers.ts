@@ -1,4 +1,4 @@
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import IAM from 'aws-sdk/clients/iam';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';

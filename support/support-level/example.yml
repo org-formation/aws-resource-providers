@@ -1,0 +1,7 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  S3:
+    Type: 'Community::Support::SupportLevel'
+    Properties:
+      AccountId: '123123123123'
+      SupportLevel: 'developer'
