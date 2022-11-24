@@ -6,35 +6,53 @@ export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
 
     @Exclude()
-    public static readonly TYPE_NAME: string = 'Community::CloudFormation::Delay';
+    public static readonly TYPE_NAME: string = 'Community::SecurityHub::Insight';
 
     @Exclude()
-    protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';
+    protected readonly IDENTIFIER_KEY_INSIGHTARN: string = '/properties/InsightArn';
 
-    @Expose({ name: 'ResourceId' })
+    @Expose({ name: 'InsightArn' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'resourceId', value, obj, []),
+            transformValue(String, 'insightArn', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    resourceId?: Optional<string>;
-    @Expose({ name: 'Duration' })
+    insightArn?: Optional<string>;
+    @Expose({ name: 'InsightName' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'duration', value, obj, []),
+            transformValue(String, 'insightName', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    duration?: Optional<string>;
+    insightName?: Optional<string>;
+    @Expose({ name: 'GroupByAttribute' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'groupByAttribute', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    groupByAttribute?: Optional<string>;
+    @Expose({ name: 'FiltersJSON' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'filtersJSON', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    filtersJSON?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
-        if (this.resourceId != null) {
-            identifier[this.IDENTIFIER_KEY_RESOURCEID] = this.resourceId;
+        if (this.insightArn != null) {
+            identifier[this.IDENTIFIER_KEY_INSIGHTARN] = this.insightArn;
         }
 
         // only return the identifier if it can be used, i.e. if all components are present

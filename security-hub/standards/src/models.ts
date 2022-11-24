@@ -6,7 +6,7 @@ export class ResourceModel extends BaseModel {
     ['constructor']: typeof ResourceModel;
 
     @Exclude()
-    public static readonly TYPE_NAME: string = 'Community::CloudFormation::Delay';
+    public static readonly TYPE_NAME: string = 'Community::SecurityHub::Standards';
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_RESOURCEID: string = '/properties/ResourceId';
@@ -20,15 +20,42 @@ export class ResourceModel extends BaseModel {
         }
     )
     resourceId?: Optional<string>;
-    @Expose({ name: 'Duration' })
+    @Expose({ name: 'CIS14' })
     @Transform(
         (value: any, obj: any) =>
-            transformValue(String, 'duration', value, obj, []),
+            transformValue(String, 'cIS14', value, obj, []),
         {
             toClassOnly: true,
         }
     )
-    duration?: Optional<string>;
+    cIS14?: Optional<string>;
+    @Expose({ name: 'CIS12' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'cIS12', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    cIS12?: Optional<string>;
+    @Expose({ name: 'PCIDSS' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'pCIDSS', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    pCIDSS?: Optional<string>;
+    @Expose({ name: 'AFSBP' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'aFSBP', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    aFSBP?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {

@@ -38,6 +38,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     controlId?: Optional<string>;
+    @Expose({ name: 'SuppressCurrentFindingsOnDisabled' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Boolean, 'suppressCurrentFindingsOnDisabled', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    suppressCurrentFindingsOnDisabled?: Optional<boolean>;
     @Expose({ name: 'ControlStatus' })
     @Transform(
         (value: any, obj: any) =>
@@ -74,5 +83,12 @@ export class ResourceModel extends BaseModel {
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
     }
+}
+
+export class TypeConfigurationModel extends BaseModel {
+    ['constructor']: typeof TypeConfigurationModel;
+
+
+
 }
 

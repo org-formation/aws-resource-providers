@@ -21,7 +21,7 @@ Resources:
                   Ref: AWS::AccountId
               StringLike:
                 aws:SourceArn:
-                  Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-SecurityHub-Members/*
+                  Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-SecurityHub-Insight/*
       Path: "/"
       Policies:
         - PolicyName: ResourceTypePolicy
@@ -30,8 +30,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "securityhub:createmembers"
-                - "securityhub:invitemembers"
+                - "securityhub:CreateInsight"
+                - "securityhub:DeleteInsight"
+                - "securityhub:GetInsight"
+                - "securityhub:UpdateInsight"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

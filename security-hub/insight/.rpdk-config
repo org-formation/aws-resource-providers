@@ -1,6 +1,6 @@
 {
     "artifact_type": "RESOURCE",
-    "typeName": "Community::SecurityHub::StandardsControl",
+    "typeName": "Community::SecurityHub::Insight",
     "language": "typescript",
     "runtime": "nodejs14.x",
     "entrypoint": "dist/handlers.entrypoint",
@@ -12,6 +12,9 @@
         "force": false,
         "type_name": null,
         "artifact_type": null,
+        "endpoint_url": null,
+        "region": null,
+        "target_schemas": [],
         "useDocker": false,
         "protocolVersion": "2.0.0"
     }

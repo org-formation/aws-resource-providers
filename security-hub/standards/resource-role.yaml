@@ -21,7 +21,7 @@ Resources:
                   Ref: AWS::AccountId
               StringLike:
                 aws:SourceArn:
-                  Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-SecurityHub-Members/*
+                  Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-SecurityHub-Standards/*
       Path: "/"
       Policies:
         - PolicyName: ResourceTypePolicy
@@ -30,8 +30,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "securityhub:createmembers"
-                - "securityhub:invitemembers"
+                - "securityhub:BatchDisableStandards"
+                - "securityhub:BatchEnableStandards"
+                - "securityhub:GetEnabledStandards"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
