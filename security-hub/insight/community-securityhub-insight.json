@@ -1,0 +1,55 @@
+{
+    "typeName": "Community::SecurityHub::Insight",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "InsightArn": {
+            "type": "string"
+        },
+        "InsightName": {
+            "type": "string"
+        },
+        "GroupByAttribute": {
+            "type": "string"
+        },
+        "FiltersJSON": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "InsightName",
+        "FiltersJSON",
+        "GroupByAttribute"
+    ],
+    "readOnlyProperties": [
+        "/properties/InsightArn"
+    ],
+    "primaryIdentifier": [
+        "/properties/InsightArn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "securityhub:CreateInsight"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "securityhub:GetInsight"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "securityhub:UpdateInsight"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "securityhub:DeleteInsight"
+            ]
+        }
+    }
+}

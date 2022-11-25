@@ -1,0 +1,49 @@
+{
+    "typeName": "Community::SecurityHub::Master",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "definitions": {
+    },
+    "properties": {
+        "MasterAccountId": {
+            "description":"AccountId of the master account this account would like to be part of.",
+            "type": "string"
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "securityhub:ListInvitations",
+                "securityhub:AcceptInvitation"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "securityhub:ListInvitations"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "securityhub:ListInvitations",
+                "securityhub:AcceptInvitation"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "securityhub:DeleteInvitations"
+            ]
+        }
+    }
+}

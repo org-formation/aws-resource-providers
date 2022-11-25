@@ -14,6 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#standardcode" title="StandardCode">StandardCode</a>" : <i>String</i>,
         "<a href="#controlid" title="ControlId">ControlId</a>" : <i>String</i>,
+        "<a href="#suppresscurrentfindingsondisabled" title="SuppressCurrentFindingsOnDisabled">SuppressCurrentFindingsOnDisabled</a>" : <i>Boolean</i>,
         "<a href="#controlstatus" title="ControlStatus">ControlStatus</a>" : <i>String</i>,
         "<a href="#disabledreason" title="DisabledReason">DisabledReason</a>" : <i>String</i>
     }
@@ -27,6 +28,7 @@ Type: Community::SecurityHub::StandardsControl
 Properties:
     <a href="#standardcode" title="StandardCode">StandardCode</a>: <i>String</i>
     <a href="#controlid" title="ControlId">ControlId</a>: <i>String</i>
+    <a href="#suppresscurrentfindingsondisabled" title="SuppressCurrentFindingsOnDisabled">SuppressCurrentFindingsOnDisabled</a>: <i>Boolean</i>
     <a href="#controlstatus" title="ControlStatus">ControlStatus</a>: <i>String</i>
     <a href="#disabledreason" title="DisabledReason">DisabledReason</a>: <i>String</i>
 </pre>
@@ -39,7 +41,7 @@ _Required_: Yes
 
 _Type_: String
 
-_Allowed Values_: <code>CIS</code> | <code>PCIDSS</code> | <code>AFSBP</code>
+_Allowed Values_: <code>CIS1.4</code> | <code>CIS1.2</code> | <code>CIS</code> | <code>PCIDSS</code> | <code>AFSBP</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -48,6 +50,14 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 _Required_: Yes
 
 _Type_: String
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### SuppressCurrentFindingsOnDisabled
+
+_Required_: No
+
+_Type_: Boolean
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

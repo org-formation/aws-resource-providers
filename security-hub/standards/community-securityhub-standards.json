@@ -1,0 +1,70 @@
+{
+    "typeName": "Community::SecurityHub::Standards",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+        "EnabledDisabled": {
+            "type": "string",
+            "enum": ["ENABLED", "DISABLED"]
+        }
+    },
+    "properties": {
+        "ResourceId": {
+            "type": "string"
+        },
+        "CIS14": {
+            "$ref": "#/definitions/EnabledDisabled"
+        },
+        "CIS12": {
+            "$ref": "#/definitions/EnabledDisabled"
+        },
+        "PCIDSS": {
+            "$ref": "#/definitions/EnabledDisabled"
+        },
+        "AFSBP": {
+            "$ref": "#/definitions/EnabledDisabled"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "CIS14",
+        "CIS12",
+        "PCIDSS",
+        "AFSBP"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "securityhub:GetEnabledStandards",
+                "securityhub:BatchDisableStandards",
+                "securityhub:BatchEnableStandards"
+            ]
+        },
+        "read": {
+            "permissions": [
+                
+            ]
+        },
+        "update": {
+            "permissions": [
+                "securityhub:GetEnabledStandards",
+                "securityhub:BatchDisableStandards",
+                "securityhub:BatchEnableStandards"
+            ]
+        },
+        "delete": {
+            "permissions": [
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
