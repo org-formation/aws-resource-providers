@@ -40,7 +40,8 @@
     },
     "additionalProperties": false,
     "createOnlyProperties": [
-        "/properties/SuppressCurrentFinding"
+        "/properties/StandardCode",
+        "/properties/ControlId"
     ],
     "required": [
         "StandardCode",
