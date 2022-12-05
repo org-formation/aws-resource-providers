@@ -1,0 +1,56 @@
+{
+    "typeName": "Community::SecurityHub::Hub",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "EnableDefaultStandards": {
+            "type": "boolean"
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "createOnlyProperties": [
+        "/properties/EnableDefaultStandards"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "securityhub:EnableSecurityHub",
+                "iam:CreateServiceLinkedRole"
+            ]
+        },
+        "read": {
+            "permissions": [
+                
+            ]
+        },
+        "update": {
+            "permissions": [
+                
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "securityhub:DisableSecurityHub",
+                "iam:DeleteServiceLinkedRole"
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
