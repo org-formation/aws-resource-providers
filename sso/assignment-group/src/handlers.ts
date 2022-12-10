@@ -95,6 +95,7 @@ const retryCreateOrDeleteOperation = async (operation: () => Promise<void>, logg
                 shouldRetry = true;
                 const wait = Math.pow(retryCount, 2) + Math.random();
                 logger.log(`received retryable error ${err}. wait ${wait} and retry-count ${retryCount}`);
+
                 await sleep(wait * 1000);
                 continue;
             }
@@ -172,6 +173,7 @@ const compareCreateAndDelete = async (service: SSOAdmin, loggingContext: LogCont
         while (creationStatus && creationStatus.Status === 'IN_PROGRESS') {
             await sleep(2000);
             const describeCreateAssignmentRequest = { AccountAssignmentCreationRequestId: creationStatus.RequestId, InstanceArn: createAssignmentRequest.InstanceArn };
+
             const describeStatusResponse = await service.describeAccountAssignmentCreationStatus(describeCreateAssignmentRequest).promise();
             creationStatus = describeStatusResponse.AccountAssignmentCreationStatus;
         }

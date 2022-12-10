@@ -13,6 +13,8 @@
         "StandardCode": {
             "type": "string",
             "enum": [
+                "CIS1.4",
+                "CIS1.2",
                 "CIS",
                 "PCIDSS",
                 "AFSBP"
@@ -20,6 +22,9 @@
         },
         "ControlId": {
             "type": "string"
+        },
+        "SuppressCurrentFindingsOnDisabled": {
+            "type": "boolean"
         },
         "ControlStatus": {
             "type": "string",
@@ -34,6 +39,10 @@
         }
     },
     "additionalProperties": false,
+    "createOnlyProperties": [
+        "/properties/StandardCode",
+        "/properties/ControlId"
+    ],
     "required": [
         "StandardCode",
         "ControlId",
@@ -48,7 +57,9 @@
     "handlers": {
         "create": {
             "permissions": [
-                "securityhub:UpdateStandardsControl"
+                "securityhub:UpdateStandardsControl",
+                "securityhub:GetFindings",
+                "securityhub:BatchUpdateFindings"
             ]
         },
         "read": {
@@ -58,7 +69,9 @@
         },
         "update": {
             "permissions": [
-                "securityhub:UpdateStandardsControl"
+                "securityhub:UpdateStandardsControl",
+                "securityhub:GetFindings",
+                "securityhub:BatchUpdateFindings"
             ]
         },
         "delete": {

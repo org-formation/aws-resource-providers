@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  CloudFormation:
+    Type: 'Community::SecurityHub::Standards'
+    Properties:
+      CIS14: DISABLED
+      CIS12: DISABLED
+      PCIDSS: DISABLED
+      AFSBP: DISABLED

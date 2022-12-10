@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  CloudFormation:
+    Type: 'Community::SecurityHub::Insight'
+    Properties:
+      InsightName: test
+      GroupByAttribute: ResourceType
+      Filters: '{
+                "AwsAccountId": [
+                    {
+                        "Value": "123123123123",
+                        "Comparison": "EQUALS"
+                    }
+                ],
+                "ComplianceStatus": [
+                    {
+                        "Value": "FAILED",
+                        "Comparison": "EQUALS"
+                    }
+                ],
+                "WorkflowStatus": [
+                    {
+                        "Value": "SUPPRESSED",
+                        "Comparison": "NOT_EQUALS"
+                    }
+                ],
+                "RecordState": [
+                    {
+                        "Value": "ACTIVE",
+                        "Comparison": "EQUALS"
+                    }
+                ]
+            }'
+      

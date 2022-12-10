@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "Community::SecurityHub::StandardsControl",
     "language": "typescript",
-    "runtime": "nodejs12.x",
+    "runtime": "nodejs14.x",
     "entrypoint": "dist/handlers.entrypoint",
     "testEntrypoint": "dist/handlers.testEntrypoint",
     "settings": {
@@ -12,7 +12,7 @@
         "force": false,
         "type_name": null,
         "artifact_type": null,
-        "useDocker": true,
+        "useDocker": false,
         "protocolVersion": "2.0.0"
     }
 }
