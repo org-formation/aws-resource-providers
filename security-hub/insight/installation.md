@@ -1,12 +1,15 @@
-# Community::CloudFormation::Delay
+# Community::SecurityHub::Insight
 
 ## Installation using AWS CLI
+
+pre-requisite: you need to deploy the cloudformation template [resource-role](./resource-role.yaml). this will create an IAM role, this IAM role can be used as the `execution-role-arn` argument below.
+
 ``` bash
 aws cloudformation register-type \
   --type-name Community::SecurityHub::Insight \
   --type RESOURCE \
   --schema-handler-package s3://community-resource-provider-catalog/community-securityhub-insight-0.1.2.zip \
-  --execution-role-arn <arn-of-role-described-in-resource-role>
+  --execution-role-arn <execution-role-arn>
 
 aws cloudformation describe-type-registration --registration-token <registration-token> 
 
