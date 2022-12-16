@@ -23,6 +23,9 @@
         "ControlId": {
             "type": "string"
         },
+        "SuppressionsUpdatedBy": {
+            "type": "string"
+        },
         "SuppressCurrentFindingsOnDisabled": {
             "type": "boolean"
         },

@@ -14,7 +14,43 @@ const createStandardsControlArn = (accountId: string, region: string, standardCo
     throw new Error('unknown standardCode');
 };
 
-const suppressFindingsForControlArn = async (securityHub: SecurityHub, controlArn: string) => {
+const unSuppressFindingsForControlArn = async (securityHub: SecurityHub, controlArn: string, suppressionsUpdatedBy: string | undefined) => {
+    let currentPageToken: string = undefined;
+    do {
+        const response = await securityHub
+            .getFindings({
+                NextToken: currentPageToken,
+                MaxResults: 100,
+                Filters: {
+                    WorkflowStatus: [{ Comparison: 'EQUALS', Value: 'SUPPRESSED' }],
+                    RecordState: [{ Comparison: 'EQUALS', Value: 'ACTIVE' }],
+                    ProductName: [{ Comparison: 'EQUALS', Value: 'Security Hub' }],
+                    ProductFields: [{ Key: 'StandardsControlArn', Value: controlArn, Comparison: 'EQUALS' }],
+                    ...(suppressionsUpdatedBy ? { NoteUpdatedBy: [{ Comparison: 'EQUALS', Value: suppressionsUpdatedBy }] } : {}),
+                },
+            })
+            .promise();
+
+        if (response.Findings.length) {
+            const identifiers = response.Findings.map((f) => ({ Id: f.Id, ProductArn: f.ProductArn } as AwsSecurityFindingIdentifier));
+            await securityHub
+                .batchUpdateFindings({
+                    FindingIdentifiers: identifiers,
+                    Note: {
+                        Text: 'un-suppressed finding, as the standards control got enabled',
+                        UpdatedBy: 'auto-suppress-disabled-rule',
+                    },
+                    Workflow: {
+                        Status: 'NEW',
+                    },
+                })
+                .promise();
+        }
+
+        currentPageToken = response.NextToken;
+    } while (currentPageToken);
+};
+const suppressFindingsForControlArn = async (securityHub: SecurityHub, controlArn: string, suppressionsUpdatedBy: string) => {
     let currentPageToken: string = undefined;
     do {
         const response = await securityHub
@@ -38,6 +74,10 @@ const suppressFindingsForControlArn = async (securityHub: SecurityHub, controlAr
             await securityHub
                 .batchUpdateFindings({
                     FindingIdentifiers: identifiers,
+                    Note: {
+                        Text: 'suppressing finding, as the standards control got disabled',
+                        UpdatedBy: suppressionsUpdatedBy,
+                    },
                     Workflow: {
                         Status: 'SUPPRESSED',
                     },
@@ -56,6 +96,9 @@ class Resource extends BaseResource<ResourceModel> {
 
         const standardsControlArn = createStandardsControlArn(args.request.awsAccountId, args.request.region, standardCode, controlId);
 
+        if (!model.suppressionsUpdatedBy) {
+            model.suppressionsUpdatedBy = 'auto-suppress-disabled-rule';
+        }
         const request: SecurityHub.UpdateStandardsControlRequest = {
             StandardsControlArn: standardsControlArn,
             DisabledReason: disabledReason,
@@ -72,7 +115,7 @@ class Resource extends BaseResource<ResourceModel> {
 
             if (controlStatus === 'DISABLED' && suppressCurrentFindingsOnDisabled) {
                 args.logger.log({ action, message: 'suppressing findings', request });
-                await suppressFindingsForControlArn(service, standardsControlArn);
+                await suppressFindingsForControlArn(service, standardsControlArn, model.suppressionsUpdatedBy);
             }
 
             return Promise.resolve(model);
@@ -87,12 +130,15 @@ class Resource extends BaseResource<ResourceModel> {
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
         const { standardCode, controlId, disabledReason, controlStatus, suppressCurrentFindingsOnDisabled } = model;
         const standardsControlArn = createStandardsControlArn(args.request.awsAccountId, args.request.region, standardCode, controlId);
-
+        const previousControlStatus = args.request.previousResourceState?.controlStatus;
         const request: SecurityHub.UpdateStandardsControlRequest = {
             StandardsControlArn: standardsControlArn,
-            DisabledReason: disabledReason,
             ControlStatus: controlStatus,
         };
+
+        if (controlStatus === 'DISABLED') {
+            request.DisabledReason = disabledReason;
+        }
 
         try {
             args.logger.log({ action, message: 'before updateStandardsControl', request });
@@ -102,9 +148,12 @@ class Resource extends BaseResource<ResourceModel> {
             model.resourceId = standardsControlArn;
             args.logger.log({ action, message: 'done', model });
 
-            if (controlStatus === 'DISABLED' && suppressCurrentFindingsOnDisabled) {
+            if (controlStatus === 'DISABLED' && previousControlStatus === 'ENABLED' && suppressCurrentFindingsOnDisabled) {
                 args.logger.log({ action, message: 'suppressing findings', request });
-                await suppressFindingsForControlArn(service, standardsControlArn);
+                await suppressFindingsForControlArn(service, standardsControlArn, model.suppressionsUpdatedBy);
+            } else if (controlStatus === 'ENABLED' && previousControlStatus === 'DISABLED') {
+                args.logger.log({ action, message: 'un-suppressing findings', request });
+                await unSuppressFindingsForControlArn(service, standardsControlArn, model.suppressionsUpdatedBy);
             }
 
             return Promise.resolve(model);
@@ -117,7 +166,34 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Delete)
     @commonAws({ service: SecurityHub, debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<null> {
-        return Promise.resolve(null);
+        const { standardCode, controlId, disabledReason, controlStatus, suppressCurrentFindingsOnDisabled } = model;
+        const standardsControlArn = createStandardsControlArn(args.request.awsAccountId, args.request.region, standardCode, controlId);
+
+        if (controlStatus === 'ENABLED') {
+            return;
+        }
+
+        const request: SecurityHub.UpdateStandardsControlRequest = {
+            StandardsControlArn: standardsControlArn,
+            ControlStatus: 'ENABLED',
+        };
+
+        try {
+            args.logger.log({ action, message: 'before updateStandardsControl', request });
+            const response = await service.updateStandardsControl(request).promise();
+            args.logger.log({ action, message: 'after invoke updateStandardsControl', response });
+
+            model.resourceId = standardsControlArn;
+            args.logger.log({ action, message: 'done', model });
+
+            args.logger.log({ action, message: 'un-suppressing findings', request });
+            await unSuppressFindingsForControlArn(service, standardsControlArn, model.suppressionsUpdatedBy);
+
+            return Promise.resolve(null);
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
     }
 
     @handlerEvent(Action.Read)
