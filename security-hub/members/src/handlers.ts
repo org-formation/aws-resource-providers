@@ -1,7 +1,7 @@
+/* eslint-disable prettier/prettier */
 import { SecurityHub } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
-
 import { ResourceModel } from './models';
 
 const versionCode = '1';
@@ -29,6 +29,12 @@ async function inviteMembers(memberAccountIDs: string[], logger: Logger, logging
     const createResponse = await service.createMembers(createRequest).promise();
     logger.log({ ...loggingContext, method: 'after createMembers', memberAccountIDs, createRequest, createResponse });
 
+    const filteredUnprocessedCreate = createResponse.UnprocessedAccounts?.filter(x=>x.ProcessingResult && !x.ProcessingResult.includes("given account ID is already a member or associated"));
+
+    if (filteredUnprocessedCreate?.length) {
+        throw new Error(`Unable to process all invitations: Unprocessed Accounts ${createResponse.UnprocessedAccounts.map((x) => x.AccountId).join(',')}`);
+    }
+
     const inviteRequest = {
         AccountIds: memberAccountIDs,
     } as SecurityHub.Types.InviteMembersRequest;
@@ -36,10 +42,14 @@ async function inviteMembers(memberAccountIDs: string[], logger: Logger, logging
     logger.log({ ...loggingContext, method: 'before inviteMembers', memberAccountIDs, inviteRequest });
     const inviteResponse = await service.inviteMembers(inviteRequest).promise();
     logger.log({ ...loggingContext, method: 'after inviteMembers', memberAccountIDs, inviteRequest, inviteResponse });
-    if (inviteResponse.UnprocessedAccounts?.length) {
+
+    const filteredUnprocessed = inviteResponse.UnprocessedAccounts?.filter(x=>x.ProcessingResult && !x.ProcessingResult.includes("because the current account has already invited or is already the SecurityHub"));
+
+    if (filteredUnprocessed?.length) {
         throw new Error(`Unable to process all invitations: Unprocessed Accounts ${inviteResponse.UnprocessedAccounts.map((x) => x.AccountId).join(',')}`);
     }
 }
+
 
 class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Create)
@@ -82,7 +92,7 @@ class Resource extends BaseResource<ResourceModel> {
 
     @handlerEvent(Action.Delete)
     @commonAws({ service: SecurityHub, debug: true })
-    public async delete(action: Action, args: HandlerArgs<ResourceModel>, _service: SecurityHub, model: ResourceModel): Promise<null> {
+    public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<null> {
         const { clientRequestToken } = args.request;
         const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
 
@@ -90,19 +100,7 @@ class Resource extends BaseResource<ResourceModel> {
 
         return null;
     }
-
-    @handlerEvent(Action.Read)
-    @commonAws({ service: SecurityHub, debug: true })
-    public async read(action: Action, args: HandlerArgs<ResourceModel>, _service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
-        const { clientRequestToken } = args.request;
-        const loggingContext: LogContext = { handler: action, clientRequestToken: clientRequestToken, versionCode };
-
-        args.logger.log({ ...loggingContext, message: 'noop', args });
-
-        return model;
-    }
 }
-
 export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
