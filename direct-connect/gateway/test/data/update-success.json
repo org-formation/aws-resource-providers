@@ -1,0 +1,15 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "DirectConnectGatewayName": "test2"
+    },
+    "previousResourceState": {
+        "DirectConnectGatewayId": "ecc5e2e3-9bf4-4589-8759-8e788983c1fb",
+        "DirectConnectGatewayName": "test",
+        "OwnerAccount": "123456789012",
+        "AmazonSideAsn": 64512
+    },
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}

@@ -1,0 +1,12 @@
+{
+    "artifact_type": "RESOURCE",
+    "typeName": "Community::DirectConnect::Gateway",
+    "language": "typescript",
+    "runtime": "nodejs14.x",
+    "entrypoint": "dist/handlers.entrypoint",
+    "testEntrypoint": "dist/handlers.testEntrypoint",
+    "settings": {
+        "useDocker": true,
+        "protocolVersion": "2.0.0"
+    }
+}
