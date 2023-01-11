@@ -1,0 +1,63 @@
+{
+    "typeName": "Community::DirectConnect::Gateway",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {},
+    "properties": {
+        "DirectConnectGatewayId": {
+            "type": "string",
+            "description": "The ID of the Direct Connect gateway."
+        },
+        "DirectConnectGatewayName": {
+            "description": "The name of the Direct Connect gateway.",
+            "type": "string"
+        },
+        "OwnerAccount": {
+            "description": "The ID of the Amazon Web Services account that owns the Direct Connect gateway.",
+            "type": "string"
+        },
+        "AmazonSideAsn": {
+            "description": "The autonomous system number (ASN) for Border Gateway Protocol (BGP) to be configured on the Amazon side of the connection. The ASN must be in the private range of 64,512 to 65,534.",
+            "type": "number",
+            "minimum": 64512,
+            "maximum": 65534
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "DirectConnectGatewayName",
+        "AmazonSideAsn"
+    ],
+    "createOnlyProperties": [
+        "/properties/AmazonSideAsn"
+    ],
+    "readOnlyProperties": [
+        "/properties/DirectConnectGatewayId",
+        "/properties/OwnerAccount"
+    ],
+    "primaryIdentifier": [
+        "/properties/DirectConnectGatewayId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "directconnect:CreateDirectConnectGateway"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "directconnect:DescribeDirectConnectGateways"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "directconnect:UpdateDirectConnectGateway"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "directconnect:DeleteDirectConnectGateway"
+            ]
+        }
+    }
+}
