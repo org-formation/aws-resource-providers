@@ -1,0 +1,159 @@
+{
+    "typeName": "Community::DirectConnect::TransitVirtualInterface",
+    "description": "Provisions a virtual interface VIF on a direct connect gateway.",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "replacementStrategy": "delete_then_create",
+    "definitions": {
+        "Tag": {
+            "description": "A key-value pair to associate with a resource.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "Key": {
+                "type": "string",
+                "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "Value": {
+                "type": "string",
+                "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+                "minLength": 0,
+                "maxLength": 256
+              }
+            },
+            "required": [
+              "Key"
+            ]
+          }
+    },
+    "properties": {
+        "ConnectionId": {
+            "type": "string",
+            "description": "The ID of the direct connect connection."
+        },
+        "VirtualInterfaceName": {
+            "description": "The name of the virtual interface assigned by the customer network. The name has a maximum of 100 characters. The following are valid characters: a-z, 0-9 and a hyphen (-).",
+            "type": "string"
+        },
+        "Vlan": {
+            "description": "The ID of the VLAN.",
+            "type": "number"
+        },
+        "Asn": {
+            "description": "The autonomous system (AS) number for Border Gateway Protocol (BGP) configuration. The valid values are 1-2147483647",
+            "type": "number"
+        },
+        "Mtu": {
+            "description": "The maximum transmission unit (MTU), in bytes. The supported values are 1500 and 9001. The default value is 1500.",
+            "type": "number"
+        },
+        "AuthKey": {
+            "description": "The authentication key for BGP configuration. This string has a minimum length of 6 characters and and a maximun lenth of 80 characters.",
+            "type": "string"
+        },
+        "AmazonAddress": {
+            "description": "The IP address assigned to the Amazon interface.",
+            "type": "string"
+        },
+        "CustomerAddress": {
+            "description": "The IP address assigned to the customer interface.",
+            "type": "string"
+        },
+        "AddressFamily": {
+            "description": "The address family for the BGP peer.",
+            "type": "string"
+        },
+        "DirectConnectGatewayId": {
+            "description": "The ID of the Direct Connect gateway.",
+            "type": "string"
+        },
+        "EnableSiteLink": {
+            "description": "Indicates whether to enable or disable SiteLink.",
+            "type": "boolean"
+        },
+        "Tags": {
+            "type": "array",
+            "maxItems": 50,
+            "insertionOrder": false,
+            "description": "An array of key-value pairs to apply to this resource.",
+            "items": {
+                "$ref": "#/definitions/Tag"
+            }
+        },
+        "VirtualInterfaceId": {
+            "description": "Identifier of the Transit Virtual Interface",
+            "type": "string"
+        },
+        "VirtualInterfaceState": {
+            "description": "The state of the virtual interface.",
+            "type": "string"
+        },
+        "OwnerAccount": {
+            "description": "The ID of the Amazon Web Services account that owns the Direct Connect gateway.",
+            "type": "string"
+        },
+        "Arn": {
+            "description": "The ARN of the Transit Virtual Interface.",
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "primaryIdentifier": [
+        "/properties/VirtualInterfaceId"
+    ],
+    "additionalIdentifiers": [
+       [ "/properties/Arn"]
+    ],
+    "required": [
+        "ConnectionId",
+        "VirtualInterfaceName",
+        "Asn",
+        "DirectConnectGatewayId"
+    ],
+    "createOnlyProperties": [
+        "/properties/Asn",
+        "/properties/AuthKey",
+        "/properties/AmazonAddress",
+        "/properties/CustomerAddress",
+        "/properties/AddressFamily",
+        "/properties/DirectConnectGatewayId"
+    ],
+    "readOnlyProperties": [
+        "/properties/Vlan",
+        "/properties/VirtualInterfaceId",
+        "/properties/OwnerAccount",
+        "/properties/VirtualInterfaceState",
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "directconnect:CreateTransitVirtualInterface",
+                "directconnect:DescribeConnections",
+                "directconnect:TagResource",
+                "directconnect:UntagResource"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "directconnect:DescribeVirtualInterfaces"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "directconnect:UpdateVirtualInterfaceAttributes",
+                "directconnect:DescribeTags",
+                "directconnect:TagResource",
+                "directconnect:UntagResource"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "directconnect:DeleteVirtualInterface",
+                "directconnect:TagResource",
+                "directconnect:UntagResource"
+            ]
+        }
+    }
+}
