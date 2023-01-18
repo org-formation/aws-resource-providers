@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="7" failures="0" errors="0" time="16.239">
+  <testsuite name="when calling handler" errors="0" failures="0" skipped="0" timestamp="2023-01-17T10:29:12" time="16.134" tests="7">
+    <testcase classname="when calling handler create operation successful - direct connect transit virtual interface" name="when calling handler create operation successful - direct connect transit virtual interface" time="1.062">
+    </testcase>
+    <testcase classname="when calling handler create operation fail - code commit approval rule template" name="when calling handler create operation fail - code commit approval rule template" time="1.023">
+    </testcase>
+    <testcase classname="when calling handler update operation successful - direct connect transit virtual interface" name="when calling handler update operation successful - direct connect transit virtual interface" time="1.017">
+    </testcase>
+    <testcase classname="when calling handler delete operation successful - direct connect transit virtual interface" name="when calling handler delete operation successful - direct connect transit virtual interface" time="1.01">
+    </testcase>
+    <testcase classname="when calling handler delete operation fail - direct connect transit virtual interface" name="when calling handler delete operation fail - direct connect transit virtual interface" time="1.011">
+    </testcase>
+    <testcase classname="when calling handler read operation successful - direct connect transit virtual interface" name="when calling handler read operation successful - direct connect transit virtual interface" time="1.015">
+    </testcase>
+    <testcase classname="when calling handler read operation fail - direct connect transit virtual interface" name="when calling handler read operation fail - direct connect transit virtual interface" time="1.023">
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,21 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "VirtualInterfaceName": "some-interface-name2",
+        "VirtualInterfaceId": "some-interface-id",
+        "Mtu": 8500,
+        "EnableSiteLink": true
+    },
+    "previousResourceState": {
+        "ConnectionId": "some-connection-id",
+        "VirtualInterfaceName": "some-interface-name",
+        "VirtualInterfaceId": "some-interface-id",
+        "Vlan": 123,
+        "Asn": 123,
+        "Mtu": 1500,
+        "EnableSiteLink": false
+    },
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}

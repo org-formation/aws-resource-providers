@@ -1,0 +1,17 @@
+{
+    "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
+    "desiredResourceState": {
+        "ConnectionId": "some-connection-id",
+        "VirtualInterfaceName": "some-interface-name",
+        "Asn": 123,
+        "DirectConnectGatewayId": "some-direct-connect-gateway",
+        "Tags": [{
+            "Key": "name",
+            "Value": "value"
+        }]
+    },
+    "previousResourceState": null,
+    "awsAccountId": "123456789012",
+    "region": "us-east-1",
+    "logicalResourceIdentifier": "MyResource"
+}
