@@ -25,3 +25,4 @@ coverage/
 utils
 *.zip
 *.tgz
+junit.xml
