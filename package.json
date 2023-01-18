@@ -33,37 +33,37 @@
     },
     "homepage": "https://github.com/org-formation/aws-resource-providers#readme",
     "dependencies": {
-        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",
+        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.3",
         "class-transformer": "0.3.1"
     },
     "devDependencies": {
-        "@jurijzahn8019/aws-promise-jest-mock": "^2.4.28",
-        "@swc/core": "^1.2.130",
-        "@swc/jest": "^0.2.17",
-        "@tsconfig/node12": "^1.0.7",
+        "@jurijzahn8019/aws-promise-jest-mock": "^2.4.80",
+        "@swc/core": "^1.3.27",
+        "@swc/jest": "^0.2.24",
+        "@tsconfig/node14": "^1.0.3",
         "@types/jest": "^27.4.0",
-        "@types/node": "^12.0.0",
+        "@types/node": "^14.0.0",
         "@types/uuid": "^7.0.3",
-        "@typescript-eslint/eslint-plugin": "^5.10.0",
-        "@typescript-eslint/parser": "^5.10.0",
-        "aws-sdk": "^2.1058.0",
-        "eslint": "^8.7.0",
-        "eslint-config-prettier": "^8.3.0",
-        "eslint-import-resolver-node": "^0.3.6",
+        "@typescript-eslint/eslint-plugin": "^5.48.2",
+        "@typescript-eslint/parser": "^5.48.2",
+        "aws-sdk": "^2.1297.0",
+        "eslint": "^8.32.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-import-resolver-node": "^0.3.7",
         "eslint-import-resolver-typescript": "^2.5.0",
-        "eslint-plugin-import": "^2.25.4",
+        "eslint-plugin-import": "^2.27.5",
         "eslint-plugin-prefer-arrow": "^1.2.3",
-        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-prettier": "^4.2.1",
         "jest": "^27.4.7",
         "jest-circus": "^27.4.6",
         "jest-silent-reporter": "^0.5.0",
-        "lerna": "^4.0.0",
+        "lerna": "^6.4.1",
         "npm-run-all": "^4.1.5",
-        "patch-package": "^6.4.7",
-        "prettier": "^2.5.1",
-        "regenerator-runtime": "^0.13.9",
+        "patch-package": "^6.5.1",
+        "prettier": "^2.8.3",
+        "regenerator-runtime": "^0.13.11",
         "rimraf": "^3.0.2",
-        "typescript": "^4.1.2"
+        "typescript": "^4.9.4"
     },
     "prettier": {
         "parser": "typescript",
@@ -75,6 +75,6 @@
     },
     "volta": {
         "node": "14.21.2",
-        "npm": "6.14.17"
+        "npm": "8.19.3"
     }
 }
