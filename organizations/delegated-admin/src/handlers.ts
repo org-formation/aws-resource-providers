@@ -8,10 +8,9 @@ import { DeregisterDelegatedAdministratorRequest, RegisterDelegatedAdministrator
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-interface CallbackContext extends Record<string, any> {}
+type CallbackContext = Record<string, any>;
 
 class Resource extends BaseResource<ResourceModel> {
-
     @handlerEvent(Action.Create)
     @commonAws({ serviceName: 'Organizations', debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<ResourceModel> {
@@ -19,8 +18,8 @@ class Resource extends BaseResource<ResourceModel> {
         const model = new ResourceModel(desiredResourceState);
 
         const request: RegisterDelegatedAdministratorRequest = {
-            ServicePrincipal : model.servicePrincipal,
-            AccountId: model.accountId
+            ServicePrincipal: model.servicePrincipal,
+            AccountId: model.accountId,
         };
         await service.registerDelegatedAdministrator(request).promise();
 
@@ -29,20 +28,20 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'Organizations'})
+    @commonAws({ serviceName: 'Organizations' })
     public async update(): Promise<ResourceModel> {
-        throw new exceptions.InvalidRequest("Type doesn't support updates.")
+        throw new exceptions.InvalidRequest("Type doesn't support updates.");
     }
 
     @handlerEvent(Action.Delete)
-    @commonAws({ serviceName: 'Organizations'})
+    @commonAws({ serviceName: 'Organizations' })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<null> {
         const { desiredResourceState } = args.request;
 
         const request: DeregisterDelegatedAdministratorRequest = {
             ServicePrincipal: desiredResourceState.servicePrincipal,
-            AccountId: desiredResourceState.accountId
-        }
+            AccountId: desiredResourceState.accountId,
+        };
 
         await service.deregisterDelegatedAdministrator(request).promise();
 

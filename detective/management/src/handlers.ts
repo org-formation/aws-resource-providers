@@ -1,16 +1,9 @@
-import {
-    Action,
-    BaseResource,
-    exceptions,
-    handlerEvent,
-} from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
+import { Action, BaseResource, exceptions, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { Detective, SecurityHub } from 'aws-sdk';
-import { request } from 'http';
 import { ResourceModel, TypeConfigurationModel } from './models';
 
 class Resource extends BaseResource<ResourceModel> {
-
     /**
      * CloudFormation invokes this handler when the resource is initially created
      * during stack create operations.
@@ -42,8 +35,6 @@ class Resource extends BaseResource<ResourceModel> {
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Detective, model: ResourceModel): Promise<ResourceModel> {
         throw new exceptions.NotUpdatable();
     }
-
-
 
     @handlerEvent(Action.Delete)
     @commonAws({ service: Detective, debug: true })

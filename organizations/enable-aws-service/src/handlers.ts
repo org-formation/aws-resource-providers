@@ -9,36 +9,34 @@ import { DisableAWSServiceAccessRequest, EnableAWSServiceAccessRequest } from 'a
 // Use this logger to forward log messages to CloudWatch Logs.
 const LOGGER = console;
 
-interface CallbackContext extends Record<string, any> {}
+type CallbackContext = Record<string, any>;
 
 class Resource extends BaseResource<ResourceModel> {
-    
     @handlerEvent(Action.Create)
     @commonAws({
         serviceName: 'Organizations',
-        debug: true
+        debug: true,
     })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations, model: ResourceModel): Promise<ResourceModel> {
         const { desiredResourceState, logicalResourceIdentifier } = args.request;
-        
+
         //let model: ResourceModel = desiredResourceState;
-        
+
         console.log(JSON.stringify(model));
 
         // the account number to which we are deploying the template
-        const targetAccountId = args.request.awsAccountId
+        const targetAccountId = args.request.awsAccountId;
 
-        const request1 : EnableAWSServiceAccessRequest = {
-            ServicePrincipal: model.servicePrincipal
-        }
-
+        const request1: EnableAWSServiceAccessRequest = {
+            ServicePrincipal: model.servicePrincipal,
+        };
 
         await service.enableAWSServiceAccess(request1).promise();
-        
+
         //const request2 : RegisterDelegatedAdministratorRequest = {
-            
-            //fix model names to match api attributes
-            
+
+        //fix model names to match api attributes
+
         //    AccountId: model.accountNumber,
         //    ServicePrincipal: model.servicePrincipal
         //}
@@ -46,13 +44,12 @@ class Resource extends BaseResource<ResourceModel> {
         //await service.registerDelegatedAdministrator(request2).promise();
 
         const arnUuid = uuidv4();
-        
+
         //model.arn = 'arn:community:organizations::${targetAccountId}:delegated-admin/${model.accountNumber}-${model.servicePrincipal}'
-        
-        model.resourceId=`arn:community:organizations::${targetAccountId}:enabled-service/${arnUuid}`
-        
+
+        model.resourceId = `arn:community:organizations::${targetAccountId}:enabled-service/${arnUuid}`;
+
         //response.
- 
 
         return Promise.resolve(model);
     }
@@ -66,10 +63,8 @@ class Resource extends BaseResource<ResourceModel> {
         serviceName: 'Organizations',
         debug: true,
     })
-    
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations, model: ResourceModel): Promise<ResourceModel> {
-        
-        throw new exceptions.InvalidRequest("Type doesn't support updates.")
+        throw new exceptions.InvalidRequest("Type doesn't support updates.");
     }
 
     /**
@@ -86,7 +81,7 @@ class Resource extends BaseResource<ResourceModel> {
         const { desiredResourceState, logicalResourceIdentifier, previousResourceState } = args.request;
 
         // let model = args.request.
-        
+
         //const request1 : DeregisterDelegatedAdministratorRequest = {
         //    AccountId : previousResourceState.accountNumber,
         //    ServicePrincipal : previousResourceState.servicePrincipal
@@ -94,9 +89,9 @@ class Resource extends BaseResource<ResourceModel> {
 
         //await service.deregisterDelegatedAdministrator(request1).promise();
 
-        const request2 : DisableAWSServiceAccessRequest = {
-            ServicePrincipal : desiredResourceState.servicePrincipal
-        }
+        const request2: DisableAWSServiceAccessRequest = {
+            ServicePrincipal: desiredResourceState.servicePrincipal,
+        };
 
         await service.disableAWSServiceAccess(request2).promise();
 
@@ -108,8 +103,6 @@ class Resource extends BaseResource<ResourceModel> {
         LOGGER.info(this.typeName, `[${previousResourceState.resourceId}] [${logicalResourceIdentifier}]`, 'successfully deleted.');
         // }
 
-        
-         
         return Promise.resolve(null);
     }
 
@@ -124,10 +117,8 @@ class Resource extends BaseResource<ResourceModel> {
     })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<ResourceModel> {
         const { desiredResourceState, logicalResourceIdentifier, previousResourceState } = args.request;
-        return previousResourceState
+        return previousResourceState;
         //return await this.retrievePasswordPolicy(service, logicalResourceIdentifier, desiredResourceState.resourceId, desiredResourceState);
-
-
     }
 
     /**
