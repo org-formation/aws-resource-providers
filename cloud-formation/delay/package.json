@@ -30,11 +30,11 @@
     },
     "homepage": "https://github.com/org-formation/aws-resource-providers#readme",
     "dependencies": {
-        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",
+        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.3",
         "class-transformer": "0.3.1"
     },
     "devDependencies": {
-        "@types/node": "^12.0.0",
-        "typescript": "^4.1.2"
+        "@types/node": "^14.0.0",
+        "typescript": "^4.9.4"
     }
 }
