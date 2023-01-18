@@ -2,10 +2,10 @@ import { Action, exceptions, OperationStatus, SessionProxy } from '@amazon-web-s
 import { AwsServiceMockBuilder, on } from '@jurijzahn8019/aws-promise-jest-mock';
 import { DirectConnect } from 'aws-sdk';
 import { resource } from '../src/handlers';
-const deleteFixture = require('./data/delete-success');
-const readFixture = require('./data/read-success');
-const updateFixture = require('./data/update-success');
-const createFixture = require('./data/create-success');
+import createFixture from './data/create-success.json';
+import deleteFixture from './data/delete-success.json';
+import readFixture from './data/read-success.json';
+import updateFixture from './data/update-success.json';
 
 jest.mock('aws-sdk');
 
