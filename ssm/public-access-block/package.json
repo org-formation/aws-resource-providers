@@ -31,6 +31,6 @@
         "typescript": "^4.9.4"
     },
     "optionalDependencies": {
-        "aws-sdk": "^2.1058.0"
+        "aws-sdk": "^2.1291.0"
     }
 }

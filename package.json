@@ -4,7 +4,7 @@
     "description": "A community driven repository where you can find AWS Resource Type Providers for different purposes.",
     "private": true,
     "scripts": {
-        "bootstrap": "npm ci --optional && npx lerna bootstrap --hoist",
+        "bootstrap": "npm ci --include=optional && npx lerna bootstrap --hoist",
         "reset": "npm run cleanup && npx lerna exec --stream --parallel -- rm -rf ./node_modules ./build && npm run bootstrap",
         "cleanup": "npx lerna run cleanup --stream --parallel",
         "build": "npx lerna run build",
@@ -46,7 +46,7 @@
         "@types/uuid": "^7.0.3",
         "@typescript-eslint/eslint-plugin": "^5.48.2",
         "@typescript-eslint/parser": "^5.48.2",
-        "aws-sdk": "^2.1297.0",
+        "aws-sdk": "^2.1291.0",
         "eslint": "^8.32.0",
         "eslint-config-prettier": "^8.6.0",
         "eslint-import-resolver-node": "^0.3.7",
