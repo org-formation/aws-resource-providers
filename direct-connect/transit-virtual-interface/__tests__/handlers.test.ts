@@ -2,10 +2,10 @@ import { Action, exceptions, OperationStatus, SessionProxy } from '@amazon-web-s
 import { AwsServiceMockBuilder, on } from '@jurijzahn8019/aws-promise-jest-mock';
 import { DirectConnect } from 'aws-sdk';
 import { resource } from '../src/handlers';
-const deleteFixture = require('./data/delete-success');
-const readFixture = require('./data/read-success');
-const updateFixture = require('./data/update-success');
-const createFixture = require('./data/create-success');
+import createFixture from './data/create-success.json';
+import deleteFixture from './data/delete-success.json';
+import readFixture from './data/read-success.json';
+import updateFixture from './data/update-success.json';
 
 jest.mock('aws-sdk');
 
@@ -28,55 +28,55 @@ describe('when calling handler', () => {
         directConnect = on(DirectConnect, { snapshot: false });
         directConnect.mock('createTransitVirtualInterface').resolve({
             virtualInterface: {
-                connectionId: "some-connection-id",
-                virtualInterfaceName: "some-interface-name",
+                connectionId: 'some-connection-id',
+                virtualInterfaceName: 'some-interface-name',
                 vlan: 123,
                 asn: 123,
-                directConnectGatewayId: "some-direct-connect-gateway",
-                virtualInterfaceId: "some-interface-id",
+                directConnectGatewayId: 'some-direct-connect-gateway',
+                virtualInterfaceId: 'some-interface-id',
                 siteLinkEnabled: false,
-                amazonAddress: "some-amazone-address",
-                customerAddress: "some-customer-address",
+                amazonAddress: 'some-amazone-address',
+                customerAddress: 'some-customer-address',
                 mtu: 1500,
                 ownerAccount: '123456789012',
-            }
+            },
         });
         directConnect.mock('updateVirtualInterfaceAttributes').resolve({
-            virtualInterfaceName: "some-interface-name2",
+            virtualInterfaceName: 'some-interface-name2',
             mtu: 8500,
             siteLinkEnabled: true,
-            connectionId: "some-connection-id",
+            connectionId: 'some-connection-id',
             vlan: 123,
             asn: 123,
-            directConnectGatewayId: "some-direct-connect-gateway",
-            virtualInterfaceId: "some-interface-id",
-            amazonAddress: "some-amazone-address",
-            customerAddress: "some-customer-address",
+            directConnectGatewayId: 'some-direct-connect-gateway',
+            virtualInterfaceId: 'some-interface-id',
+            amazonAddress: 'some-amazone-address',
+            customerAddress: 'some-customer-address',
             ownerAccount: '123456789012',
         });
         directConnect.mock('deleteVirtualInterface').resolve({
-            virtualInterfaceState: "pending"
+            virtualInterfaceState: 'pending',
         });
         directConnect.mock('describeTags').resolve({
-            resourceTags: []
+            resourceTags: [],
         });
         directConnect.mock('tagResource').resolve({});
         directConnect.mock('describeVirtualInterfaces').resolve({
             virtualInterfaces: [
                 {
-                    connectionId: "some-connection-id",
-                    virtualInterfaceName: "some-interface-name",
+                    connectionId: 'some-connection-id',
+                    virtualInterfaceName: 'some-interface-name',
                     vlan: 123,
                     asn: 123,
-                    directConnectGatewayId: "some-direct-connect-gateway",
-                    virtualInterfaceId: "some-interface-id",
+                    directConnectGatewayId: 'some-direct-connect-gateway',
+                    virtualInterfaceId: 'some-interface-id',
                     siteLinkEnabled: false,
-                    amazonAddress: "some-amazone-address",
-                    customerAddress: "some-customer-address",
+                    amazonAddress: 'some-amazone-address',
+                    customerAddress: 'some-customer-address',
                     mtu: 1500,
                     ownerAccount: '123456789012',
-                }
-            ]
+                },
+            ],
         });
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
@@ -99,8 +99,8 @@ describe('when calling handler', () => {
             connections: [
                 {
                     vlan: 123,
-                }
-            ]
+                },
+            ],
         });
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
         expect(progress).toMatchObject({ status: OperationStatus.InProgress, message: '', callbackDelaySeconds: 60 });
@@ -176,5 +176,4 @@ describe('when calling handler', () => {
         expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.InternalFailure.name });
         expect(mockGet.mock).toHaveBeenCalledTimes(1);
     });
-
 });

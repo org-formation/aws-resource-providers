@@ -10,7 +10,7 @@ import {
     Optional,
     ProgressEvent,
     ResourceHandlerRequest,
-    SessionProxy
+    SessionProxy,
 } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { DirectConnect } from 'aws-sdk';

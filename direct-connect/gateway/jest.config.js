@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
+const base = require('../../jest.config.base.js');
+const package = require('./package');
+
 module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',
-    testMatch: ['<rootDir>/test/**/*.test.ts'],
-    coverageReporters: ['text', 'cobertura'],
-    collectCoverageFrom: ['**/*.ts', '!node_modules/**', '!build/**', '!test/**'],
-    reporters: ['default', 'jest-junit'],
-    verbose: true,
-    testTimeout: 300000,
+    ...base,
+    displayName: package.name,
+    name: package.name,
 };
