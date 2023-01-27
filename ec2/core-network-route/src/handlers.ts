@@ -53,6 +53,13 @@ class Resource extends BaseResource<ResourceModel> {
         }
     }
 
+    @handlerEvent(Action.Update)
+    @commonAws({ serviceName: 'EC2', debug: true })
+    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
+        // this shouldn't do anything because all properties are createOnly.
+        return model;
+    }
+
     @handlerEvent(Action.Read)
     @commonAws({ serviceName: 'EC2', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
