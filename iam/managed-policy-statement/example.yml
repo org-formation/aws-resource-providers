@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  Statement1:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-1
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy1\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+      
+  Statement2:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-2
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy2\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+
+  Statement3:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-3
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy3\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+
+  Statement4:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-4
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy4\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+      
+  Statement5:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-5
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy5\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+      
+  Statement6:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-6
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy6\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+
+  Statement7:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-7
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy7\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+      
+  Statement8:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-8
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy8\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+      
+  Statement9:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-9
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy9\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+
+  Statement10:
+    Type: "Community::IAM::ManagedPolicyStatement"
+    Properties:
+      StatementId: stmt-10
+      StatementJson: "{ Effect: \"Allow\", Action: \"xx:yy10\", Resource: \"*\" }"
+      ManagedPolicyName: merged-policy
+      ManagedPolicyPath: /path/
+      

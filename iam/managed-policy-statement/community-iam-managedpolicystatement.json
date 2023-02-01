@@ -1,0 +1,73 @@
+{
+    "typeName": "Community::IAM::ManagedPolicyStatement",
+    "description": "a CloudFormation resource that allows you to manage a (single) statement within a managed policy.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "ResourceId": {
+            "type": "string"
+        },
+        "StatementId": {
+            "type": "string"
+        },
+        "StatementJson": {
+            "type": "string"
+        },
+        "ManagedPolicyName": {
+            "type": "string"
+        },
+        "ManagedPolicyPath": {
+            "type": "string"
+        }
+
+    },
+    "additionalProperties": false,
+    "required": [
+        "StatementId",
+        "StatementJson",
+        "ManagedPolicyName"
+    ],
+    "createOnlyProperties": [
+        "/properties/StatementId",
+        "/properties/ManagedPolicyName",
+        "/properties/ManagedPolicyPath"
+    ],
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "iam:CreatePolicyVersion",
+                "iam:CreatePolicy",
+                "iam:DeletePolicyVersion",
+                "iam:ListPolicyVersions"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "iam:GetPolicy",
+                "iam:GetPolicyVersion"
+            ]
+        },
+        "update": {
+            "permissions": [
+             "iam:SetDefaultPolicyVersion"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                
+            ]
+        },
+        "list": {
+            "permissions": [
+                
+            ]
+        }
+    }
+}
