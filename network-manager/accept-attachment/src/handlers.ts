@@ -2,6 +2,7 @@ import {
     Action,
     BaseResource,
     handlerEvent,
+    Logger,
     LoggerProxy,
     OperationStatus,
     Optional,
@@ -19,7 +20,43 @@ type CallbackContext = {
     id: string;
     type: string;
 };
+
 class Resource extends BaseResource<ResourceModel> {
+    private async getAttachment(id: string, type: string, service: NetworkManager, model: ResourceModel, logger:Logger): Promise<ResourceModel> {
+        switch (type) {
+            case 'VPC':
+                const { VpcAttachment } = await service.getVpcAttachment({ AttachmentId: model.attachmentId }).promise();
+                model.id = VpcAttachment.Attachment.AttachmentId;
+                model.attachmentId = VpcAttachment.Attachment.AttachmentId;
+                model.attachmentType = VpcAttachment.Attachment.AttachmentType;
+                model.attachmentState = VpcAttachment.Attachment.State;
+                return model;
+            case 'CONNECT':
+                const { ConnectAttachment } = await service.getConnectAttachment({ AttachmentId: model.attachmentId }).promise();    
+                model.id = ConnectAttachment.Attachment.AttachmentId;
+                model.attachmentId = ConnectAttachment.Attachment.AttachmentId;
+                model.attachmentType = ConnectAttachment.Attachment.AttachmentType;
+                model.attachmentState = ConnectAttachment.Attachment.State;
+                return model;
+            case 'SITE_TO_SITE_VPN':
+                const { SiteToSiteVpnAttachment } = await service.getSiteToSiteVpnAttachment({ AttachmentId: model.attachmentId }).promise();    
+                model.id = SiteToSiteVpnAttachment.Attachment.AttachmentId;
+                model.attachmentId = SiteToSiteVpnAttachment.Attachment.AttachmentId;
+                model.attachmentType = SiteToSiteVpnAttachment.Attachment.AttachmentType;
+                model.attachmentState = SiteToSiteVpnAttachment.Attachment.State;
+                return model;
+            case 'TRANSIT_GATEWAY_ROUTE_TABLE':
+                const { TransitGatewayRouteTableAttachment } = await service.getTransitGatewayRouteTableAttachment({ AttachmentId: model.attachmentId }).promise();    
+                model.id = TransitGatewayRouteTableAttachment.Attachment.AttachmentId;
+                model.attachmentId = TransitGatewayRouteTableAttachment.Attachment.AttachmentId;
+                model.attachmentType = TransitGatewayRouteTableAttachment.Attachment.AttachmentType;
+                model.attachmentState = TransitGatewayRouteTableAttachment.Attachment.State;
+                return model;
+        }
+
+        throw new Error(`Unsupported attachment type: ${type}`);
+    }
+
     @handlerEvent(Action.Create)
     public async create(
         session: Optional<SessionProxy>,
@@ -49,25 +86,13 @@ class Resource extends BaseResource<ResourceModel> {
         // we're being called back after IN_PROGESS - check if the interface is ready
         model.id = callbackContext.id;
 
-        if (callbackContext.type === 'VPC') {
-            logger.log({ message: 'before get vpc attachment' });
-            const result = await service.getVpcAttachment({ AttachmentId: model.attachmentId }).promise();
-            logger.log({ message: 'after get vpc attachment' });
-
-            model.id = result.VpcAttachment.Attachment.AttachmentId;
-            model.attachmentId = result.VpcAttachment.Attachment.AttachmentId;
-            model.attachmentType = result.VpcAttachment.Attachment.AttachmentType;
-            model.attachmentState = result.VpcAttachment.Attachment.State;
-        } else {
-            logger.log({ message: 'before get vpc attachment' });
-            const result = await service.getConnectAttachment({ AttachmentId: model.attachmentId }).promise();
-            logger.log({ message: 'after get vpc attachment' });
-
-            model.id = result.ConnectAttachment.Attachment.AttachmentId;
-            model.attachmentId = result.ConnectAttachment.Attachment.AttachmentId;
-            model.attachmentType = result.ConnectAttachment.Attachment.AttachmentType;
-            model.attachmentState = result.ConnectAttachment.Attachment.State;
-        }
+        logger.log({ message: `before get (${callbackContext.type}) attachment` });
+        const attachment = await this.getAttachment(callbackContext.id, callbackContext.type, service, model, logger);
+        model.id = attachment.id;
+        model.attachmentId = attachment.attachmentId;
+        model.attachmentType = attachment.attachmentType;
+        model.attachmentState = attachment.attachmentState;
+        logger.log({ message: `after get (${callbackContext.type}) attachment` });
 
         // Check when succeded.
         if (model.attachmentState === 'AVAILABLE') {
@@ -106,25 +131,7 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Read)
     @commonAws({ serviceName: 'NetworkManager', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: NetworkManager, model: ResourceModel): Promise<ResourceModel> {
-        if (model.attachmentType === 'VPC') {
-            args.logger.log({ message: 'before get vpc attachment' });
-            const result = await service.getVpcAttachment({ AttachmentId: model.attachmentId }).promise();
-            args.logger.log({ message: 'after get vpc attachment' });
-            model.id = result.VpcAttachment.Attachment.AttachmentId;
-            model.attachmentId = result.VpcAttachment.Attachment.AttachmentId;
-            model.attachmentType = result.VpcAttachment.Attachment.AttachmentType;
-            model.attachmentState = result.VpcAttachment.Attachment.State;
-        } else {
-            args.logger.log({ message: 'before get connect attachment' });
-            const result = await service.getConnectAttachment({ AttachmentId: model.attachmentId }).promise();
-            args.logger.log({ message: 'after get connect attachment' });
-
-            model.id = result.ConnectAttachment.Attachment.AttachmentId;
-            model.attachmentId = result.ConnectAttachment.Attachment.AttachmentId;
-            model.attachmentType = result.ConnectAttachment.Attachment.AttachmentType;
-            model.attachmentState = result.ConnectAttachment.Attachment.State;
-        }
-        return model;
+        return this.getAttachment(model.attachmentId, model.attachmentType, service, model, args.logger);
     }
 }
 

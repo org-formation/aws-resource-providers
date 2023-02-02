@@ -9,7 +9,7 @@
             "type": "string"
         },
         "AttachmentType": {
-            "description": "The type of the attachment, either 'connect' or 'vpc'.",
+            "description": "The type of the attachment.",
             "type": "string"
         },
         "AttachmentState": {

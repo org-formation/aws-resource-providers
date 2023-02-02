@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="6" failures="0" errors="0" time="9.278">
-  <testsuite name="network manager accept attachment" errors="0" failures="0" skipped="0" timestamp="2023-02-02T08:37:27" time="9.246" tests="6">
+<testsuites name="jest tests" tests="7" failures="0" errors="0" time="10.241">
+  <testsuite name="network manager accept attachment" errors="0" failures="0" skipped="0" timestamp="2023-02-02T14:29:30" time="10.206" tests="7">
     <testcase classname="network manager accept attachment create operation initial create runs acceptAttachment call" name="network manager accept attachment create operation initial create runs acceptAttachment call" time="1.033">
     </testcase>
-    <testcase classname="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state pending" name="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state pending" time="1.017">
+    <testcase classname="network manager accept attachment create operation IN_PROGRESS create call with incorrect type fails" name="network manager accept attachment create operation IN_PROGRESS create call with incorrect type fails" time="1.023">
     </testcase>
-    <testcase classname="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state available" name="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state available" time="1.019">
+    <testcase classname="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state pending" name="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state pending" time="1.016">
     </testcase>
-    <testcase classname="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state failed" name="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state failed" time="1.015">
+    <testcase classname="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state available" name="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state available" time="1.021">
     </testcase>
-    <testcase classname="network manager accept attachment read operation reading vpc attachment" name="network manager accept attachment read operation reading vpc attachment" time="1.016">
+    <testcase classname="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state failed" name="network manager accept attachment create operation IN_PROGRESS create call will getAttachment state failed" time="1.014">
     </testcase>
-    <testcase classname="network manager accept attachment read operation reading attachment fails" name="network manager accept attachment read operation reading attachment fails" time="1.016">
+    <testcase classname="network manager accept attachment read operation reading vpc attachment" name="network manager accept attachment read operation reading vpc attachment" time="1.015">
+    </testcase>
+    <testcase classname="network manager accept attachment read operation reading attachment fails" name="network manager accept attachment read operation reading attachment fails" time="1.019">
     </testcase>
   </testsuite>
 </testsuites>

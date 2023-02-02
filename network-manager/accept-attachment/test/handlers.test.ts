@@ -23,6 +23,8 @@ describe('network manager accept attachment', () => {
         networkManager.mock('acceptAttachment').resolve({});
         networkManager.mock('getVpcAttachment').resolve({});
         networkManager.mock('getConnectAttachment').resolve({});
+        networkManager.mock('getSiteToSiteVpnAttachment').resolve({});
+        networkManager.mock('getTransitGatewayRouteTableAttachment').resolve({});
 
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
@@ -57,6 +59,22 @@ describe('network manager accept attachment', () => {
             expect(progress.status).toEqual(OperationStatus.InProgress);
         });
 
+        test('IN_PROGRESS create call with incorrect type fails', async () => {
+        const vpcAttach = networkManager.mock('getVpcAttachment').resolve({});
+        const connectAttach = networkManager.mock('getConnectAttachment').resolve({});
+        const siteAttach = networkManager.mock('getSiteToSiteVpnAttachment').resolve({});
+        const transitAttach = networkManager.mock('getTransitGatewayRouteTableAttachment').resolve({});
+
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request, callbackContext:{ id: 'some-id', type: 'broken-type'}}, undefined);
+            expect(progress).toBeDefined();
+            expect(vpcAttach.mock).toHaveBeenCalledTimes(0);
+            expect(connectAttach.mock).toHaveBeenCalledTimes(0);
+            expect(siteAttach.mock).toHaveBeenCalledTimes(0);
+            expect(transitAttach.mock).toHaveBeenCalledTimes(0);
+
+            expect(progress.status).toEqual(OperationStatus.Failed);
+        });
+
         test('IN_PROGRESS create call will getAttachment state pending', async () => {
             const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
                 VpcAttachment: {
@@ -73,7 +91,6 @@ describe('network manager accept attachment', () => {
             expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
             expect(progress.status).toEqual(OperationStatus.InProgress);
         });
-
 
         test('IN_PROGRESS create call will getAttachment state available', async () => {
             const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
@@ -99,13 +116,13 @@ describe('network manager accept attachment', () => {
                 ConnectAttachment: {
                     Attachment: {
                         AttachmentId:'some-id',
-                        AttachmentType: 'VPC',
+                        AttachmentType: 'CONNECT',
                         State: 'FAILED',
                     }
                 }
             });
 
-            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request, callbackContext:{ id: 'some-id', type: 'connect'}}, undefined);
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request, callbackContext:{ id: 'some-id', type: 'CONNECT'}}, undefined);
             expect(progress).toBeDefined();
             expect(getConnectAttachment.mock).toHaveBeenCalledTimes(1);
             expect(progress.status).toEqual(OperationStatus.Failed);
@@ -142,7 +159,5 @@ describe('network manager accept attachment', () => {
             expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
             expect(progress.status).toEqual(OperationStatus.Failed);
         });
-
-
     });
 });
