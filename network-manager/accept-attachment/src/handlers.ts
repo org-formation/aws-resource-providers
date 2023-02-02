@@ -83,16 +83,16 @@ class Resource extends BaseResource<ResourceModel> {
 
             return progress;
         }
-        // we're being called back after IN_PROGESS - check if the interface is ready
-        model.id = callbackContext.id;
 
+        // we're being called back after IN_PROGESS - check if the interface is ready
         logger.log({ message: `before get (${callbackContext.type}) attachment` });
         const attachment = await this.getAttachment(callbackContext.id, callbackContext.type, service, model, logger);
+        logger.log({ message: `after get (${callbackContext.type}) attachment` });
+
         model.id = attachment.id;
         model.attachmentId = attachment.attachmentId;
         model.attachmentType = attachment.attachmentType;
         model.attachmentState = attachment.attachmentState;
-        logger.log({ message: `after get (${callbackContext.type}) attachment` });
 
         // Check when succeded.
         if (model.attachmentState === 'AVAILABLE') {
@@ -101,17 +101,15 @@ class Resource extends BaseResource<ResourceModel> {
             return progress;
         }
 
-        // Check for when in progress.
+        // Check whether to wait or if it failed.
         if (waitingStates.includes(model.attachmentState)) {
             progress.status = OperationStatus.InProgress;
             progress.resourceModel = model;
             progress.callbackDelaySeconds = 30;
             return progress;
         } else {
-            // Check for failed state.
             progress.status = OperationStatus.Failed;
             progress.resourceModel = model;
-            progress.callbackDelaySeconds = 30;
             return progress;
         }
     }
