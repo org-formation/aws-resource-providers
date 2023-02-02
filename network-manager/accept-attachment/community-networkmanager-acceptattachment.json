@@ -1,0 +1,59 @@
+{
+    "typeName": "Community::NetworkManager::AcceptAttachment",
+    "description": "Accepts a core network attachment request. Once the attachment request is accepted by a core network owner, the attachment is created and connected to a core network. The creation of the resource only accepts the attachment & waits until it becomes available. Other operations do not have any effect.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "replacementStrategy": "delete_then_create",
+    "properties": {
+        "AttachmentId": {
+            "description": "The ID of the attachment.",
+            "type": "string"
+        },
+        "AttachmentType": {
+            "description": "The type of the attachment, either 'connect' or 'vpc'.",
+            "type": "string"
+        },
+        "AttachmentState": {
+            "description": "The current state of the attachment.",
+            "type": "string"
+        },
+        "Id": {
+            "description": "The ID of the acceptance of attachment",
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "AttachmentId"
+    ],
+    "readOnlyProperties": [
+        "/properties/AttachmentType",
+        "/properties/AttachmentState",
+        "/properties/Id"
+    ],
+    "primaryIdentifier": [
+        "/properties/Id"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ec2:DescribeRegions",
+                "networkmanager:AcceptAttachment"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "networkmanager:GetVpcAttachment",
+                "networkmanager:GetConnectAttachment"
+            ]
+        },
+        "update": {
+            "permissions": []
+        },
+        "delete": {
+            "permissions": []
+        },
+        "list": {
+            "permissions": []
+        }
+    }
+}
