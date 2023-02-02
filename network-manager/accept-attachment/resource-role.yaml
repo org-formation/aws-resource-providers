@@ -22,7 +22,7 @@ Resources:
               StringLike:
                 aws:SourceArn:
                   Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-NetworkManager-AcceptAttachment/*
-      Path: "/community-types/"
+      Path: "/"
       Policies:
         - PolicyName: ResourceTypePolicy
           PolicyDocument:

@@ -51,7 +51,7 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 #### AttachmentType
 
-The type of the attachment, either 'connect' or 'vpc'.
+The type of the attachment.
 
 #### AttachmentState
 
