@@ -14,6 +14,12 @@
         "RouteTableId": {
             "type": "string"
         },
+        "VpcAttachmentId": {
+            "type": "string"
+        },
+        "MaxWaitSeconds": {
+            "type": "number"
+        },
         "CoreNetworkArn": {
             "type": "string"
         },
@@ -41,7 +47,8 @@
     "handlers": {
         "create": {
             "permissions": [
-                "ec2:CreateRoute"
+                "ec2:CreateRoute",
+                "networkmanager:GetVpcAttachment"
             ]
         },
         "read": {

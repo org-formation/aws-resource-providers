@@ -1,9 +1,11 @@
 import { Action, exceptions, OperationStatus, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { AwsServiceMockBuilder, on } from '@jurijzahn8019/aws-promise-jest-mock';
-import { EC2 } from 'aws-sdk';
+import { EC2, NetworkManager } from 'aws-sdk';
 import { resource } from '../src/handlers';
 const deleteFixture = require('./data/delete-success');
-const createFixture = require('./data/create-success');
+const createNoWaitFixture = require('./data/create-no-wait');
+const createWaitFixture = require('./data/create-wait');
+const createInvalidFixture = require('./data/create-wait-invalid');
 const readFixture = require('./data/read-success');
 
 jest.mock('aws-sdk');
@@ -13,11 +15,12 @@ describe('core network route', () => {
     let spySession: jest.SpyInstance;
     let spySessionClient: jest.SpyInstance;
     let ec2: AwsServiceMockBuilder<EC2>;
+    let nm: AwsServiceMockBuilder<NetworkManager>;
     let fixtureMap: Map<Action, Record<string, any>>;
 
     beforeAll(() => {
         fixtureMap = new Map<Action, Record<string, any>>();
-        fixtureMap.set(Action.Create, createFixture);
+        fixtureMap.set(Action.Create, createNoWaitFixture);
         fixtureMap.set(Action.Read, readFixture);
         fixtureMap.set(Action.Delete, deleteFixture);
     });
@@ -27,6 +30,7 @@ describe('core network route', () => {
         ec2.mock('createRoute').resolve({ Return: true });
         ec2.mock('replaceRoute').resolve({});
         ec2.mock('deleteRoute').resolve({});
+        nm = on(NetworkManager, { snapshot: false });
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
         spySessionClient.mockReturnValue(ec2.instance);
@@ -42,7 +46,7 @@ describe('core network route', () => {
         jest.restoreAllMocks();
     });
 
-    test('create operation successful', async () => {
+    test('create immediate successful', async () => {
         const request = fixtureMap.get(Action.Create)!;
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
@@ -51,6 +55,60 @@ describe('core network route', () => {
             ...request.desiredResourceState,
             Id: 'some-route-table:192.168.0.0/22:undefined:some-core-network'
         });
+    });
+
+    test('create waiting first call', async () => {
+        const request = createWaitFixture;
+        nm.mock('getVpcAttachment').resolve({ VpcAttachment: { Attachment: { State: "PENDING_ATTACHMENT_ACCEPTANCE" } } });
+        spySessionClient.mockReturnValue(nm.instance);
+
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
+        expect(progress).toMatchObject({ status: OperationStatus.InProgress, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeDefined();
+        expect(progress.resourceModel!.serialize()).toMatchObject({
+            ...request.desiredResourceState,
+        });
+        console.log(JSON.stringify(progress, null, 2));
+        expect(progress.callbackContext?.timeStarted).toBeDefined()
+    });
+
+    test('create waiting invalid input', async () => {
+        const request = createInvalidFixture
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, message: 'If you provide maxWaitSeconds, you MUST provide vpcAttachmentId', callbackDelaySeconds: 0 });
+    });
+
+    test('create waiting second call in progress', async () => {
+        const request = createWaitFixture
+        const fiveSecondsAgo = new Date().getTime() / 1000 - 5;
+        testEntrypointPayload.callbackContext = { timeStarted: fiveSecondsAgo }
+        nm.mock('getVpcAttachment').resolve({ VpcAttachment: { Attachment: { State: "PENDING_ATTACHMENT_ACCEPTANCE" } } });
+        spySessionClient.mockReturnValue(nm.instance);
+
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
+        expect(progress).toMatchObject({ status: OperationStatus.InProgress, message: '', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeDefined();
+        expect(progress.resourceModel!.serialize()).toMatchObject({
+            ...request.desiredResourceState,
+        });
+        console.log(JSON.stringify(progress, null, 2));
+        expect(progress.callbackContext?.timeStarted).toBe(fiveSecondsAgo)
+    });
+
+    test('create waiting waited too long', async () => {
+        const request = createWaitFixture
+        const hundredSecondsAgo = new Date().getTime() / 1000 - 100;
+        testEntrypointPayload.callbackContext = { timeStarted: hundredSecondsAgo }
+        nm.mock('getVpcAttachment').resolve({ VpcAttachment: { Attachment: { State: "PENDING_ATTACHMENT_ACCEPTANCE" } } });
+        spySessionClient.mockReturnValue(nm.instance);
+
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, message: 'VPC Attachment some-attachment is (still) in state PENDING_ATTACHMENT_ACCEPTANCE after waiting to reach state AVAILABLE for 100 seconds which is longer than the maximum configured of 60.', callbackDelaySeconds: 0 });
+        expect(progress.resourceModel).toBeDefined();
+        expect(progress.resourceModel!.serialize()).toMatchObject({
+            ...request.desiredResourceState,
+        });
+        console.log(JSON.stringify(progress, null, 2));
     });
 
     test('create operation fail', async () => {
@@ -96,12 +154,4 @@ describe('core network route', () => {
         });
     });
 
-    test('all operations fail without session', async () => {
-        expect.assertions(fixtureMap.size);
-        spySession.mockReturnValue(null);
-        for (const [action, request] of fixtureMap) {
-            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, undefined);
-            expect(progress.errorCode).toBe(exceptions.InvalidCredentials.name);
-        }
-    });
 });

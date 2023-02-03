@@ -38,6 +38,24 @@ export class ResourceModel extends BaseModel {
         }
     )
     routeTableId?: Optional<string>;
+    @Expose({ name: 'VpcAttachmentId' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'vpcAttachmentId', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    vpcAttachmentId?: Optional<string>;
+    @Expose({ name: 'MaxWaitSeconds' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Number, 'maxWaitSeconds', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    maxWaitSeconds?: Optional<number>;
     @Expose({ name: 'CoreNetworkArn' })
     @Transform(
         (value: any, obj: any) =>
