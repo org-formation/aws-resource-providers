@@ -22,7 +22,7 @@ Resources:
               StringLike:
                 aws:SourceArn:
                   Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-NetworkManager-AcceptAttachment/*
-      Path: "/community-types/"
+      Path: "/"
       Policies:
         - PolicyName: ResourceTypePolicy
           PolicyDocument:
@@ -33,6 +33,8 @@ Resources:
                 - "ec2:DescribeRegions"
                 - "networkmanager:AcceptAttachment"
                 - "networkmanager:GetConnectAttachment"
+                - "networkmanager:GetSiteToSiteVpnAttachment"
+                - "networkmanager:GetTranitGatewayRouteTableAttachment"
                 - "networkmanager:GetVpcAttachment"
                 Resource: "*"
 Outputs:

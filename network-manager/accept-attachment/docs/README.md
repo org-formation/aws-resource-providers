@@ -13,6 +13,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "Community::NetworkManager::AcceptAttachment",
     "Properties" : {
         "<a href="#attachmentid" title="AttachmentId">AttachmentId</a>" : <i>String</i>,
+        "<a href="#attachmenttype" title="AttachmentType">AttachmentType</a>" : <i>String</i>,
     }
 }
 </pre>
@@ -23,6 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: Community::NetworkManager::AcceptAttachment
 Properties:
     <a href="#attachmentid" title="AttachmentId">AttachmentId</a>: <i>String</i>
+    <a href="#attachmenttype" title="AttachmentType">AttachmentType</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -35,7 +37,17 @@ _Required_: Yes
 
 _Type_: String
 
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
+#### AttachmentType
+
+The type of the attachment.
+
+_Required_: Yes
+
+_Type_: String
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 ## Return Values
 
@@ -48,10 +60,6 @@ When you pass the logical ID of this resource to the intrinsic `Ref` function, R
 The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of this type. The following are the available attributes and sample return values.
 
 For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
-
-#### AttachmentType
-
-The type of the attachment.
 
 #### AttachmentState
 

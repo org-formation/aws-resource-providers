@@ -44,7 +44,17 @@ describe('network manager accept attachment', () => {
     describe('create operation', () => {
         const request = fixtureMap.get(Action.Create)!;
 
-        test('initial create runs acceptAttachment call', async () => {
+        test('initial create runs acceptAttachment call when acceptance is pending', async () => {
+            const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
+                VpcAttachment: {
+                    Attachment: {
+                        AttachmentId:'some-id',
+                        AttachmentType: 'VPC',
+                        State: 'PENDING_ATTACHMENT_ACCEPTANCE',
+                    }
+                }
+            });         
+            
             const acceptAttachmentMock = networkManager.mock('acceptAttachment').resolve({
                 Attachment: {
                     AttachmentId:'some-id',
@@ -55,7 +65,60 @@ describe('network manager accept attachment', () => {
 
             const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request, callbackContext:{ id: undefined}}, undefined);
             expect(progress).toBeDefined();
+            expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
             expect(acceptAttachmentMock.mock).toHaveBeenCalledTimes(1);
+            expect(progress.status).toEqual(OperationStatus.InProgress);
+        });
+
+        test('initial create skips acceptAttachment call when acceptance is AVAILABLE', async () => {
+            const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
+                VpcAttachment: {
+                    Attachment: {
+                        AttachmentId:'some-id',
+                        AttachmentType: 'VPC',
+                        State: 'AVAILABLE',
+                    }
+                }
+            });  
+            
+            const acceptAttachmentMock = networkManager.mock('acceptAttachment').resolve({
+                Attachment: {
+                    AttachmentId:'some-id',
+                    AttachmentType: 'VPC',
+                    State: 'AVAILABLE',
+                },
+            });
+
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request, callbackContext:{ id: undefined}}, undefined);
+            expect(progress).toBeDefined();
+            expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
+            expect(acceptAttachmentMock.mock).toHaveBeenCalledTimes(0);
+            expect(progress.status).toEqual(OperationStatus.Success);
+        });
+
+        test('initial create skips acceptAttachment call when acceptance in a waiting state', async () => {
+            const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
+                VpcAttachment: {
+                    Attachment: {
+                        AttachmentId:'some-id',
+                        AttachmentType: 'VPC',
+                        State: 'CREATING',
+                    }
+                }
+            });  
+            
+            const acceptAttachmentMock = networkManager.mock('acceptAttachment').resolve({
+                Attachment: {
+                    AttachmentId:'some-id',
+                    AttachmentType: 'VPC',
+                    State: 'PENDING',
+                },
+            });
+
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request, callbackContext:{ id: undefined}}, undefined);
+            expect(progress).toBeDefined();
+            expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
+            expect(acceptAttachmentMock.mock).toHaveBeenCalledTimes(0);
             expect(progress.status).toEqual(OperationStatus.InProgress);
         });
 

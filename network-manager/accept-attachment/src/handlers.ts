@@ -14,7 +14,7 @@ import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { NetworkManager } from 'aws-sdk';
 import { ResourceModel } from './models';
 
-const waitingStates = ['CREATING', 'PENDING_NETWORK_UPDATE', 'PENDING'];
+const waitingStates = ['CREATING', 'PENDING_NETWORK_UPDATE', 'PENDING', "PENDING_TAG_ACCEPTANCE"];
 
 type CallbackContext = {
     id: string;
@@ -71,15 +71,32 @@ class Resource extends BaseResource<ResourceModel> {
 
         // first call - initiate creation
         if (callbackContext.id === undefined) {
-            logger.log({ message: 'before accept attachment' });
-            const { Attachment } = await service.acceptAttachment({ AttachmentId: model.attachmentId }).promise();
-            logger.log({ message: 'after accept attachment', Attachment });
-            progress.callbackContext = { id: Attachment.AttachmentId, type: Attachment.AttachmentType };
-            progress.callbackDelaySeconds = 60;
-            model.id = Attachment.AttachmentId;
-            model.attachmentId = Attachment.AttachmentId;
-            model.attachmentType = Attachment.AttachmentType;
-            model.attachmentState = Attachment.State;
+            // fetch the attachment and accept the attachment if needed.
+            logger.log({ message: `before get (${model.attachmentType}) attachment` });
+            const attachment = await this.getAttachment(model.attachmentId, model.attachmentType, service, model, logger);
+            logger.log({ message: `after get (${model.attachmentType}) attachment` });
+            progress.callbackContext = { id: attachment.attachmentId, type: attachment.attachmentType };
+
+            // If available, no need to create attachment return success.
+            if (attachment.attachmentState === 'AVAILABLE') {
+                progress.status = OperationStatus.Success;
+                progress.resourceModel = attachment;
+                return progress;
+            }
+
+            // If pending acceptance, accept the attachment.
+            if (attachment.attachmentState === 'PENDING_ATTACHMENT_ACCEPTANCE') {
+                logger.log({ message: 'before accept attachment' });
+                const { Attachment } = await service.acceptAttachment({ AttachmentId: model.attachmentId }).promise();
+                logger.log({ message: 'after accept attachment', Attachment });
+                
+                progress.callbackDelaySeconds = 60;
+                model.id = Attachment.AttachmentId;
+                model.attachmentId = Attachment.AttachmentId;
+                model.attachmentType = Attachment.AttachmentType;
+                model.attachmentState = Attachment.State;
+                return progress;
+            }
 
             return progress;
         }
@@ -104,11 +121,13 @@ class Resource extends BaseResource<ResourceModel> {
         // Check whether to wait or if it failed.
         if (waitingStates.includes(model.attachmentState)) {
             progress.status = OperationStatus.InProgress;
+            progress.message = `Waiting for attachment to become AVAILABLE, current state: ${model.attachmentState}`;
             progress.resourceModel = model;
             progress.callbackDelaySeconds = 30;
             return progress;
         } else {
-            progress.status = OperationStatus.Failed;
+            progress.status = OperationStatus.Failed; 
+            progress.message = `Resource creation failed as attachment state is '${model.attachmentState}', it cannot become 'AVAILABLE'`;
             progress.resourceModel = model;
             return progress;
         }

@@ -23,10 +23,14 @@
     },
     "additionalProperties": false,
     "required": [
-        "AttachmentId"
+        "AttachmentId",
+        "AttachmentType"
+    ],
+    "createOnlyProperties": [
+        "/properties/AttachmentId",
+        "/properties/AttachmentType"
     ],
     "readOnlyProperties": [
-        "/properties/AttachmentType",
         "/properties/AttachmentState",
         "/properties/Id"
     ],
@@ -37,12 +41,18 @@
         "create": {
             "permissions": [
                 "ec2:DescribeRegions",
-                "networkmanager:AcceptAttachment"
+                "networkmanager:AcceptAttachment",
+                "networkmanager:GetVpcAttachment",
+                "networkmanager:GetSiteToSiteVpnAttachment",
+                "networkmanager:GetTranitGatewayRouteTableAttachment",
+                "networkmanager:GetConnectAttachment"
             ]
         },
         "read": {
             "permissions": [
                 "networkmanager:GetVpcAttachment",
+                "networkmanager:GetSiteToSiteVpnAttachment",
+                "networkmanager:GetTranitGatewayRouteTableAttachment",
                 "networkmanager:GetConnectAttachment"
             ]
         },
