@@ -5,7 +5,6 @@ import { resource } from '../src/handlers';
 const deleteFixture = require('./data/delete-success');
 const createNoWaitFixture = require('./data/create-no-wait');
 const createWaitFixture = require('./data/create-wait');
-const createInvalidFixture = require('./data/create-wait-invalid');
 const readFixture = require('./data/read-success');
 
 jest.mock('aws-sdk');
@@ -72,12 +71,6 @@ describe('core network route', () => {
         expect(progress.callbackContext?.timeStarted).toBeDefined()
     });
 
-    test('create waiting invalid input', async () => {
-        const request = createInvalidFixture
-        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
-        expect(progress).toMatchObject({ status: OperationStatus.Failed, message: 'If you provide maxWaitSeconds, you MUST provide vpcAttachmentId', callbackDelaySeconds: 0 });
-    });
-
     test('create waiting second call in progress', async () => {
         const request = createWaitFixture
         const fiveSecondsAgo = new Date().getTime() / 1000 - 5;
@@ -97,13 +90,13 @@ describe('core network route', () => {
 
     test('create waiting waited too long', async () => {
         const request = createWaitFixture
-        const hundredSecondsAgo = new Date().getTime() / 1000 - 100;
+        const hundredSecondsAgo = new Date().getTime() / 1000 - 1000;
         testEntrypointPayload.callbackContext = { timeStarted: hundredSecondsAgo }
         nm.mock('getVpcAttachment').resolve({ VpcAttachment: { Attachment: { State: "PENDING_ATTACHMENT_ACCEPTANCE" } } });
         spySessionClient.mockReturnValue(nm.instance);
 
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
-        expect(progress).toMatchObject({ status: OperationStatus.Failed, message: 'VPC Attachment some-attachment is (still) in state PENDING_ATTACHMENT_ACCEPTANCE after waiting to reach state AVAILABLE for 100 seconds which is longer than the maximum configured of 60.', callbackDelaySeconds: 0 });
+        expect(progress).toMatchObject({ status: OperationStatus.Failed, message: 'VPC Attachment some-attachment is (still) in state PENDING_ATTACHMENT_ACCEPTANCE after waiting to reach state AVAILABLE for 1000 seconds which is longer than the maximum configured of 600.', callbackDelaySeconds: 0 });
         expect(progress.resourceModel).toBeDefined();
         expect(progress.resourceModel!.serialize()).toMatchObject({
             ...request.desiredResourceState,

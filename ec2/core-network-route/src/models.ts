@@ -47,15 +47,6 @@ export class ResourceModel extends BaseModel {
         }
     )
     vpcAttachmentId?: Optional<string>;
-    @Expose({ name: 'MaxWaitSeconds' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(Number, 'maxWaitSeconds', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    maxWaitSeconds?: Optional<number>;
     @Expose({ name: 'CoreNetworkArn' })
     @Transform(
         (value: any, obj: any) =>

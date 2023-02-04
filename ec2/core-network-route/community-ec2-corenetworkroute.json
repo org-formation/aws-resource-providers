@@ -17,9 +17,6 @@
         "VpcAttachmentId": {
             "type": "string"
         },
-        "MaxWaitSeconds": {
-            "type": "number"
-        },
         "CoreNetworkArn": {
             "type": "string"
         },

@@ -9,7 +9,7 @@ import {
     Optional,
     ProgressEvent,
     ResourceHandlerRequest,
-    SessionProxy
+    SessionProxy,
 } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { EC2, NetworkManager } from 'aws-sdk';
@@ -21,6 +21,7 @@ type CallbackContext = {
 };
 
 const VPC_ATTACHMENT_TERMINAL_FAILED_STATES = ['FAILED', 'REJECTED', 'DELETING'];
+const MAX_WAIT_SECONDS = 600;
 
 class Resource extends BaseResource<ResourceModel> {
     async createRoute(model: ResourceModel, logger: LoggerProxy, progress: ProgressEvent<ResourceModel, CallbackContext>, ec2: EC2): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
@@ -61,30 +62,15 @@ class Resource extends BaseResource<ResourceModel> {
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model, callbackContext);
         logger.log(model);
 
-        const { maxWaitSeconds, vpcAttachmentId } = model;
+        const vpcAttachmentId = model.vpcAttachmentId;
 
         // if no waiting, create the route immediately
-        if (maxWaitSeconds === undefined && vpcAttachmentId === undefined) {
-            logger.log({ message: 'create called without waiting enabled. Returning immediate create.', maxWaitSeconds, vpcAttachmentId });
+        if (vpcAttachmentId === undefined) {
+            logger.log({ message: 'create called without waiting enabled. Returning immediate create.', vpcAttachmentId });
             return await this.createRoute(model, logger, progress, ec2);
         }
 
-        // some input validation
-        if (maxWaitSeconds && vpcAttachmentId === undefined) {
-            progress.status = OperationStatus.Failed;
-            progress.errorCode = HandlerErrorCode.InvalidRequest;
-            progress.message = `If you provide maxWaitSeconds, you MUST provide vpcAttachmentId`;
-            return progress;
-        }
-
-        if (maxWaitSeconds === undefined && vpcAttachmentId) {
-            progress.status = OperationStatus.Failed;
-            progress.errorCode = HandlerErrorCode.InvalidRequest;
-            progress.message = `If you provide vpcAttachmentId, you MUST provide maxWaitSeconds`;
-            return progress;
-        }
-
-        logger.log({ message: 'create called with waiting enabled', maxWaitSeconds, vpcAttachmentId });
+        logger.log({ message: 'create called with waiting enabled', vpcAttachmentId });
         const { VpcAttachment } = await nm.getVpcAttachment({ AttachmentId: vpcAttachmentId }).promise();
         const attachmentState = VpcAttachment.Attachment.State;
         logger.log({ message: 'vpcAttachmentId state', attachmentState, vpcAttachmentId });
@@ -115,10 +101,10 @@ class Resource extends BaseResource<ResourceModel> {
         // this is the subsequent call. check that we're not going over time.
         const nowSeconds = new Date().getTime() / 1000;
         const secondsSinceStart = Math.round(nowSeconds - callbackContext.timeStarted);
-        if (secondsSinceStart > model.maxWaitSeconds) {
+        if (secondsSinceStart > MAX_WAIT_SECONDS) {
             progress.status = OperationStatus.Failed;
             progress.errorCode = HandlerErrorCode.GeneralServiceException;
-            progress.message = `VPC Attachment ${vpcAttachmentId} is (still) in state ${attachmentState} after waiting to reach state AVAILABLE for ${secondsSinceStart} seconds which is longer than the maximum configured of ${model.maxWaitSeconds}.`;
+            progress.message = `VPC Attachment ${vpcAttachmentId} is (still) in state ${attachmentState} after waiting to reach state AVAILABLE for ${secondsSinceStart} seconds which is longer than the maximum configured of ${MAX_WAIT_SECONDS}.`;
             return progress;
         }
 

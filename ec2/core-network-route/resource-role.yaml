@@ -32,6 +32,7 @@ Resources:
                 Action:
                 - "ec2:CreateRoute"
                 - "ec2:DeleteRoute"
+                - "networkmanager:GetVpcAttachment"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

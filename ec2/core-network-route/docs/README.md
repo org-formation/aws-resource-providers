@@ -16,7 +16,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#destinationcidrblock" title="DestinationCidrBlock">DestinationCidrBlock</a>" : <i>String</i>,
         "<a href="#routetableid" title="RouteTableId">RouteTableId</a>" : <i>String</i>,
         "<a href="#vpcattachmentid" title="VpcAttachmentId">VpcAttachmentId</a>" : <i>String</i>,
-        "<a href="#maxwaitseconds" title="MaxWaitSeconds">MaxWaitSeconds</a>" : <i>Double</i>,
         "<a href="#corenetworkarn" title="CoreNetworkArn">CoreNetworkArn</a>" : <i>String</i>,
     }
 }
@@ -31,7 +30,6 @@ Properties:
     <a href="#destinationcidrblock" title="DestinationCidrBlock">DestinationCidrBlock</a>: <i>String</i>
     <a href="#routetableid" title="RouteTableId">RouteTableId</a>: <i>String</i>
     <a href="#vpcattachmentid" title="VpcAttachmentId">VpcAttachmentId</a>: <i>String</i>
-    <a href="#maxwaitseconds" title="MaxWaitSeconds">MaxWaitSeconds</a>: <i>Double</i>
     <a href="#corenetworkarn" title="CoreNetworkArn">CoreNetworkArn</a>: <i>String</i>
 </pre>
 
@@ -66,14 +64,6 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 _Required_: No
 
 _Type_: String
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
-#### MaxWaitSeconds
-
-_Required_: No
-
-_Type_: Double
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
