@@ -44,13 +44,39 @@ describe('network manager accept attachment', () => {
     describe('create operation', () => {
         const request = fixtureMap.get(Action.Create)!;
 
-        test('initial create runs acceptAttachment call when acceptance is pending', async () => {
+        test('initial create runs acceptAttachment call when acceptance is pending attachment', async () => {
             const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
                 VpcAttachment: {
                     Attachment: {
                         AttachmentId:'some-id',
                         AttachmentType: 'VPC',
                         State: 'PENDING_ATTACHMENT_ACCEPTANCE',
+                    }
+                }
+            });         
+            
+            const acceptAttachmentMock = networkManager.mock('acceptAttachment').resolve({
+                Attachment: {
+                    AttachmentId:'some-id',
+                    AttachmentType: 'VPC',
+                    State: 'PENDING',
+                },
+            });
+
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request, callbackContext:{ id: undefined}}, undefined);
+            expect(progress).toBeDefined();
+            expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
+            expect(acceptAttachmentMock.mock).toHaveBeenCalledTimes(1);
+            expect(progress.status).toEqual(OperationStatus.InProgress);
+        });
+
+        test('initial create runs acceptAttachment call when acceptance is pending tag', async () => {
+            const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
+                VpcAttachment: {
+                    Attachment: {
+                        AttachmentId:'some-id',
+                        AttachmentType: 'VPC',
+                        State: 'PENDING_TAG_ACCEPTANCE',
                     }
                 }
             });         
@@ -191,6 +217,37 @@ describe('network manager accept attachment', () => {
             expect(progress.status).toEqual(OperationStatus.Failed);
         });
     });
+
+    describe('update operation',  () => {
+        const request = fixtureMap.get(Action.Read)!;
+
+        test('reading vpc attachment', async () => {
+            const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').resolve({
+                VpcAttachment: {
+                    Attachment: {
+                        AttachmentId:'some-id',
+                        AttachmentType: 'VPC',
+                        State: 'AVAILABLE',
+                    }
+                }
+            });
+
+            const result = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request, model: { attachemtType: 'VPC'}}, undefined);
+            expect(result).toBeDefined();
+            expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
+            expect(result.resourceModel?.id).toEqual(request.desiredResourceState.AttachmentId);
+        });
+
+        test('reading attachment fails', async () => {
+            const getVpcAttachmentMock = networkManager.mock('getVpcAttachment').reject({
+                ...new Error(),
+                code: 'InternalFailure',
+            });
+            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Read, request, callbackContext:{ id: undefined}}, undefined);
+            expect(progress).toBeDefined();
+            expect(getVpcAttachmentMock.mock).toHaveBeenCalledTimes(1);
+            expect(progress.status).toEqual(OperationStatus.Failed);
+        });
 
     describe('read operation',  () => {
         const request = fixtureMap.get(Action.Read)!;
