@@ -55,7 +55,7 @@ class Resource extends BaseResource<ResourceModel> {
         logger: LoggerProxy,
         typeConfiguration: TypeConfigurationModel
     ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-        const nm: NetworkManager = session.client<NetworkManager>('NetworkManager');
+        const nm: NetworkManager = session.client<NetworkManager>('NetworkManager', { region: 'us-west-2' });
         const ec2: EC2 = session.client<EC2>('EC2');
 
         const model: ResourceModel = new ResourceModel(request.desiredResourceState);
