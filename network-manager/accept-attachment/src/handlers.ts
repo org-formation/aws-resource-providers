@@ -14,7 +14,8 @@ import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { NetworkManager } from 'aws-sdk';
 import { ResourceModel } from './models';
 
-const waitingStates = ['CREATING', 'PENDING_NETWORK_UPDATE', 'PENDING', "PENDING_TAG_ACCEPTANCE"];
+const waitingStates = ['CREATING', 'PENDING_NETWORK_UPDATE', 'PENDING'];
+const acceptState = ['PENDING_ATTACHMENT_ACCEPTANCE','PENDING_TAG_ACCEPTANCE']
 
 type CallbackContext = {
     id: string;
@@ -57,8 +58,7 @@ class Resource extends BaseResource<ResourceModel> {
         throw new Error(`Unsupported attachment type: ${type}`);
     }
 
-    @handlerEvent(Action.Create)
-    public async create(
+    private async waitOrAcceptAttachment(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
@@ -85,7 +85,7 @@ class Resource extends BaseResource<ResourceModel> {
             }
 
             // If pending acceptance, accept the attachment.
-            if (attachment.attachmentState === 'PENDING_ATTACHMENT_ACCEPTANCE') {
+            if (acceptState.includes(attachment.attachmentState)) {
                 logger.log({ message: 'before accept attachment' });
                 const { Attachment } = await service.acceptAttachment({ AttachmentId: model.attachmentId }).promise();
                 logger.log({ message: 'after accept attachment', Attachment });
@@ -133,10 +133,24 @@ class Resource extends BaseResource<ResourceModel> {
         }
     }
 
+    @handlerEvent(Action.Create)
+    public async create(
+        session: Optional<SessionProxy>,
+        request: ResourceHandlerRequest<ResourceModel>,
+        callbackContext: CallbackContext,
+        logger: LoggerProxy
+    ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        return await this.waitOrAcceptAttachment(session, request, callbackContext, logger);
+    }
+
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'NetworkManager', debug: true })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: NetworkManager, model: ResourceModel): Promise<ResourceModel> {
-        return model;
+    public async update(
+        session: Optional<SessionProxy>,
+        request: ResourceHandlerRequest<ResourceModel>,
+        callbackContext: CallbackContext,
+        logger: LoggerProxy
+    ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        return await this.waitOrAcceptAttachment(session, request, callbackContext, logger);
     }
 
     @handlerEvent(Action.Delete)

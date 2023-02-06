@@ -19,6 +19,10 @@
         "Id": {
             "description": "The ID of the acceptance of attachment",
             "type": "string"
+        },
+        "AttachmentUpdatedAt": {
+            "description": "The time at which the attachment was updated.",
+            "type": "string"
         }
     },
     "additionalProperties": false,
@@ -57,7 +61,14 @@
             ]
         },
         "update": {
-            "permissions": []
+            "permissions": [
+                "ec2:DescribeRegions",
+                "networkmanager:AcceptAttachment",
+                "networkmanager:GetVpcAttachment",
+                "networkmanager:GetSiteToSiteVpnAttachment",
+                "networkmanager:GetTranitGatewayRouteTableAttachment",
+                "networkmanager:GetConnectAttachment"
+            ]
         },
         "delete": {
             "permissions": []
