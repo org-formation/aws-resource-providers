@@ -12,7 +12,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "Community::EC2::CoreNetworkRoute",
     "Properties" : {
-        "<a href="#destinationipv6cidrblock" title="DestinationIpv6CidrBlock">DestinationIpv6CidrBlock</a>" : <i>String</i>,
         "<a href="#destinationcidrblock" title="DestinationCidrBlock">DestinationCidrBlock</a>" : <i>String</i>,
         "<a href="#routetableid" title="RouteTableId">RouteTableId</a>" : <i>String</i>,
         "<a href="#vpcattachmentid" title="VpcAttachmentId">VpcAttachmentId</a>" : <i>String</i>,
@@ -26,7 +25,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: Community::EC2::CoreNetworkRoute
 Properties:
-    <a href="#destinationipv6cidrblock" title="DestinationIpv6CidrBlock">DestinationIpv6CidrBlock</a>: <i>String</i>
     <a href="#destinationcidrblock" title="DestinationCidrBlock">DestinationCidrBlock</a>: <i>String</i>
     <a href="#routetableid" title="RouteTableId">RouteTableId</a>: <i>String</i>
     <a href="#vpcattachmentid" title="VpcAttachmentId">VpcAttachmentId</a>: <i>String</i>
@@ -35,17 +33,9 @@ Properties:
 
 ## Properties
 
-#### DestinationIpv6CidrBlock
-
-_Required_: No
-
-_Type_: String
-
-_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
-
 #### DestinationCidrBlock
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
@@ -61,11 +51,11 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 #### VpcAttachmentId
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 #### CoreNetworkArn
 

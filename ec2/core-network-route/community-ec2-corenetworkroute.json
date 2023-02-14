@@ -5,9 +5,6 @@
     "replacementStrategy": "delete_then_create",
     "definitions": {},
     "properties": {
-        "DestinationIpv6CidrBlock": {
-            "type": "string"
-        },
         "DestinationCidrBlock": {
             "type": "string"
         },
@@ -27,13 +24,15 @@
     "additionalProperties": false,
     "required": [
         "RouteTableId",
-        "CoreNetworkArn"
+        "CoreNetworkArn",
+        "DestinationCidrBlock",
+        "VpcAttachmentId"
     ],
     "createOnlyProperties": [
         "/properties/RouteTableId",
         "/properties/CoreNetworkArn",
         "/properties/DestinationCidrBlock",
-        "/properties/DestinationIpv6CidrBlock"
+        "/properties/VpcAttachmentId"
     ],
     "readOnlyProperties": [
         "/properties/Id"
@@ -46,18 +45,20 @@
             "permissions": [
                 "ec2:CreateRoute",
                 "networkmanager:GetVpcAttachment"
-            ]
+            ],
+            "timeoutInMinutes": 10
         },
         "read": {
-            "permissions": [ ]
-        },
-        "update": {
-            "permissions": [ ]
+            "permissions": [
+                "ec2:DescribeRouteTables"
+            ],
+            "timeoutInMinutes": 2
         },
         "delete": {
             "permissions": [
                 "ec2:DeleteRoute"
-            ]
+            ],
+            "timeoutInMinutes": 2
         }
     }
 }

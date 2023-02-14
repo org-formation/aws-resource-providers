@@ -7,7 +7,7 @@ Resources:
   ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      MaxSessionDuration: 8400
+      MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -32,6 +32,7 @@ Resources:
                 Action:
                 - "ec2:CreateRoute"
                 - "ec2:DeleteRoute"
+                - "ec2:DescribeRouteTables"
                 - "networkmanager:GetVpcAttachment"
                 Resource: "*"
 Outputs:

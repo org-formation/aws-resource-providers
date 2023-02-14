@@ -13,7 +13,7 @@ import {
 } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 import { EC2, NetworkManager } from 'aws-sdk';
-import { CreateRouteRequest, CreateRouteResult, DeleteRouteRequest } from 'aws-sdk/clients/ec2';
+import { CreateRouteRequest, CreateRouteResult, DeleteRouteRequest, DescribeRouteTablesRequest } from 'aws-sdk/clients/ec2';
 import { ResourceModel, TypeConfigurationModel } from './models';
 
 type CallbackContext = {
@@ -22,12 +22,12 @@ type CallbackContext = {
 
 const VPC_ATTACHMENT_TERMINAL_FAILED_STATES = ['FAILED', 'REJECTED', 'DELETING'];
 const MAX_WAIT_SECONDS = 600;
+const ID_SEPARATOR = "@";
 
 class Resource extends BaseResource<ResourceModel> {
     async createRoute(model: ResourceModel, logger: LoggerProxy, progress: ProgressEvent<ResourceModel, CallbackContext>, ec2: EC2): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
         const createRouteRequest: CreateRouteRequest = {
             DestinationCidrBlock: model.destinationCidrBlock,
-            DestinationIpv6CidrBlock: model.destinationIpv6CidrBlock,
             CoreNetworkArn: model.coreNetworkArn,
             RouteTableId: model.routeTableId,
         };
@@ -37,7 +37,7 @@ class Resource extends BaseResource<ResourceModel> {
             const response: CreateRouteResult = await ec2.createRoute(createRouteRequest).promise();
             logger.log({ message: 'after createRoute', response });
 
-            model.id = `${model.routeTableId}:${model.destinationCidrBlock}:${model.destinationIpv6CidrBlock}:${model.coreNetworkArn}`;
+            model.id = [model.routeTableId, model.destinationCidrBlock, model.coreNetworkArn, model.vpcAttachmentId].join(ID_SEPARATOR);
             logger.log({ message: 'done', model });
             progress.status = OperationStatus.Success;
             return progress;
@@ -63,13 +63,6 @@ class Resource extends BaseResource<ResourceModel> {
         logger.log(model);
 
         const vpcAttachmentId = model.vpcAttachmentId;
-
-        // if no waiting, create the route immediately
-        if (vpcAttachmentId === undefined) {
-            logger.log({ message: 'create called without waiting enabled. Returning immediate create.', vpcAttachmentId });
-            return await this.createRoute(model, logger, progress, ec2);
-        }
-
         logger.log({ message: 'create called with waiting enabled', vpcAttachmentId });
         const { VpcAttachment } = await nm.getVpcAttachment({ AttachmentId: vpcAttachmentId }).promise();
         const attachmentState = VpcAttachment.Attachment.State;
@@ -116,42 +109,47 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Delete)
     @commonAws({ serviceName: 'EC2', debug: true })
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<null> {
-        const elements = model.id.split(':');
+        const elements = model.id.split(ID_SEPARATOR);
         const request: DeleteRouteRequest = {
             RouteTableId: elements[0],
-            DestinationCidrBlock: elements[1] === 'undefined' ? undefined : elements[1],
-            DestinationIpv6CidrBlock: elements[2] === 'undefined' ? undefined : elements[1],
+            DestinationCidrBlock: elements[1],
         };
 
         try {
             args.logger.log({ action, message: 'before deleteRoute', request });
             const response = await service.deleteRoute(request).promise();
             args.logger.log({ action, message: 'after deleteRoute', response });
+            // wait 10 seconds to stabilize
+            // await new Promise((resolve) => setTimeout(resolve, 10_000));
             return null;
         } catch (err: any) {
             if (err.code === 'InvalidRoute.NotFound') {
-                return null;
+                throw new exceptions.NotFound(model.getTypeName(), model.id);
             }
             console.log(err);
             throw new exceptions.GeneralServiceException(err.message, err.code);
         }
     }
 
-    @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'EC2', debug: true })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
-        // this shouldn't do anything because all properties are createOnly.
-        return model;
-    }
-
     @handlerEvent(Action.Read)
     @commonAws({ serviceName: 'EC2', debug: true })
     public async read(action: Action, args: HandlerArgs<ResourceModel>, service: EC2, model: ResourceModel): Promise<ResourceModel> {
-        const elements = model.id.split(':');
+        const elements = model.id.split(ID_SEPARATOR);
+        const request: DescribeRouteTablesRequest = {
+            RouteTableIds: [elements[0]],
+        };
         model.routeTableId = elements[0];
         model.destinationCidrBlock = elements[1];
-        model.destinationIpv6CidrBlock = elements[2];
-        model.coreNetworkArn = elements[3];
+        model.coreNetworkArn = elements[2];
+        model.vpcAttachmentId = elements[3];
+
+        args.logger.log({ action, message: 'before describeRouteTables', request });
+        const response = await service.describeRouteTables(request).promise();
+        args.logger.log({ action, message: 'after describeRouteTables', response });
+        if (!response.RouteTables[0].Routes.some((r) => r.DestinationCidrBlock === model.destinationCidrBlock)) {
+            args.logger.log({ action, message: 'throwing notFound as CIDR isnt present in Route Table' });
+            throw new exceptions.NotFound(model.getTypeName(), model.id);
+        }
         args.logger.log({ action, message: 'done', model });
         return model;
     }

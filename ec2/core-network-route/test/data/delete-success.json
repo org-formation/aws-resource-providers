@@ -1,7 +1,7 @@
 {
     "clientRequestToken": "4b90a7e4-b790-456b-a937-0cfdfa211dfe",
     "desiredResourceState": {
-        "Id": "some-route-table:192.168.0.0/22:undefined:some-core-network"
+        "Id": "some-route-table@192.168.0.0/22@some-core-network@some-vpc-attachment"
     },
     "awsAccountId": "123456789012",
     "region": "us-east-1",

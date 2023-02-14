@@ -11,15 +11,6 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     protected readonly IDENTIFIER_KEY_ID: string = '/properties/Id';
 
-    @Expose({ name: 'DestinationIpv6CidrBlock' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'destinationIpv6CidrBlock', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    destinationIpv6CidrBlock?: Optional<string>;
     @Expose({ name: 'DestinationCidrBlock' })
     @Transform(
         (value: any, obj: any) =>

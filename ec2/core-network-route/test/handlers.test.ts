@@ -3,7 +3,6 @@ import { AwsServiceMockBuilder, on } from '@jurijzahn8019/aws-promise-jest-mock'
 import { EC2, NetworkManager } from 'aws-sdk';
 import { resource } from '../src/handlers';
 const deleteFixture = require('./data/delete-success');
-const createNoWaitFixture = require('./data/create-no-wait');
 const createWaitFixture = require('./data/create-wait');
 const readFixture = require('./data/read-success');
 
@@ -19,7 +18,7 @@ describe('core network route', () => {
 
     beforeAll(() => {
         fixtureMap = new Map<Action, Record<string, any>>();
-        fixtureMap.set(Action.Create, createNoWaitFixture);
+        fixtureMap.set(Action.Create, createWaitFixture);
         fixtureMap.set(Action.Read, readFixture);
         fixtureMap.set(Action.Delete, deleteFixture);
     });
@@ -29,6 +28,7 @@ describe('core network route', () => {
         ec2.mock('createRoute').resolve({ Return: true });
         ec2.mock('replaceRoute').resolve({});
         ec2.mock('deleteRoute').resolve({});
+        ec2.mock('describeRouteTables').resolve({ RouteTables: [{ Routes: [{ DestinationCidrBlock: "192.168.0.0/22" }] }] });
         nm = on(NetworkManager, { snapshot: false });
         spySession = jest.spyOn(SessionProxy, 'getSession');
         spySessionClient = jest.spyOn<any, any>(SessionProxy.prototype, 'client');
@@ -45,19 +45,8 @@ describe('core network route', () => {
         jest.restoreAllMocks();
     });
 
-    test('create immediate successful', async () => {
-        const request = fixtureMap.get(Action.Create)!;
-        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
-        expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
-        expect(progress.resourceModel).toBeDefined();
-        expect(progress.resourceModel!.serialize()).toMatchObject({
-            ...request.desiredResourceState,
-            Id: 'some-route-table:192.168.0.0/22:undefined:some-core-network'
-        });
-    });
-
     test('create waiting first call', async () => {
-        const request = createWaitFixture;
+        const request = fixtureMap.get(Action.Create)!;
         nm.mock('getVpcAttachment').resolve({ VpcAttachment: { Attachment: { State: "PENDING_ATTACHMENT_ACCEPTANCE" } } });
         spySessionClient.mockReturnValue(nm.instance);
 
@@ -72,7 +61,7 @@ describe('core network route', () => {
     });
 
     test('create waiting second call in progress', async () => {
-        const request = createWaitFixture
+        const request = fixtureMap.get(Action.Create)!;
         const fiveSecondsAgo = new Date().getTime() / 1000 - 5;
         testEntrypointPayload.callbackContext = { timeStarted: fiveSecondsAgo }
         nm.mock('getVpcAttachment').resolve({ VpcAttachment: { Attachment: { State: "PENDING_ATTACHMENT_ACCEPTANCE" } } });
@@ -89,7 +78,7 @@ describe('core network route', () => {
     });
 
     test('create waiting waited too long', async () => {
-        const request = createWaitFixture
+        const request = fixtureMap.get(Action.Create)!;
         const hundredSecondsAgo = new Date().getTime() / 1000 - 1000;
         testEntrypointPayload.callbackContext = { timeStarted: hundredSecondsAgo }
         nm.mock('getVpcAttachment').resolve({ VpcAttachment: { Attachment: { State: "PENDING_ATTACHMENT_ACCEPTANCE" } } });
@@ -105,15 +94,16 @@ describe('core network route', () => {
     });
 
     test('create operation fail', async () => {
-        expect.assertions(2);
-        const mockCreate = ec2.mock('createRoute').reject({
+        const mockGet = nm.mock('getVpcAttachment').reject({
             ...new Error(),
             code: 'InternalFailure',
         });
+        spySessionClient.mockReturnValue(nm.instance);
+
         const request = fixtureMap.get(Action.Create);
         const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
         expect(progress).toMatchObject({ status: OperationStatus.Failed, errorCode: exceptions.InternalFailure.name });
-        expect(mockCreate.mock).toHaveBeenCalledTimes(1);
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
     });
 
     test('delete operation successful', async () => {
@@ -124,7 +114,6 @@ describe('core network route', () => {
     });
 
     test('delete operation fail', async () => {
-        expect.assertions(2);
         const mockGet = ec2.mock('deleteRoute').reject({
             ...new Error(),
             code: 'InternalFailure',
@@ -143,7 +132,8 @@ describe('core network route', () => {
             ...request.desiredResourceState,
             DestinationCidrBlock: "192.168.0.0/22",
             RouteTableId: "some-route-table",
-            CoreNetworkArn: "some-core-network"
+            CoreNetworkArn: "some-core-network",
+            VpcAttachmentId: "some-vpc-attachment"
         });
     });
 
