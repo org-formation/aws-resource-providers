@@ -1,0 +1,64 @@
+{
+    "typeName": "Community::EC2::CoreNetworkRoute",
+    "description": "An AWS::EC2::Route connected to a AWS::NetworkManager::CoreNetwork",
+    "sourceUrl": "https://github.com/org-formation/aws-resource-providers.git",
+    "replacementStrategy": "delete_then_create",
+    "definitions": {},
+    "properties": {
+        "DestinationCidrBlock": {
+            "type": "string"
+        },
+        "RouteTableId": {
+            "type": "string"
+        },
+        "VpcAttachmentId": {
+            "type": "string"
+        },
+        "CoreNetworkArn": {
+            "type": "string"
+        },
+        "Id": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "RouteTableId",
+        "CoreNetworkArn",
+        "DestinationCidrBlock",
+        "VpcAttachmentId"
+    ],
+    "createOnlyProperties": [
+        "/properties/RouteTableId",
+        "/properties/CoreNetworkArn",
+        "/properties/DestinationCidrBlock",
+        "/properties/VpcAttachmentId"
+    ],
+    "readOnlyProperties": [
+        "/properties/Id"
+    ],
+    "primaryIdentifier": [
+        "/properties/Id"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ec2:CreateRoute",
+                "networkmanager:GetVpcAttachment"
+            ],
+            "timeoutInMinutes": 10
+        },
+        "read": {
+            "permissions": [
+                "ec2:DescribeRouteTables"
+            ],
+            "timeoutInMinutes": 2
+        },
+        "delete": {
+            "permissions": [
+                "ec2:DeleteRoute"
+            ],
+            "timeoutInMinutes": 2
+        }
+    }
+}

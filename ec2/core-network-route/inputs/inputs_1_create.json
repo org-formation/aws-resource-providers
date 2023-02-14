@@ -1,0 +1,6 @@
+{
+    "DestinationCidrBlock": "192.168.0.0/22",
+    "RouteTableId": "rtb-0a25f66ef68fe4e17",
+    "CoreNetworkArn": "arn:aws:networkmanager::696140357683:core-network/core-network-07507f4057ea21ae4",
+    "VpcAttachmentId": "attachment-08f7f329163a336b5"
+}
