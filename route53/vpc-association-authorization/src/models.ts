@@ -77,3 +77,10 @@ export class VPC extends BaseModel {
 
 }
 
+export class TypeConfigurationModel extends BaseModel {
+    ['constructor']: typeof TypeConfigurationModel;
+
+
+
+}
+

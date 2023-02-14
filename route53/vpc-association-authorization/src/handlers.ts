@@ -1,11 +1,30 @@
 import { Route53 } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, exceptions, handlerEvent, Logger } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
+import {
+    Action,
+    BaseResource,
+    exceptions,
+    handlerEvent,
+    Logger,
+    LoggerProxy,
+    OperationStatus,
+    Optional,
+    ProgressEvent,
+    ResourceHandlerRequest,
+    SessionProxy,
+} from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 
-import { ResourceModel, VPC } from './models';
+import { ResourceModel, TypeConfigurationModel, VPC } from './models';
+
+type CallbackContext = Record<string, never>;
 
 class Resource extends BaseResource<ResourceModel> {
-    private async createVpcAssociationAuthorization(action: Action, service: Route53, logger: Logger, model: ResourceModel): Promise<ResourceModel> {
+    private async createVpcAssociationAuthorization(
+        model: ResourceModel,
+        logger: LoggerProxy,
+        progress: ProgressEvent<ResourceModel, CallbackContext>,
+        route53: Route53
+    ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
         const request: Route53.CreateVPCAssociationAuthorizationRequest = {
             HostedZoneId: model.hostedZoneId,
             VPC: {
@@ -13,12 +32,21 @@ class Resource extends BaseResource<ResourceModel> {
                 VPCRegion: model.vPC.vPCRegion,
             },
         };
-        logger.log({ action, message: 'before invoke createVPCAssociationAuthorization', request });
-        const response = await service.createVPCAssociationAuthorization(request).promise();
-        logger.log({ action, message: 'after invoke createVPCAssociationAuthorization', response });
-        logger.log({ action, message: 'done', model });
         model.resourceId = `${model.hostedZoneId}/${model.vPC.vPCRegion}/${model.vPC.vPCId}`;
-        return model;
+        try {
+            logger.log({ message: 'before invoke createVPCAssociationAuthorization', request });
+            const response = await route53.createVPCAssociationAuthorization(request).promise();
+            logger.log({ message: 'after invoke createVPCAssociationAuthorization', response });
+            logger.log({ message: 'done', model });
+            progress.status = OperationStatus.Success;
+            return progress;
+        } catch (err: any) {
+            console.log(err);
+            if (String(err.message).startsWith('A conflicting modification to the authorizations in place')) {
+                return progress;
+            }
+            throw new exceptions.GeneralServiceException(err.message, err.code);
+        }
     }
 
     private async deleteVpcAssociationAuthorization(action: Action, service: Route53, logger: Logger, model: ResourceModel): Promise<null> {
@@ -55,17 +83,31 @@ class Resource extends BaseResource<ResourceModel> {
     }
 
     @handlerEvent(Action.Create)
-    @commonAws({ serviceName: 'Route53', debug: true })
-    public async create(action: Action, args: HandlerArgs<ResourceModel>, service: Route53, model: ResourceModel): Promise<ResourceModel> {
-        if (model.resourceId) throw new exceptions.InvalidRequest('Read only property [ResourceId] cannot be provided by the user.');
-        return this.createVpcAssociationAuthorization(action, service, args.logger, model);
+    public async create(
+        session: Optional<SessionProxy>,
+        request: ResourceHandlerRequest<ResourceModel>,
+        callbackContext: CallbackContext,
+        logger: LoggerProxy,
+        typeConfiguration: TypeConfigurationModel
+    ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        const route53: Route53 = session.client<Route53>('Route53');
+        const model: ResourceModel = new ResourceModel(request.desiredResourceState);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model, callbackContext);
+        return this.createVpcAssociationAuthorization(model, logger, progress, route53);
     }
 
     @handlerEvent(Action.Update)
-    @commonAws({ serviceName: 'Route53', debug: true })
-    public async update(action: Action, args: HandlerArgs<ResourceModel>, service: Route53, model: ResourceModel): Promise<ResourceModel> {
-        if (model.resourceId) throw new exceptions.InvalidRequest('Read only property [ResourceId] cannot be provided by the user.');
-        return this.createVpcAssociationAuthorization(action, service, args.logger, model);
+    public async update(
+        session: Optional<SessionProxy>,
+        request: ResourceHandlerRequest<ResourceModel>,
+        callbackContext: CallbackContext,
+        logger: LoggerProxy,
+        typeConfiguration: TypeConfigurationModel
+    ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        const route53: Route53 = session.client<Route53>('Route53');
+        const model: ResourceModel = new ResourceModel(request.desiredResourceState);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model, callbackContext);
+        return this.createVpcAssociationAuthorization(model, logger, progress, route53);
     }
 
     @handlerEvent(Action.Delete)
