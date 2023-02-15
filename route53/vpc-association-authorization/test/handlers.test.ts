@@ -65,7 +65,7 @@ describe('when calling handler', () => {
         const mockGet = route53.mock('createVPCAssociationAuthorization').reject({
             ...new Error(),
             message: "A conflicting modification to the authorizations in place",
-            code: 'InternalFailure',
+            code: 'ConcurrentModification',
         });
         spySessionClient.mockReturnValue(route53.instance);
 

@@ -42,7 +42,8 @@ class Resource extends BaseResource<ResourceModel> {
             return progress;
         } catch (err: any) {
             console.log(err);
-            if (String(err.message).startsWith('A conflicting modification to the authorizations in place')) {
+            const errorCode = err.code || err.name;
+            if (errorCode === 'ConcurrentModification') {
                 return progress;
             }
             throw new exceptions.GeneralServiceException(err.message, err.code);
