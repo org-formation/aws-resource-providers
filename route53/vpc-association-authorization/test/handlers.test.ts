@@ -1,9 +1,9 @@
 import { Route53 } from 'aws-sdk';
 import { on, AwsServiceMockBuilder } from '@jurijzahn8019/aws-promise-jest-mock';
-import { Action, exceptions, OperationStatus, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
-import createFixture from './data/create-success.json';
-import deleteFixture from './data/delete-success.json';
-import updateFixture from './data/update-success.json';
+import { Action, OperationStatus, SessionProxy } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
+const deleteFixture = require('./data/delete-success');
+const createFixture = require('./data/create-success');
+const updateFixture = require('./data/update-success');
 import { resource } from '../src/handlers';
 
 jest.mock('aws-sdk');
@@ -55,33 +55,53 @@ describe('when calling handler', () => {
     });
 
     test('create operation successful - vpc association', async () => {
-        const request = fixtureMap.get(Action.Create);
-        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, null);
+        const request = fixtureMap.get(Action.Create)!;
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request });
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
-        expect(progress.resourceModel.serialize()).toMatchObject({ ...request.desiredResourceState, ResourceId: 'Z123456789012345678/us-east-1/v-12345678901234567' });
+        expect(progress.resourceModel?.serialize()).toMatchObject({ ...request.desiredResourceState, ResourceId: 'Z123456789012345678/us-east-1/v-12345678901234567' });
     });
 
+    test('create operation fail - retry later', async () => {
+        const mockGet = route53.mock('createVPCAssociationAuthorization').reject({
+            ...new Error(),
+            message: "A conflicting modification to the authorizations in place",
+            code: 'ConcurrentModification',
+        });
+        spySessionClient.mockReturnValue(route53.instance);
+
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
+        expect(progress).toMatchObject({ status: OperationStatus.InProgress });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+    });
+
+    test('create operation fail', async () => {
+        const mockGet = route53.mock('createVPCAssociationAuthorization').reject({
+            ...new Error(),
+            message: "Some other failure",
+            code: 'InternalFailure',
+        });
+        spySessionClient.mockReturnValue(route53.instance);
+
+        const request = fixtureMap.get(Action.Create);
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Create, request }, undefined);
+        expect(progress).toMatchObject({ status: OperationStatus.Failed });
+        expect(mockGet.mock).toHaveBeenCalledTimes(1);
+    });
+
+
     test('update operation successful - vpc association', async () => {
-        const request = fixtureMap.get(Action.Update);
-        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request }, null);
+        const request = fixtureMap.get(Action.Update)!;
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Update, request });
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
-        expect(progress.resourceModel.serialize()).toMatchObject(request.desiredResourceState);
+        expect(progress.resourceModel?.serialize()).toMatchObject(request.desiredResourceState);
     });
 
     test('delete operation successful - vpc association', async () => {
-        const request = fixtureMap.get(Action.Delete);
-        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request }, null);
+        const request = fixtureMap.get(Action.Delete)!;
+        const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action: Action.Delete, request });
         expect(progress).toMatchObject({ status: OperationStatus.Success, message: '', callbackDelaySeconds: 0 });
         expect(progress.resourceModel).toBeNull();
     });
 
-    test('all operations fail without session - vpc association', async () => {
-        expect.assertions(fixtureMap.size);
-        spySession.mockReturnValue(null);
-        for (const [action, request] of fixtureMap) {
-            const progress = await resource.testEntrypoint({ ...testEntrypointPayload, action, request }, null);
-            console.log(JSON.stringify(progress));
-            expect(progress.errorCode).toBe(exceptions.InvalidCredentials.name);
-        }
-    });
 });

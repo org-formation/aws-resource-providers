@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "Community::Route53::VPCAssociationAuthorization",
     "language": "typescript",
-    "runtime": "nodejs12.x",
+    "runtime": "nodejs14.x",
     "entrypoint": "dist/handlers.entrypoint",
     "testEntrypoint": "dist/handlers.testEntrypoint",
     "settings": {
@@ -12,7 +12,10 @@
         "force": false,
         "type_name": null,
         "artifact_type": null,
-        "useDocker": false,
+        "endpoint_url": null,
+        "region": null,
+        "target_schemas": [],
+        "useDocker": true,
         "protocolVersion": "2.0.0"
     }
 }

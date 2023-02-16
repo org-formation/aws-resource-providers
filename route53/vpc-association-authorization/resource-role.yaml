@@ -15,7 +15,14 @@ Resources:
             Principal:
               Service: resources.cloudformation.amazonaws.com
             Action: sts:AssumeRole
-      Path: "/community-types/"
+            Condition:
+              StringEquals:
+                aws:SourceAccount:
+                  Ref: AWS::AccountId
+              StringLike:
+                aws:SourceArn:
+                  Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-Route53-VPCAssociationAuthorization/*
+      Path: "/"
       Policies:
         - PolicyName: ResourceTypePolicy
           PolicyDocument:
