@@ -21,7 +21,7 @@ class Resource extends BaseResource<ResourceModel> {
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
         const invitations = await service.listInvitations().promise();
 
-        const foundInvite = invitations.Invitations.find((invitation) => invitation.AccountId === model.masterAccountId && invitation.MemberStatus === 'INVITED');
+        const foundInvite = invitations.Invitations.find((invitation) => invitation.AccountId === model.masterAccountId && invitation.MemberStatus === 'Invited');
         if (!foundInvite) throw new exceptions.NotFound(`Unable to find invite from ${model.masterAccountId}.`, model.masterAccountId);
 
         const acceptInvitationRequest: SecurityHub.AcceptInvitationRequest = { InvitationId: foundInvite.InvitationId, MasterId: model.masterAccountId };
