@@ -1,0 +1,55 @@
+{
+    "typeName": "Community::SecurityHub::FindingAggregation",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "RegionLinkingMode": {
+            "description": "Indicates whether to aggregate findings from all of the available Regions in the current partition. Also determines whether to automatically aggregate findings from new Regions as Security Hub supports them and you opt into them.",
+            "type": "string",
+            "enum": ["ALL_REGIONS", "ALL_REGIONS_EXCEPT_SPECIFIED", "SPECIFIED_REGIONS"]
+        },
+        "Regions": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "securityhub:createFindingAggregator"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "securityhub:updateFindingAggregator"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "securityhub:createFindingAggregator"
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
