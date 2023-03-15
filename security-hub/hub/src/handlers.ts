@@ -10,7 +10,7 @@ class Resource extends BaseResource<ResourceModel> {
     @commonAws({ service: SecurityHub, debug: true })
     public async create(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
         try{
-        await service.enableSecurityHub({ EnableDefaultStandards: model.enableDefaultStandards }).promise();
+            await service.enableSecurityHub({ EnableDefaultStandards: model.enableDefaultStandards, ControlFindingGenerator: model.controlFindingGenerator }).promise();
         }catch(err) {
             if (!(err.message as string ?? "").includes("Account is already subscribed to Security Hub")) {
                 throw err;
@@ -23,6 +23,9 @@ class Resource extends BaseResource<ResourceModel> {
     @handlerEvent(Action.Update)
     @commonAws({ service: SecurityHub, debug: true })
     public async update(action: Action, args: HandlerArgs<ResourceModel>, service: SecurityHub, model: ResourceModel): Promise<ResourceModel> {
+
+        await service.updateSecurityHubConfiguration({ ControlFindingGenerator: model.controlFindingGenerator }).promise();
+
         return Promise.resolve(model);
     }
 

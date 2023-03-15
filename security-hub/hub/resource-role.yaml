@@ -34,6 +34,7 @@ Resources:
                 - "iam:DeleteServiceLinkedRole"
                 - "securityhub:DisableSecurityHub"
                 - "securityhub:EnableSecurityHub"
+                - "securityhub:UpdateSecurityHubConfiguration"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
