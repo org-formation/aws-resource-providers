@@ -46,8 +46,8 @@ async function ensureStandardsEnabled(service: SecurityHub, model: ResourceModel
     
     if (standardsToDisable.length > 0) {
         const subscriptions = standardsToDisable.map(x=> {
-            const subsription = response.StandardsSubscriptions.find(y=>y.StandardsArn === x);
-            return subsription.StandardsSubscriptionArn;
+            const subscription = response.StandardsSubscriptions.find(y=>y.StandardsArn === x);
+            return subscription.StandardsSubscriptionArn;
         })
 
         logger?.log({ StandardsSubscriptionArns: subscriptions });
@@ -58,11 +58,13 @@ async function ensureStandardsEnabled(service: SecurityHub, model: ResourceModel
     }
 
     let allReady = false;
-    while(!allReady) {
+    let numTries = 0;
+    while(!allReady && numTries < 10) {
         await delay(4000);
 
         const standards = await service.getEnabledStandards({ }).promise();
-        allReady = !standards.StandardsSubscriptions.find(x=>x.StandardsStatus != "READY");
+        allReady = !standards.StandardsSubscriptions.find(x => x.StandardsStatus != "READY");
+        numTries++;
     }
 }
 function delay(ms: number) {
