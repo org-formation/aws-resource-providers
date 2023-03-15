@@ -13,6 +13,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "Community::SecurityHub::Hub",
     "Properties" : {
         "<a href="#enabledefaultstandards" title="EnableDefaultStandards">EnableDefaultStandards</a>" : <i>Boolean</i>,
+        "<a href="#controlfindinggenerator" title="ControlFindingGenerator">ControlFindingGenerator</a>" : <i>String</i>,
     }
 }
 </pre>
@@ -23,6 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: Community::SecurityHub::Hub
 Properties:
     <a href="#enabledefaultstandards" title="EnableDefaultStandards">EnableDefaultStandards</a>: <i>Boolean</i>
+    <a href="#controlfindinggenerator" title="ControlFindingGenerator">ControlFindingGenerator</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -34,6 +36,16 @@ _Required_: No
 _Type_: Boolean
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
+#### ControlFindingGenerator
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>STANDARD_CONTROL</code> | <code>SECURITY_CONTROL</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 ## Return Values
 

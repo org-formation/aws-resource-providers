@@ -8,6 +8,10 @@
         "EnableDefaultStandards": {
             "type": "boolean"
         },
+        "ControlFindingGenerator": {
+            "type": "string",
+            "enum": ["STANDARD_CONTROL","SECURITY_CONTROL"]
+        },
         "ResourceId": {
             "type": "string"
         }

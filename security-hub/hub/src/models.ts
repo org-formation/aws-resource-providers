@@ -20,6 +20,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     enableDefaultStandards?: Optional<boolean>;
+    @Expose({ name: 'ControlFindingGenerator' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'controlFindingGenerator', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    controlFindingGenerator?: Optional<string>;
     @Expose({ name: 'ResourceId' })
     @Transform(
         (value: any, obj: any) =>
