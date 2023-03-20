@@ -16,6 +16,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#cis12" title="CIS12">CIS12</a>" : <i>String</i>,
         "<a href="#pcidss" title="PCIDSS">PCIDSS</a>" : <i>String</i>,
         "<a href="#afsbp" title="AFSBP">AFSBP</a>" : <i>String</i>
+        "<a href="#nist" title="NIST">NIST</a>" : <i>String</i>
+        
     }
 }
 </pre>
@@ -29,6 +31,7 @@ Properties:
     <a href="#cis12" title="CIS12">CIS12</a>: <i>String</i>
     <a href="#pcidss" title="PCIDSS">PCIDSS</a>: <i>String</i>
     <a href="#afsbp" title="AFSBP">AFSBP</a>: <i>String</i>
+    <a href="#nist" title="NIST">NIST</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -64,6 +67,16 @@ _Allowed Values_: <code>ENABLED</code> | <code>DISABLED</code>
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### AFSBP
+
+_Required_: Yes
+
+_Type_: String
+
+_Allowed Values_: <code>ENABLED</code> | <code>DISABLED</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### NIST
 
 _Required_: Yes
 

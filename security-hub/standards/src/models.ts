@@ -57,6 +57,16 @@ export class ResourceModel extends BaseModel {
     )
     aFSBP?: Optional<string>;
 
+    @Expose({ name: 'NIST' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'nIST', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    nIST?: Optional<string>;
+
     @Exclude()
     public getPrimaryIdentifier(): Dict {
         const identifier: Dict = {};
