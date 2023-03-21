@@ -15,9 +15,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#cis14" title="CIS14">CIS14</a>" : <i>String</i>,
         "<a href="#cis12" title="CIS12">CIS12</a>" : <i>String</i>,
         "<a href="#pcidss" title="PCIDSS">PCIDSS</a>" : <i>String</i>,
-        "<a href="#afsbp" title="AFSBP">AFSBP</a>" : <i>String</i>
+        "<a href="#afsbp" title="AFSBP">AFSBP</a>" : <i>String</i>,
         "<a href="#nist" title="NIST">NIST</a>" : <i>String</i>
-        
     }
 }
 </pre>

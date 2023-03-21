@@ -23,6 +23,9 @@
         },
         "AFSBP": {
             "$ref": "#/definitions/EnabledDisabled"
+        },
+        "NIST": {
+            "$ref": "#/definitions/EnabledDisabled"
         }
     },
     "additionalProperties": false,
@@ -30,7 +33,8 @@
         "CIS14",
         "CIS12",
         "PCIDSS",
-        "AFSBP"
+        "AFSBP",
+        "NIST"
     ],
     "readOnlyProperties": [
         "/properties/ResourceId"

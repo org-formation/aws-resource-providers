@@ -1,6 +1,6 @@
 {
     "name": "community-securityhub-standards",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "AWS custom resource provider named Community::SecurityHub::Standards.",
     "private": true,
     "main": "dist/handlers.js",

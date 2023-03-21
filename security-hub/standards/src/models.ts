@@ -56,7 +56,6 @@ export class ResourceModel extends BaseModel {
         }
     )
     aFSBP?: Optional<string>;
-
     @Expose({ name: 'NIST' })
     @Transform(
         (value: any, obj: any) =>
