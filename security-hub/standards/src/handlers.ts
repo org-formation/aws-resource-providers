@@ -10,6 +10,7 @@ const createStandardArn = (region: string, standardCode: string) => {
     if (standardCode == 'CIS1.2') return `arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0`;
     if (standardCode == 'PCIDSS') return `arn:aws:securityhub:${region}::standards/pci-dss/v/3.2.1`;
     if (standardCode == 'AFSBP') return `arn:aws:securityhub:${region}::standards/aws-foundational-security-best-practices/v/1.0.0`;
+    if (standardCode == 'NIST') return `arn:aws:securityhub:${region}::standards/nist-800-53/v/5.0.0`;
     throw new Error('unknown standardCode');
 };
 export interface CallbackContext extends Record<string, any> {
@@ -32,6 +33,9 @@ async function ensureStandardsEnabled(service: SecurityHub, model: ResourceModel
     }
     if (model.cIS14 === "ENABLED") {
         desiredStandards.push(createStandardArn(args.request.region, 'CIS1.4'));
+    }
+    if (model.nIST === "ENABLED") {
+        desiredStandards.push(createStandardArn(args.request.region, 'NIST'));
     }
 
     const standardsToDisable = currentlyEnabledStandards.filter(x => !desiredStandards.includes(x));
