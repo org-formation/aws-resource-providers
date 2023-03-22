@@ -18,12 +18,12 @@ type ServiceName = keyof ClientMap;
 type Client = InstanceType<ClientMap[ServiceName]>;
 type HandlerEvents = Map<Action, string | symbol>;
 
-export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Record<string, any>> = {
+export type HandlerArgs<R extends BaseModel, C extends BaseModel = BaseModel, T extends Record<string, any> = Record<string, any>> = {
     session: Optional<SessionProxy>;
     request: ResourceHandlerRequest<R>;
     callbackContext: T;
     logger?: Logger;
-    typeConfiguration: unknown;
+    typeConfiguration: C;
 };
 
 export interface commonAwsOptions {
@@ -45,8 +45,8 @@ interface Session {
  *
  * @returns {MethodDecorator}
  */
-export function commonAws<T extends Record<string, any>, R extends BaseModel>(options: commonAwsOptions): MethodDecorator {
-    return function (target: BaseResource<R>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
+export function commonAws<T extends Record<string, any>, R extends BaseModel, C extends BaseModel>(options: commonAwsOptions): MethodDecorator {
+    return function (target: BaseResource<R, C>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
         const { debug, service, serviceName } = options;
 
         if (!descriptor) {
@@ -76,7 +76,7 @@ export function commonAws<T extends Record<string, any>, R extends BaseModel>(op
             request: ResourceHandlerRequest<R>,
             callbackContext: T,
             logger: Logger | undefined,
-            typeConfiguration: unknown
+            typeConfiguration: C
         ): Promise<ProgressEvent<R, T>> {
             let action = options.action;
 
