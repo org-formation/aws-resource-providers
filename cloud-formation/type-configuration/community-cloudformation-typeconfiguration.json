@@ -1,0 +1,64 @@
+{
+    "typeName": "Community::CloudFormation::TypeConfiguration",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+       
+    },
+    "properties": {
+        "ResourceId": {
+            "type": "string"
+        },
+        "Type": {
+            "type": "string",
+            "enum": ["RESOURCE", "MODULE", "HOOK"]
+        },
+        "ConfigurationAlias": {
+            "type": "string"
+        },
+        "Configuration": {
+            "type": "string"
+        },
+        "TypeName": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Type",
+        "TypeName"
+    ],
+    "createOnlyProperties": [
+        "/properties/ResourceId",
+        "/properties/Type",
+        "/properties/TypeName"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "cloudformation:SetTypeConfiguration"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "update": {
+            "permissions": [
+                "cloudformation:SetTypeConfiguration"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "cloudformation:SetTypeConfiguration"
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
