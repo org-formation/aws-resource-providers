@@ -44,7 +44,7 @@
         },
         "delete": {
             "permissions": [
-                "securityhub:createFindingAggregator"
+                "securityhub:deleteFindingAggregator"
             ]
         },
         "list": {
