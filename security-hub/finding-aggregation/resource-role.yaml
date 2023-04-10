@@ -31,6 +31,7 @@ Resources:
               - Effect: Allow
                 Action:
                 - "securityhub:createFindingAggregator"
+                - "securityhub:deleteFindingAggregator"
                 - "securityhub:updateFindingAggregator"
                 Resource: "*"
 Outputs:
