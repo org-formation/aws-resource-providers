@@ -27,7 +27,7 @@ export async function createSupportCase(model: ResourceModel, service: Support):
     await service.createCase(createCaseRequest).promise();
 }
 
-async function checkContextIsOrganizationMasterAccount(args: HandlerArgs<ResourceModel, Record<string, any>>): Promise<void> {
+async function checkContextIsOrganizationMasterAccount(args: HandlerArgs<ResourceModel>): Promise<void> {
     try {
         const organizationsClient = args.session.client('Organizations', { region: 'us-east-1' }) as Organizations;
         await organizationsClient.describeOrganization().promise();

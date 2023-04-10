@@ -18,11 +18,12 @@ type ServiceName = keyof ClientMap;
 type Client = InstanceType<ClientMap[ServiceName]>;
 type HandlerEvents = Map<Action, string | symbol>;
 
-export type HandlerArgs<R extends BaseModel, T extends Record<string, any> = Record<string, any>> = {
+export type HandlerArgs<R extends BaseModel, C extends BaseModel = BaseModel, T extends Record<string, any> = Record<string, any>> = {
     session: Optional<SessionProxy>;
     request: ResourceHandlerRequest<R>;
     callbackContext: T;
     logger?: Logger;
+    typeConfiguration: C;
 };
 
 export interface commonAwsOptions {
@@ -44,8 +45,8 @@ interface Session {
  *
  * @returns {MethodDecorator}
  */
-export function commonAws<T extends Record<string, any>, R extends BaseModel>(options: commonAwsOptions): MethodDecorator {
-    return function (target: BaseResource<R>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
+export function commonAws<T extends Record<string, any>, R extends BaseModel, C extends BaseModel>(options: commonAwsOptions): MethodDecorator {
+    return function (target: BaseResource<R, C>, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
         const { debug, service, serviceName } = options;
 
         if (!descriptor) {
@@ -70,8 +71,15 @@ export function commonAws<T extends Record<string, any>, R extends BaseModel>(op
         }
 
         // Wrapping the original method with new signature.
-        descriptor.value = async function (session: Optional<SessionProxy | Session>, request: ResourceHandlerRequest<R>, callbackContext: T, logger?: Logger): Promise<ProgressEvent<R, T>> {
+        descriptor.value = async function (
+            session: Optional<SessionProxy | Session>,
+            request: ResourceHandlerRequest<R>,
+            callbackContext: T,
+            logger: Logger | undefined,
+            typeConfiguration: C
+        ): Promise<ProgressEvent<R, T>> {
             let action = options.action;
+
             if (!action) {
                 const events: HandlerEvents = Reflect.getMetadata('handlerEvents', target);
                 events.forEach((value: string | symbol, key: Action) => {
@@ -83,7 +91,7 @@ export function commonAws<T extends Record<string, any>, R extends BaseModel>(op
 
             logger = logger || console;
 
-            const handlerArgs = { session, request, callbackContext, logger };
+            const handlerArgs = { session, request, callbackContext, logger, typeConfiguration };
             const desiredResourceState = request.desiredResourceState || {};
 
             let ModelClass: Constructor<R> = Object.getPrototypeOf(desiredResourceState).constructor;
