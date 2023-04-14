@@ -1,0 +1,65 @@
+{
+    "typeName": "Community::SecurityHub::SecurityControl",
+    "description": "Resource that allows  management of Security Hub Security Controls",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "documentationUrl": "https://github.com/org-formation/aws-resource-providers/tree/master/security-hub/security-control/docs",
+    "definitions": {},
+    "properties": {
+        "ControlId": {
+            "type": "string"
+        },
+        "SuppressionsUpdatedBy": {
+            "type": "string"
+        },
+        "SuppressCurrentFindingsOnDisabled": {
+            "type": "boolean"
+        },
+        "ControlStatus": {
+            "type": "string",
+            "enum": [
+                "ENABLED",
+                "DISABLED"
+            ]
+        },
+        "DisabledReason": {
+            "type": "string",
+            "description": "The description for the custom action target."
+        }
+    },
+    "additionalProperties": false,
+    "createOnlyProperties": [
+        "/properties/ControlId"
+    ],
+    "required": [
+        "ControlId",
+        "ControlStatus"
+    ],
+    "primaryIdentifier": [
+        "/properties/ControlId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "securityhub:*"
+            ]
+        },
+        "read": {
+            "permissions": [
+                
+            ]
+        },
+        "update": {
+            "permissions": [
+                "securityhub:ListStandardsControlAssociations",
+                "securityhub:GetFindings",
+                "securityhub:BatchUpdateFindings",
+                "securityhub:BatchUpdateStandardsControlAssociations"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                
+            ]
+        }
+    }
+}

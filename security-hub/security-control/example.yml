@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Resources:
+  SecurityControlIAM1:
+    Type: 'Community::SecurityHub::SecurityControl'
+    Properties:
+      ControlId: 'IAM.1'
+      ControlStatus: 'DISABLED'
+      DisabledReason: Root user doesnt have a password
+      SuppressCurrentFindingsOnDisabled: true
