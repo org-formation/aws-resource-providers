@@ -12,41 +12,58 @@ interface LogContext {
     clientRequestToken: string;
 }
 
-async function inviteMembers(memberAccountIDs: string[], logger: Logger, loggingContext: LogContext, service: SecurityHub) {
-    if (memberAccountIDs.length === 0) {
+const batchSize = 50;
+
+const batchedArray = (arr: string[]): string[][] => arr.reduce((acc, cur, index) => {
+    const batchIndex = Math.floor(index / batchSize);
+    if (!acc[batchIndex]) {
+        acc[batchIndex] = [];
+    }
+    acc[batchIndex].push(cur);
+    return acc as string[][];
+}, []);
+
+async function inviteMembers(allMemberAccountIDs: string[], logger: Logger, loggingContext: LogContext, service: SecurityHub) {
+    const currentMembers = await service.listMembers({ }).promise();
+    const newMemberAccountIds = allMemberAccountIDs.filter((x) => !currentMembers.Members?.some((y) => y.AccountId === x));
+
+    if (newMemberAccountIds.length === 0) {
         return;
     }
 
-    logger.log({ ...loggingContext, method: 'inviteMembers', memberAccountIDs });
+    for (const batch of batchedArray(newMemberAccountIds)) {
 
-    const accountDetails = memberAccountIDs.map((x) => ({ AccountId: x }));
+        logger.log({ ...loggingContext, method: 'inviteMembers', batch });
 
-    const createRequest = {
-        AccountDetails: accountDetails,
-    };
+        const accountDetails = batch.map((x) => ({ AccountId: x }));
 
-    logger.log({ ...loggingContext, method: 'before createMembers', memberAccountIDs, createRequest });
-    const createResponse = await service.createMembers(createRequest).promise();
-    logger.log({ ...loggingContext, method: 'after createMembers', memberAccountIDs, createRequest, createResponse });
+        const createRequest = {
+            AccountDetails: accountDetails,
+        };
 
-    const filteredUnprocessedCreate = createResponse.UnprocessedAccounts?.filter(x=>x.ProcessingResult && !x.ProcessingResult.includes("given account ID is already a member or associated"));
+        logger.log({ ...loggingContext, method: 'before createMembers', batch, createRequest });
+        const createResponse = await service.createMembers(createRequest).promise();
+        logger.log({ ...loggingContext, method: 'after createMembers', batch, createRequest, createResponse });
 
-    if (filteredUnprocessedCreate?.length) {
-        throw new Error(`Unable to process all invitations: Unprocessed Accounts ${createResponse.UnprocessedAccounts.map((x) => x.AccountId).join(',')}`);
-    }
+        const filteredUnprocessedCreate = createResponse.UnprocessedAccounts?.filter(x=>x.ProcessingResult && !x.ProcessingResult.includes("given account ID is already a member or associated"));
 
-    const inviteRequest = {
-        AccountIds: memberAccountIDs,
-    } as SecurityHub.Types.InviteMembersRequest;
+        if (filteredUnprocessedCreate?.length) {
+            throw new Error(`Unable to process all invitations: Unprocessed Accounts ${createResponse.UnprocessedAccounts.map((x) => x.AccountId).join(',')}`);
+        }
 
-    logger.log({ ...loggingContext, method: 'before inviteMembers', memberAccountIDs, inviteRequest });
-    const inviteResponse = await service.inviteMembers(inviteRequest).promise();
-    logger.log({ ...loggingContext, method: 'after inviteMembers', memberAccountIDs, inviteRequest, inviteResponse });
+        const inviteRequest = {
+            AccountIds: batch,
+        } as SecurityHub.Types.InviteMembersRequest;
 
-    const filteredUnprocessed = inviteResponse.UnprocessedAccounts?.filter(x=>x.ProcessingResult && !x.ProcessingResult.includes("because the current account has already invited or is already the SecurityHub"));
+        logger.log({ ...loggingContext, method: 'before inviteMembers', batch, inviteRequest });
+        const inviteResponse = await service.inviteMembers(inviteRequest).promise();
+        logger.log({ ...loggingContext, method: 'after inviteMembers', batch, inviteRequest, inviteResponse });
 
-    if (filteredUnprocessed?.length) {
-        throw new Error(`Unable to process all invitations: Unprocessed Accounts ${inviteResponse.UnprocessedAccounts.map((x) => x.AccountId).join(',')}`);
+        const filteredUnprocessed = inviteResponse.UnprocessedAccounts?.filter(x=>x.ProcessingResult && !x.ProcessingResult.includes("because the current account has already invited or is already the SecurityHub"));
+
+        if (filteredUnprocessed?.length) {
+            throw new Error(`Unable to process all invitations: Unprocessed Accounts ${inviteResponse.UnprocessedAccounts.map((x) => x.AccountId).join(',')}`);
+        }
     }
 }
 

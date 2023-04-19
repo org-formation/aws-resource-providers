@@ -29,7 +29,8 @@
         "create": {
             "permissions": [
                 "securityhub:createmembers",
-                "securityhub:invitemembers"
+                "securityhub:invitemembers",
+                "securityhub:listMembers"
             ]
         },
         "read": {
@@ -39,7 +40,8 @@
         "update": {
             "permissions": [
                 "securityhub:createmembers",
-                "securityhub:invitemembers"
+                "securityhub:invitemembers",
+                "securityhub:listMembers"
             ]
         },
         "delete": {

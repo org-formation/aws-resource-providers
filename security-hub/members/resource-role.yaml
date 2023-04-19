@@ -32,6 +32,7 @@ Resources:
                 Action:
                 - "securityhub:createmembers"
                 - "securityhub:invitemembers"
+                - "securityhub:listMembers"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
