@@ -16,8 +16,7 @@
     },
     "additionalProperties": false,
     "required": [
-        "ServicePrincipal",
-        "ResourceId"
+        "ServicePrincipal"
     ],
     "createOnlyProperties": [
         "/properties/ResourceId"
