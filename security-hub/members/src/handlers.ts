@@ -24,8 +24,16 @@ const batchedArray = (arr: string[]): string[][] => arr.reduce((acc, cur, index)
 }, []);
 
 async function inviteMembers(allMemberAccountIDs: string[], logger: Logger, loggingContext: LogContext, service: SecurityHub) {
-    const currentMembers = await service.listMembers({ }).promise();
-    const newMemberAccountIds = allMemberAccountIDs.filter((x) => !currentMembers.Members?.some((y) => y.AccountId === x));
+
+    const currentMembers: SecurityHub.MemberList = [];
+    let nextToken : string | undefined = undefined;
+    do {
+        const listMembersPage = await service.listMembers({ NextToken: nextToken}).promise();
+        currentMembers.push(...(listMembersPage.Members || []))
+        nextToken = listMembersPage.NextToken;
+    } while(nextToken);
+    
+    const newMemberAccountIds = allMemberAccountIDs.filter((x) => !currentMembers.some((y) => y.AccountId === x));
 
     if (newMemberAccountIds.length === 0) {
         return;
