@@ -1,7 +1,7 @@
 {
     "typeName": "Community::ServiceQuotas::DynamoDB",
     "language": "typescript",
-    "runtime": "nodejs12.x",
+    "runtime": "nodejs14.x",
     "artifact_type": "RESOURCE",
     "entrypoint": "dist/handlers.entrypoint",
     "testEntrypoint": "dist/handlers.testEntrypoint",
