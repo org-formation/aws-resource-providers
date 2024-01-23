@@ -1,7 +1,7 @@
 {
     "typeName": "Community::Support::SupportLevel",
     "language": "typescript",
-    "runtime": "nodejs14.x",
+    "runtime": "nodejs20.x",
     "artifact_type": "RESOURCE",
     "entrypoint": "dist/handlers.entrypoint",
     "testEntrypoint": "dist/handlers.testEntrypoint",

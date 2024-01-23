@@ -1,6 +1,6 @@
 {
     "name": "community-organizations-enableawsserviceaccess",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::Organizations::EnableAWSService.",
     "private": true,
     "main": "dist/handlers.js",
@@ -20,9 +20,9 @@
         "validate": "cfn validate"
     },
     "dependencies": {
-        "aws-resource-providers-common": "^0.2.0",
+        "aws-resource-providers-common": "^0.5.0",
         "aws-sdk": "^2.656.0",
-        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.4.0",
+        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",
         "class-transformer": "^0.3.1",
         "uuid": "^7.0.3"
     },

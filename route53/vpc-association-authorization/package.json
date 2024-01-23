@@ -1,6 +1,6 @@
 {
     "name": "community-route53-vpcassociationauthorization",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::Route53::VPCAssociationAuthorization.",
     "private": true,
     "main": "dist/handlers.js",

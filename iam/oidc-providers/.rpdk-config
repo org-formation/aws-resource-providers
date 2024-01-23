@@ -1,7 +1,7 @@
 {
     "typeName": "Community::IAM::OpenIDConnectProvider",
     "language": "typescript",
-    "runtime": "nodejs14.x",
+    "runtime": "nodejs20.x",
     "entrypoint": "dist/handlers.entrypoint",
     "testEntrypoint": "dist/handlers.testEntrypoint",
     "settings": {

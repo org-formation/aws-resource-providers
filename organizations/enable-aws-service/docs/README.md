@@ -45,7 +45,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 Primary Identifier for this resource
 
-_Required_: Yes
+_Required_: No
 
 _Type_: String
 

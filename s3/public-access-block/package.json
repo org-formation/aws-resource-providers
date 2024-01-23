@@ -1,6 +1,6 @@
 {
     "name": "community-s3-publicaccessblock",
-    "version": "0.2.2",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::S3::PublicAccessBlock.",
     "private": true,
     "main": "dist/handlers.js",

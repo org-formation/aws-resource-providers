@@ -35,9 +35,9 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>4</code>
+_Minimum Length_: <code>4</code>
 
-_Maximum_: <code>15</code>
+_Maximum Length_: <code>15</code>
 
 _Pattern_: <code>^PT(?=[0-9])([0-1]?[0-9]H)?([0-9]{1,3}M)?([0-9]{1,5}S)?$</code>
 
