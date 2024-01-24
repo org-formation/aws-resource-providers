@@ -1,6 +1,6 @@
 {
     "name": "community-ec2-corenetworkroute",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "AWS custom resource provider named Community::EC2::CoreNetworkRoute.",
     "private": true,
     "main": "dist/handlers.js",

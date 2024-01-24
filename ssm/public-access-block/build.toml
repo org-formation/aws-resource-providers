@@ -3,7 +3,7 @@
 [function_build_definitions]
 [function_build_definitions.f772bbfe-a8e3-4c68-9e23-563cb6485c30]
 codeuri = "./"
-runtime = "nodejs14.x"
+runtime = "nodejs20.x"
 source_md5 = ""
 packagetype = "Zip"
 functions = ["TestEntrypoint", "TypeFunction"]

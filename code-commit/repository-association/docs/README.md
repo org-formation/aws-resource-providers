@@ -36,13 +36,13 @@ Properties:
 
 The Amazon Resource Name (ARN) or ID of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateName is set.
 
-_Required_: Yes
+_Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>256</code>
+_Maximum Length_: <code>256</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -50,13 +50,13 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 The name of the approval rule template for which you want to associate the repositories. It is NOT required in case ApprovalRuleTemplateArn is set.
 
-_Required_: Yes
+_Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>100</code>
+_Maximum Length_: <code>100</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -64,7 +64,7 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 A list of repository names that will be associated with the specified approval rule template.
 
-_Required_: Yes
+_Required_: No
 
 _Type_: List of String
 

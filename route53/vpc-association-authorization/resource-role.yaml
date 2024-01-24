@@ -22,7 +22,7 @@ Resources:
               StringLike:
                 aws:SourceArn:
                   Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-Route53-VPCAssociationAuthorization/*
-      Path: "/"
+      Path: "/community-types/"
       Policies:
         - PolicyName: ResourceTypePolicy
           PolicyDocument:

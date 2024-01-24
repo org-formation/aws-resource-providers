@@ -2,7 +2,7 @@ import { Organizations } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
 // import { v4 as uuidv4 } from 'uuid';
 import { v4 as uuidv4 } from 'uuid';
-import { Action, BaseResource, exceptions, handlerEvent } from 'cfn-rpdk';
+import { Action, BaseResource, exceptions, handlerEvent } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
 import { DisableAWSServiceAccessRequest, EnableAWSServiceAccessRequest } from 'aws-sdk/clients/organizations';
 
@@ -85,14 +85,6 @@ class Resource extends BaseResource<ResourceModel> {
     public async delete(action: Action, args: HandlerArgs<ResourceModel>, service: Organizations): Promise<null> {
         const { desiredResourceState, logicalResourceIdentifier, previousResourceState } = args.request;
 
-        // let model = args.request.
-        
-        //const request1 : DeregisterDelegatedAdministratorRequest = {
-        //    AccountId : previousResourceState.accountNumber,
-        //    ServicePrincipal : previousResourceState.servicePrincipal
-        //}
-
-        //await service.deregisterDelegatedAdministrator(request1).promise();
 
         const request2 : DisableAWSServiceAccessRequest = {
             ServicePrincipal : desiredResourceState.servicePrincipal

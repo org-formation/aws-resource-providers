@@ -90,7 +90,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### AuthKey
 
-The authentication key for BGP configuration. This string has a minimum length of 6 characters and and a maximun lenth of 80 characters.
+The authentication key for BGP configuration. This string has a minimum length of 6 characters and and a maximum length of 80 characters.
 
 _Required_: No
 

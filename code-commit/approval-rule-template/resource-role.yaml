@@ -15,7 +15,14 @@ Resources:
             Principal:
               Service: resources.cloudformation.amazonaws.com
             Action: sts:AssumeRole
-      Path: "/"
+            Condition:
+              StringEquals:
+                aws:SourceAccount:
+                  Ref: AWS::AccountId
+              StringLike:
+                aws:SourceArn:
+                  Fn::Sub: arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/resource/Community-CodeCommit-ApprovalRuleTemplate/*
+      Path: "/community-types/"
       Policies:
         - PolicyName: ResourceTypePolicy
           PolicyDocument:

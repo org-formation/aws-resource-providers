@@ -1,6 +1,6 @@
 {
     "name": "community-codecommit-repositoryassociation",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::CodeCommit::RepositoryAssociation.",
     "private": true,
     "main": "dist/handlers.js",
