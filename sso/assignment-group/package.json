@@ -1,6 +1,6 @@
 {
     "name": "community-sso-assignmentgroup",
-    "version": "0.3.1",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::SSO::AssignmentGroup.",
     "main": "dist/handlers.js",
     "files": [
