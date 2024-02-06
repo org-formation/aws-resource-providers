@@ -130,3 +130,10 @@ export class ResourceModel extends BaseModel {
     }
 }
 
+export class TypeConfigurationModel extends BaseModel {
+    ['constructor']: typeof TypeConfigurationModel;
+
+
+
+}
+

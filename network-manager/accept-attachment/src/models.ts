@@ -47,6 +47,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     id?: Optional<string>;
+    @Expose({ name: 'AttachmentUpdatedAt' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'attachmentUpdatedAt', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    attachmentUpdatedAt?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {

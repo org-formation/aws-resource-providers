@@ -1,6 +1,6 @@
 {
     "name": "community-iam-passwordpolicy",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "description": "CloudFormation Resource Provider for AWS IAM Password Policy",
     "private": true,
     "main": "dist/handlers.js",
