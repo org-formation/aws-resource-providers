@@ -1,6 +1,6 @@
 {
     "name": "community-detective-management",
-    "version": "0.1.1",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::Detective::Management.",
     "private": true,
     "main": "dist/handlers.js",

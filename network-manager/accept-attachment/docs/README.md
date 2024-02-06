@@ -14,6 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#attachmentid" title="AttachmentId">AttachmentId</a>" : <i>String</i>,
         "<a href="#attachmenttype" title="AttachmentType">AttachmentType</a>" : <i>String</i>,
+        "<a href="#attachmentupdatedat" title="AttachmentUpdatedAt">AttachmentUpdatedAt</a>" : <i>String</i>
     }
 }
 </pre>
@@ -25,6 +26,7 @@ Type: Community::NetworkManager::AcceptAttachment
 Properties:
     <a href="#attachmentid" title="AttachmentId">AttachmentId</a>: <i>String</i>
     <a href="#attachmenttype" title="AttachmentType">AttachmentType</a>: <i>String</i>
+    <a href="#attachmentupdatedat" title="AttachmentUpdatedAt">AttachmentUpdatedAt</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -48,6 +50,16 @@ _Required_: Yes
 _Type_: String
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
+#### AttachmentUpdatedAt
+
+The time at which the attachment was updated.
+
+_Required_: No
+
+_Type_: String
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 ## Return Values
 

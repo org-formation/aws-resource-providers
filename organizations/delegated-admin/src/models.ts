@@ -1,5 +1,5 @@
 // This is a generated file. Modifications will be overwritten.
-import { BaseModel, Dict, integer, Integer, Optional, transformValue } from 'cfn-rpdk';
+import { BaseModel, Dict, integer, Integer, Optional, transformValue } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { Exclude, Expose, Type, Transform } from 'class-transformer';
 
 export class ResourceModel extends BaseModel {
@@ -56,5 +56,12 @@ export class ResourceModel extends BaseModel {
         // only return the identifiers if any can be used
         return identifiers.length === 0 ? null : identifiers;
     }
+}
+
+export class TypeConfigurationModel extends BaseModel {
+    ['constructor']: typeof TypeConfigurationModel;
+
+
+
 }
 

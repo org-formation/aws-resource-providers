@@ -1,6 +1,6 @@
 {
     "name": "community-iam-openidconnectprovider",
-    "version": "0.3.0",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::IAM::OpenIDConnectProvider.",
     "main": "dist/handlers.js",
     "files": [
@@ -20,8 +20,8 @@
         "validate": "cfn validate"
     },
     "dependencies": {
-        "aws-resource-providers-common": "^0.2.0",
-        "cfn-rpdk": "npm:@org-formation/cfn-rpdk@^0.4.0",
+        "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",
+        "aws-resource-providers-common": "^0.5.0",
         "class-transformer": "^0.3.1"
     },
     "devDependencies": {

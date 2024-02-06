@@ -39,11 +39,13 @@ _Required_: Yes
 
 _Type_: String
 
+_Pattern_: <code>^https://.*$</code>
+
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 #### ThumbprintList
 
-_Required_: No
+_Required_: Yes
 
 _Type_: List of String
 

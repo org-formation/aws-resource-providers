@@ -1,6 +1,6 @@
 import { Organizations } from 'aws-sdk';
 import { commonAws, HandlerArgs } from 'aws-resource-providers-common';
-import { Action, BaseResource, handlerEvent, exceptions } from 'cfn-rpdk';
+import { Action, BaseResource, handlerEvent, exceptions } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 
 import { ResourceModel } from './models';
 import { DeregisterDelegatedAdministratorRequest, RegisterDelegatedAdministratorRequest } from 'aws-sdk/clients/organizations';

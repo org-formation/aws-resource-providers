@@ -1,6 +1,6 @@
 {
     "name": "community-networkmanager-acceptattachment",
-    "version": "0.1.2",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::NetworkManager::AcceptAttachment.",
     "private": true,
     "main": "dist/handlers.js",

@@ -1,6 +1,6 @@
 {
     "name": "community-cloudformation-typeconfiguration",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "AWS custom resource provider named Community::CloudFormation::TypeConfiguration.",
     "private": true,
     "main": "dist/handlers.js",
