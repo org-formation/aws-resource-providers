@@ -80,7 +80,8 @@
                 "sso:DescribeAccountAssignmentCreationStatus",
                 "sso:ListAccountAssignments",
                 "iam:GetSAMLProvider",
-                "iam:CreateRole"
+                "iam:CreateRole",
+                "iam:ListRolePolicies"
             ]
         },
         "read": {
@@ -95,7 +96,8 @@
                 "sso:DescribeAccountAssignmentDeletionStatus",
                 "sso:ListAccountAssignments",
                 "iam:GetSAMLProvider",
-                "iam:CreateRole"
+                "iam:CreateRole",
+                "iam:ListRolePolicies"
             ]
         },
         "delete": {
