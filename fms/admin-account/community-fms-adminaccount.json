@@ -1,0 +1,44 @@
+{
+    "typeName": "Community::FMS::AdminAccount",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": { },
+    "properties": {
+        "AccountId": {
+            "type": "string"
+        }
+       
+    },
+    "additionalProperties": false,
+    "required": [
+        "AccountId"
+    ],
+    "createOnlyProperties": [
+        "/properties/AccountId"
+    ],
+    "primaryIdentifier": [
+        "/properties/AccountId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "fms:AssociateAdminAccount",
+                "organizations:RegisterDelegatedAdministrator",
+                "organizations:ListDelegatedAdministrators"
+            ]
+        },
+        "read": {
+            "permissions": [
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "fms:DisassociateAdminAccount"
+            ]
+        },
+        "list": {
+            "permissions": [
+            ]
+        }
+    }
+}
