@@ -1,0 +1,74 @@
+{
+    "typeName": "Community::Organizations::InstanceMetadataDefaults",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "properties": {
+        "HttpTokens": {
+            "type": "string",
+            "enum": [
+                "optional",
+                "required",
+                "no-preference"
+            ]
+        },
+        "HttpPutResponseHopLimit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 64
+        },
+        "HttpEndpoint": {
+            "type": "string",
+            "enum": [
+                "enabled",
+                "disabled",
+                "no-preference"
+            ]
+        },
+        "InstanceMetadataTags": {
+            "type": "string",
+            "enum": [
+                "enabled",
+                "disabled",
+                "no-preference"
+            ]
+        },
+        "ResourceId": {
+            "type": "string"
+        }
+
+    },
+    "additionalProperties": false,
+    "readOnlyProperties": [
+        "/properties/ResourceId"
+    ],
+    "primaryIdentifier": [
+        "/properties/ResourceId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ec2:ModifyInstanceMetadataDefaults"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "ec2:ModifyInstanceMetadataDefaults"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ec2:ModifyInstanceMetadataDefaults"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ec2:ModifyInstanceMetadataDefaults"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "ec2:ModifyInstanceMetadataDefaults"
+            ]
+        }
+    }
+}
