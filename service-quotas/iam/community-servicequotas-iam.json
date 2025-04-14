@@ -18,6 +18,12 @@
             "default": 1500,
             "minimum": 1500
         },
+        "ManagedPoliciesPerRole": {
+            "description":"Maximum number of AWS IAM managed policies that you can attach to a role (default = 10).",
+            "type": "integer",
+            "default": 10,
+            "minimum": 10
+        },
         "ResourceId": {
             "type": "string"
         }

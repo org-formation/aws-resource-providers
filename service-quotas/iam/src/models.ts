@@ -29,6 +29,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     customerManagedPolicies?: Optional<integer>;
+    @Expose({ name: 'ManagedPoliciesPerRole' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(Integer, 'managedPoliciesPerRole', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    managedPoliciesPerRole?: Optional<integer>;
     @Expose({ name: 'ResourceId' })
     @Transform(
         (value: any, obj: any) =>
