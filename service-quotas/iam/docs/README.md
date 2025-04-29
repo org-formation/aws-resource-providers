@@ -14,6 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#roles" title="Roles">Roles</a>" : <i>Integer</i>,
         "<a href="#customermanagedpolicies" title="CustomerManagedPolicies">CustomerManagedPolicies</a>" : <i>Integer</i>,
+        "<a href="#managedpoliciesperrole" title="ManagedPoliciesPerRole">ManagedPoliciesPerRole</a>" : <i>Integer</i>,
     }
 }
 </pre>
@@ -25,6 +26,7 @@ Type: Community::ServiceQuotas::IAM
 Properties:
     <a href="#roles" title="Roles">Roles</a>: <i>Integer</i>
     <a href="#customermanagedpolicies" title="CustomerManagedPolicies">CustomerManagedPolicies</a>: <i>Integer</i>
+    <a href="#managedpoliciesperrole" title="ManagedPoliciesPerRole">ManagedPoliciesPerRole</a>: <i>Integer</i>
 </pre>
 
 ## Properties
@@ -42,6 +44,16 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 #### CustomerManagedPolicies
 
 Maximum number of AWS IAM Customer Managed Policies that you can create (default = 1500).
+
+_Required_: No
+
+_Type_: Integer
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### ManagedPoliciesPerRole
+
+Maximum number of AWS IAM managed policies that you can attach to a role (default = 10).
 
 _Required_: No
 

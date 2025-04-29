@@ -18,6 +18,7 @@ const LOGGER = console;
 const quotaCodeForPropertyName: Record<string, QuotaID> = {
     roles: { QuotaCode: 'L-FE177D64', ServiceCode: 'iam' },
     customerManagedPolicies: { QuotaCode: 'L-E95E4862', ServiceCode: 'iam' },
+    managedPoliciesPerRole: { QuotaCode: 'L-0DA4ABF3', ServiceCode: 'iam' },
 };
 
 type CallbackContext = Record<string, any>;
