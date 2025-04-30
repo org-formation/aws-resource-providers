@@ -1,0 +1,73 @@
+{
+    "typeName": "Community::CostExplorer::AnomalyMonitor",
+    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "definitions": {
+    },
+    "properties": {
+        "MonitorName": {
+            "type": "string"
+        },
+        "MonitorType": {
+            "type": "string",
+            "enum": [
+                "DIMENSIONAL",
+                "CUSTOM"
+            ]
+        },
+        "MonitorDimension": {
+            "type": "string",
+            "enum": [
+                "SERVICE"
+            ]
+        },
+        "MonitorSpecification": {
+            "type": "object"
+        },
+        "DimensionalValueCount": {
+            "type": "number"
+        },
+        "Arn": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "MonitorName",
+        "MonitorType",
+        "MonitorDimension"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
+    ],
+    "primaryIdentifier": [
+        "/properties/Arn"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "costExplorer:createAnomalyMonitor"
+            ]
+        },
+        "read": {
+            "permissions": [
+
+            ]
+        },
+        "update": {
+            "permissions": [
+                "costExplorer:updateAnomalyMonitor"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "costExplorer:deleteAnomalyMonitor"
+            ]
+        },
+        "list": {
+            "permissions": [
+
+            ]
+        }
+    }
+}

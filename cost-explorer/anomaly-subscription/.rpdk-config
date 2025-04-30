@@ -1,0 +1,11 @@
+{
+    "typeName": "Community::CostExplorer::AnomalySubscription",
+    "language": "typescript",
+    "runtime": "nodejs12.x",
+    "entrypoint": "dist/handlers.entrypoint",
+    "testEntrypoint": "dist/handlers.testEntrypoint",
+    "settings": {
+        "useDocker": false,
+        "protocolVersion": "2.0.0"
+    }
+}

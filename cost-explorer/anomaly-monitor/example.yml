@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Sample template
+
+Resources:
+  AnomalyMonitor:
+    Type: Community::CostExplorer::AnomalyMonitor
+    Properties:
+      MonitorName: 'test-monitor'
